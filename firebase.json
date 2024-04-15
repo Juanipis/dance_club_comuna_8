@@ -1,0 +1,30 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "dance-club-comuna-8",
+          "appId": "1:94397344533:android:643e8431a8499c8cd5971c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "dance-club-comuna-8",
+          "configurations": {
+            "android": "1:94397344533:android:643e8431a8499c8cd5971c",
+            "web": "1:94397344533:web:8c7ed7c6914faa37d5971c"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

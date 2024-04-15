@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "94397344533",
+    "project_id": "dance-club-comuna-8",
+    "storage_bucket": "dance-club-comuna-8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94397344533:android:643e8431a8499c8cd5971c",
+        "android_client_info": {
+          "package_name": "com.example.dance_club_comuna_8"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC95azX902EjsVms5zCyxy2R7j9V_lcqxM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
