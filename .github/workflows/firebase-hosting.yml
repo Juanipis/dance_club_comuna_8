@@ -27,8 +27,9 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
-          flutter-version: 3.19.5
+          channel: stable
+          flutter-version-file: "../../pubspec.yaml"
+      - run: flutter --version
       - name: 📦 Install Dependencies
         run: |
           flutter pub global activate very_good_cli
