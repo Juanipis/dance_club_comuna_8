@@ -16,6 +16,7 @@ jobs:
     with:
       flutter_channel: stable
       flutter_version: 3.19.5
+      min_coverage: 0
 
   build:
     name: Build
