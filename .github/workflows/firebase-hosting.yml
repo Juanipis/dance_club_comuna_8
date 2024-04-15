@@ -28,7 +28,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.3.8
+          flutter-version: 3.19.5
       - name: 📦 Install Dependencies
         run: |
           flutter pub global activate very_good_cli
