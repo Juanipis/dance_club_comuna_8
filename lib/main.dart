@@ -1,27 +1,39 @@
 import 'package:dance_club_comuna_8/firebase_options.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
+import 'package:dance_club_comuna_8/logic/presentation/screen/test/insert_test.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  final FirestoreService firestoreService = FirestoreService();
+  runApp(MyApp(firestoreService: firestoreService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final FirestoreService firestoreService;
 
-  // This widget is the root of your application.
+  const MyApp({super.key, required this.firestoreService});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Club de danza comuna 8',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<EventBloc>(
+          create: (context) => EventBloc(firestoreService),
+        )
+      ],
+      child: MaterialApp(
+        title: 'Club de danza comuna 8',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -60,6 +72,16 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const InsertEventPage()),
+                );
+              },
+              child: const Text('Agregar Evento'),
             ),
           ],
         ),
