@@ -1,3 +1,5 @@
+import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/auth/auth_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
@@ -16,6 +18,27 @@ class _InsertEventPageState extends State<InsertEventPage> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is Authenticated) {
+          // Usuario autenticado, mostrar formulario
+          return buildEventForm(context);
+        } else {
+          // Usuario no autenticado, mostrar mensaje
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Insertar Evento'),
+            ),
+            body: const Center(
+              child: Text('No tienes permiso para ver este contenido.'),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget buildEventForm(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Insertar Evento'),
