@@ -7,6 +7,7 @@ class Event {
   String address;
   String imageUrl;
   int attendees;
+  int maxAttendees;
 
   Event({
     required this.id,
@@ -17,6 +18,7 @@ class Event {
     required this.address,
     required this.imageUrl,
     required this.attendees,
+    required this.maxAttendees,
   });
 
   Event copyWith({
@@ -28,6 +30,7 @@ class Event {
     String? address,
     String? imageUrl,
     int? attendees,
+    int? maxAttendees,
   }) {
     return Event(
       id: id ?? this.id,
@@ -38,6 +41,7 @@ class Event {
       address: address ?? this.address,
       imageUrl: imageUrl ?? this.imageUrl,
       attendees: attendees ?? this.attendees,
+      maxAttendees: maxAttendees ?? this.maxAttendees,
     );
   }
 }

@@ -21,6 +21,7 @@ class InserEventEvent extends EventEvent {
   final String address;
   final String imageUrl;
   final int attendees;
+  final int maxAttendees;
 
   const InserEventEvent(
       {required this.date,
@@ -29,7 +30,8 @@ class InserEventEvent extends EventEvent {
       required this.instructions,
       required this.address,
       required this.imageUrl,
-      required this.attendees});
+      required this.attendees,
+      required this.maxAttendees});
 
   @override
   List<Object> get props =>
@@ -45,6 +47,7 @@ class UpdateEventEvent extends EventEvent {
   final String address;
   final String imageUrl;
   final int attendees;
+  final int maxAttendees;
 
   const UpdateEventEvent(
       {required this.id,
@@ -54,7 +57,8 @@ class UpdateEventEvent extends EventEvent {
       required this.instructions,
       required this.address,
       required this.imageUrl,
-      required this.attendees});
+      required this.attendees,
+      required this.maxAttendees});
 
   @override
   List<Object> get props => [

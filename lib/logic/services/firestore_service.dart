@@ -21,6 +21,7 @@ class FirestoreService {
           address: data['address'],
           imageUrl: data['imageUrl'],
           attendees: data['attendees'],
+          maxAttendees: data['maxAttendees'],
         );
       }).toList();
     });
@@ -39,6 +40,7 @@ class FirestoreService {
       address: data['address'],
       imageUrl: data['imageUrl'],
       attendees: data['attendees'],
+      maxAttendees: data['maxAttendees'],
     );
   }
 
@@ -49,7 +51,8 @@ class FirestoreService {
       required String instructions,
       required String address,
       required String imageUrl,
-      required int attendees}) {
+      required int attendees,
+      required int maxAttendees}) {
     logger.d('Adding event to firestore');
     return _eventCollection.add({
       'date': date.toString(),
@@ -59,6 +62,7 @@ class FirestoreService {
       'address': address,
       'imageUrl': imageUrl,
       'attendees': attendees,
+      'maxAttendees': maxAttendees,
     });
   }
 
@@ -71,6 +75,7 @@ class FirestoreService {
     String? address,
     String? imageUrl,
     int? attendees,
+    int? maxAttendees,
   }) {
     logger.d('Updating event by $id from firestore');
     return _eventCollection.doc(id).update({
@@ -81,6 +86,7 @@ class FirestoreService {
       if (address != null) 'address': address,
       if (imageUrl != null) 'imageUrl': imageUrl,
       if (attendees != null) 'attendees': attendees,
+      if (maxAttendees != null) 'maxAttendees': maxAttendees,
     });
   }
 

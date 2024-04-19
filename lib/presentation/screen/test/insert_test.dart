@@ -70,6 +70,7 @@ class _InsertEventPageState extends State<InsertEventPage> {
                   address: "Dirección por definir",
                   imageUrl: "",
                   attendees: 1,
+                  maxAttendees: 10,
                 ));
               },
               child: const Text('Guardar Evento'),

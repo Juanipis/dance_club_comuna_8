@@ -28,6 +28,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
           address: eventInfo.address,
           imageUrl: eventInfo.imageUrl,
           attendees: eventInfo.attendees,
+          maxAttendees: eventInfo.maxAttendees,
         );
         emit(EventInsertedState());
       } catch (e) {
@@ -47,6 +48,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
           address: event.address,
           imageUrl: event.imageUrl,
           attendees: event.attendees,
+          maxAttendees: event.maxAttendees,
         );
         emit(EventInsertedState());
       } catch (e) {
