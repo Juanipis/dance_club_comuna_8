@@ -1,6 +1,9 @@
 import 'package:dance_club_comuna_8/firebase_options.dart';
+import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
 import 'package:dance_club_comuna_8/logic/presentation/screen/test/insert_test.dart';
+import 'package:dance_club_comuna_8/logic/presentation/screen/test/login_test.dart';
+import 'package:dance_club_comuna_8/logic/services/auth_service.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,20 +14,26 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final FirestoreService firestoreService = FirestoreService();
-  runApp(MyApp(firestoreService: firestoreService));
+  final AuthService authService = AuthService();
+  runApp(MyApp(firestoreService: firestoreService, authService: authService));
 }
 
 class MyApp extends StatelessWidget {
   final FirestoreService firestoreService;
+  final AuthService authService;
 
-  const MyApp({super.key, required this.firestoreService});
+  const MyApp(
+      {super.key, required this.firestoreService, required this.authService});
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<EventBloc>(
           create: (context) => EventBloc(firestoreService),
-        )
+        ),
+        BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(authService: authService),
+        ),
       ],
       child: MaterialApp(
         title: 'Club de danza comuna 8',
@@ -82,6 +91,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: const Text('Agregar Evento'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginWidget()),
+                );
+              },
+              child: const Text('Iniciar sesión'),
             ),
           ],
         ),

@@ -4,7 +4,7 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 
 class InsertEventPage extends StatefulWidget {
-  const InsertEventPage({Key? key}) : super(key: key);
+  const InsertEventPage({super.key});
 
   @override
   State<InsertEventPage> createState() => _InsertEventPageState();
