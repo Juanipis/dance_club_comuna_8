@@ -1,8 +1,8 @@
 import 'package:dance_club_comuna_8/firebase_options.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
-import 'package:dance_club_comuna_8/logic/presentation/screen/test/insert_test.dart';
-import 'package:dance_club_comuna_8/logic/presentation/screen/test/login_test.dart';
+import 'package:dance_club_comuna_8/presentation/screen/test/insert_test.dart';
+import 'package:dance_club_comuna_8/presentation/screen/test/login_test.dart';
 import 'package:dance_club_comuna_8/logic/services/auth_service.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_service.dart';
 import 'package:firebase_core/firebase_core.dart';
