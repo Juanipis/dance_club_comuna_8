@@ -1,10 +1,15 @@
 import 'package:bloc/bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
-import 'package:dance_club_comuna_8/logic/services/firestore_service.dart';
+import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart';
+import 'package:logger/logger.dart';
 
 class EventBloc extends Bloc<EventEvent, EventState> {
-  final FirestoreService _firestoreService;
+  final FirestoreEventsService _firestoreService;
+  List<Event> allEvents = [];
+
+  Logger logger = Logger();
 
   EventBloc(this._firestoreService) : super(EventLoadingState()) {
     on<LoadEventEventById>((eventInfo, emit) async {
@@ -36,24 +41,71 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       }
     });
 
-    on<UpdateEventEvent>((event, emit) async {
+    on<UpdateEventEvent>((eventInfo, emit) async {
       emit(EventLoadingState());
       try {
         await _firestoreService.updateEvent(
-          id: event.id,
-          date: event.date,
-          title: event.title,
-          description: event.description,
-          instructions: event.instructions,
-          address: event.address,
-          imageUrl: event.imageUrl,
-          attendees: event.attendees,
-          maxAttendees: event.maxAttendees,
+          id: eventInfo.id,
+          date: eventInfo.date,
+          title: eventInfo.title,
+          description: eventInfo.description,
+          instructions: eventInfo.instructions,
+          address: eventInfo.address,
+          imageUrl: eventInfo.imageUrl,
+          attendees: eventInfo.attendees,
+          maxAttendees: eventInfo.maxAttendees,
         );
         emit(EventInsertedState());
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }
     });
+
+    on<LoadUpcomingEventsEvent>((eventInfo, emit) async {
+      logger.d('Loading upcoming events');
+      emit(EventLoadingState());
+      try {
+        DateTime now = DateTime.now();
+        DateTime end = eventInfo.endTime;
+        allEvents = await _firestoreService.getUpcomingEvents(now, end);
+        emit(EventsLoadedState(allEvents));
+      } catch (e) {
+        emit(EventErrorState(message: e.toString()));
+      }
+    });
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  List<Event> filterEventsForToday() {
+    DateTime now = DateTime.now();
+    return allEvents.where((event) => isSameDay(event.date, now)).toList();
+  }
+
+  List<Event> filterEventsForTomorrow() {
+    DateTime now = DateTime.now();
+    DateTime tomorrow =
+        DateTime(now.year, now.month, now.day + 1, 23, 59, 59, 999);
+    return allEvents.where((event) => isSameDay(event.date, tomorrow)).toList();
+  }
+
+  List<Event> filterEventsForThisWeek() {
+    DateTime now = DateTime.now();
+    DateTime endOfWeek = now.add(Duration(days: 7 - now.weekday));
+    endOfWeek = DateTime(
+        endOfWeek.year, endOfWeek.month, endOfWeek.day, 23, 59, 59, 999);
+    return allEvents
+        .where((event) =>
+            event.date.isAfter(now) && event.date.isBefore(endOfWeek))
+        .toList();
+  }
+
+  List<Event> filterUpcomingEvents() {
+    DateTime now = DateTime.now();
+    return allEvents.where((event) => event.date.isAfter(now)).toList();
   }
 }

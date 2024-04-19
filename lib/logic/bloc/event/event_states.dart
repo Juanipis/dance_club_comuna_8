@@ -11,10 +11,19 @@ class EventLoadingState extends EventState {
 class EventLoadedState extends EventState {
   final List<Event> events;
 
-  EventLoadedState({required this.events});
+  EventLoadedState(List<Event> allEvents, {required this.events});
 
   @override
   List<Object> get props => [events];
+}
+
+class EventsLoadedState extends EventState {
+  final List<Event> events;
+
+  EventsLoadedState(this.events);
+
+  @override
+  List<Object?> get props => [events];
 }
 
 class EventErrorState extends EventState {
