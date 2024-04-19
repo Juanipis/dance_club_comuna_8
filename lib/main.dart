@@ -4,7 +4,8 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/insert_test.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/login_test.dart';
 import 'package:dance_club_comuna_8/logic/services/auth_service.dart';
-import 'package:dance_club_comuna_8/logic/services/firestore_service.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart';
+import 'package:dance_club_comuna_8/presentation/screen/test/view_events.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,23 +14,28 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final FirestoreService firestoreService = FirestoreService();
+  final FirestoreEventsService firestoreEventsService =
+      FirestoreEventsService();
   final AuthService authService = AuthService();
-  runApp(MyApp(firestoreService: firestoreService, authService: authService));
+  runApp(MyApp(
+      firestoreEventsService: firestoreEventsService,
+      authService: authService));
 }
 
 class MyApp extends StatelessWidget {
-  final FirestoreService firestoreService;
+  final FirestoreEventsService firestoreEventsService;
   final AuthService authService;
 
   const MyApp(
-      {super.key, required this.firestoreService, required this.authService});
+      {super.key,
+      required this.firestoreEventsService,
+      required this.authService});
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<EventBloc>(
-          create: (context) => EventBloc(firestoreService),
+          create: (context) => EventBloc(firestoreEventsService),
         ),
         BlocProvider<AuthBloc>(
           create: (context) => AuthBloc(authService: authService),
@@ -100,6 +106,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
               child: const Text('Iniciar sesión'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EventNavigationPage()),
+                );
+              },
+              child: const Text('Ver eventos'),
             ),
           ],
         ),

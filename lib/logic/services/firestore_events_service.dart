@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:logger/logger.dart';
 
-class FirestoreService {
+class FirestoreEventsService {
   final logger = Logger();
   final CollectionReference _eventCollection =
       FirebaseFirestore.instance.collection('events');
@@ -44,6 +44,35 @@ class FirestoreService {
     );
   }
 
+  Future<List<Event>> getUpcomingEvents(
+      DateTime startDate, DateTime endDate) async {
+    logger.d('Getting upcoming events from firestore');
+    List<Event> events = [];
+
+    QuerySnapshot querySnapshot = await _eventCollection
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate)
+        .get();
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      events.add(Event(
+        id: doc.id,
+        date: data['date'].toDate(),
+        title: data['title'],
+        description: data['description'],
+        instructions: data['instructions'],
+        address: data['address'],
+        imageUrl: data['imageUrl'],
+        attendees: data['attendees'],
+        maxAttendees: data['maxAttendees'],
+      ));
+    }
+
+    logger.d('Upcoming events: $events');
+    return events;
+  }
+
   Future<void> addEvent(
       {required DateTime date,
       required String title,
@@ -55,7 +84,7 @@ class FirestoreService {
       required int maxAttendees}) {
     logger.d('Adding event to firestore');
     return _eventCollection.add({
-      'date': date.toString(),
+      'date': Timestamp.fromDate(date),
       'title': title,
       'description': description,
       'instructions': instructions,
@@ -79,7 +108,7 @@ class FirestoreService {
   }) {
     logger.d('Updating event by $id from firestore');
     return _eventCollection.doc(id).update({
-      if (date != null) 'date': date.toString(),
+      if (date != null) 'date': Timestamp.fromDate(date),
       if (title != null) 'title': title,
       if (description != null) 'description': description,
       if (instructions != null) 'instructions': instructions,
