@@ -123,4 +123,39 @@ class FirestoreEventsService {
     logger.d('Removing event by $id from firestore');
     return _eventCollection.doc(id).delete();
   }
+
+  Future<bool> registerUser(String eventId, String phoneNumber) async {
+    logger.d('Registering user $phoneNumber to event $eventId');
+    DocumentReference eventDocRef = _eventCollection.doc(eventId);
+    DocumentSnapshot eventDoc = await eventDocRef.get();
+
+    // Check if the document exists
+    if (!eventDoc.exists) {
+      logger.d('Event does not exist.');
+      return false;
+    }
+
+    Map<String, dynamic> eventData = eventDoc.data() as Map<String, dynamic>;
+    if (eventData['attendees'] >= eventData['maxAttendees']) {
+      logger.d('Event is full.');
+      return false;
+    }
+
+    // Check if the user is already registered
+    DocumentSnapshot userDoc =
+        await eventDocRef.collection('registered_users').doc(phoneNumber).get();
+    if (userDoc.exists) {
+      logger.d('User already registered.');
+      return false;
+    }
+
+    // Register the user if not already registered
+    await eventDocRef.collection('registered_users').doc(phoneNumber).set({
+      'phoneNumber': phoneNumber,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+    await eventDocRef.update({'attendees': FieldValue.increment(1)});
+    logger.d('User registered successfully.');
+    return true;
+  }
 }
