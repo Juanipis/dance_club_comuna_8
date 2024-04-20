@@ -73,6 +73,22 @@ class EventBloc extends Bloc<EventEvent, EventState> {
         emit(EventErrorState(message: e.toString()));
       }
     });
+
+    on<RegisterUserEvent>((eventInfo, emit) async {
+      emit(EventLoadingState());
+      try {
+        bool success = await _firestoreService.registerUser(
+            eventInfo.eventId, eventInfo.phoneNumber);
+        if (success) {
+          emit(UserRegisteredState());
+        } else {
+          emit(EventErrorState(
+              message: 'Event is full or user already registered'));
+        }
+      } catch (e) {
+        emit(EventErrorState(message: e.toString()));
+      }
+    });
   }
 
   bool isSameDay(DateTime date1, DateTime date2) {

@@ -52,3 +52,8 @@ class EventInsertedState extends EventState {
   @override
   List<Object?> get props => [succesMessage];
 }
+
+class UserRegisteredState extends EventState {
+  @override
+  List<Object?> get props => [];
+}

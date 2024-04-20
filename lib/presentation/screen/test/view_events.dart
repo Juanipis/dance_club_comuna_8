@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:flutter/material.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,9 +24,17 @@ class EventNavigationPageState extends State<EventNavigationPage> {
         return ListTile(
           title: Text(event.title),
           subtitle: Text("${event.description} - ${event.date} - ${event.id}"),
-          // description and date
-
-          trailing: const Icon(Icons.arrow_forward),
+          trailing: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegisterEvent(eventId: event.id),
+                ),
+              );
+            },
+            child: const Icon(Icons.arrow_forward),
+          ),
         );
       },
     );
@@ -80,6 +89,88 @@ class EventNavigationPageState extends State<EventNavigationPage> {
             label: 'Upcoming',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class RegisterEvent extends StatefulWidget {
+  final String eventId;
+
+  const RegisterEvent({super.key, required this.eventId});
+
+  @override
+  State<StatefulWidget> createState() => _RegisterEventState();
+}
+
+class _RegisterEventState extends State<RegisterEvent> {
+  final TextEditingController phoneNumber = TextEditingController();
+  late EventBloc eventBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    eventBloc = BlocProvider.of<EventBloc>(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<EventBloc, EventState>(
+      listener: (context, state) {
+        if (state is UserRegisteredState) {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Registration Successful'),
+              content: const Text('You have been successfully registered.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        } else if (state is EventErrorState) {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Text('Registration Failed'),
+              content: Text(state.message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Event Details'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text('Registering for event...'),
+              Text('Event ID: ${widget.eventId}'),
+              TextField(
+                controller: phoneNumber,
+                decoration: const InputDecoration(labelText: 'Phone Number'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  eventBloc.add(RegisterUserEvent(
+                      eventId: widget.eventId, phoneNumber: phoneNumber.text));
+                },
+                child: const Text('Register'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
