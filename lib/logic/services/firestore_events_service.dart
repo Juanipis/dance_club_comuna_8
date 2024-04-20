@@ -77,17 +77,22 @@ class FirestoreEventsService {
       required String instructions,
       required String address,
       required String imageUrl,
-      required int maxAttendees}) {
+      required int maxAttendees}) async {
     logger.d('Adding event to firestore');
-    return _eventCollection.add({
-      'date': Timestamp.fromDate(date),
-      'title': title,
-      'description': description,
-      'instructions': instructions,
-      'address': address,
-      'imageUrl': imageUrl,
-      'maxAttendees': maxAttendees,
-    });
+    try {
+      await _eventCollection.add({
+        'date': Timestamp.fromDate(date),
+        'title': title,
+        'description': description,
+        'instructions': instructions,
+        'address': address,
+        'imageUrl': imageUrl,
+        'maxAttendees': maxAttendees,
+      });
+      logger.d('Event added successfully');
+    } catch (e) {
+      logger.e('Error adding event: $e');
+    }
   }
 
   Future<void> updateEvent({
