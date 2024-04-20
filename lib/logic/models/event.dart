@@ -6,7 +6,6 @@ class Event {
   String instructions;
   String address;
   String imageUrl;
-  int attendees;
   int maxAttendees;
 
   Event({
@@ -17,7 +16,6 @@ class Event {
     required this.instructions,
     required this.address,
     required this.imageUrl,
-    required this.attendees,
     required this.maxAttendees,
   });
 
@@ -40,7 +38,6 @@ class Event {
       instructions: instructions ?? this.instructions,
       address: address ?? this.address,
       imageUrl: imageUrl ?? this.imageUrl,
-      attendees: attendees ?? this.attendees,
       maxAttendees: maxAttendees ?? this.maxAttendees,
     );
   }

@@ -69,7 +69,6 @@ class _InsertEventPageState extends State<InsertEventPage> {
                   instructions: "Ninguna",
                   address: "Dirección por definir",
                   imageUrl: "",
-                  attendees: 1,
                   maxAttendees: 10,
                 ));
               },

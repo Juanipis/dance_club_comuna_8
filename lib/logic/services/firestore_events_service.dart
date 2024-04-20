@@ -20,7 +20,6 @@ class FirestoreEventsService {
           instructions: data['instructions'],
           address: data['address'],
           imageUrl: data['imageUrl'],
-          attendees: data['attendees'],
           maxAttendees: data['maxAttendees'],
         );
       }).toList();
@@ -39,7 +38,6 @@ class FirestoreEventsService {
       instructions: data['instructions'],
       address: data['address'],
       imageUrl: data['imageUrl'],
-      attendees: data['attendees'],
       maxAttendees: data['maxAttendees'],
     );
   }
@@ -64,7 +62,6 @@ class FirestoreEventsService {
         instructions: data['instructions'],
         address: data['address'],
         imageUrl: data['imageUrl'],
-        attendees: data['attendees'],
         maxAttendees: data['maxAttendees'],
       ));
     }
@@ -80,7 +77,6 @@ class FirestoreEventsService {
       required String instructions,
       required String address,
       required String imageUrl,
-      required int attendees,
       required int maxAttendees}) {
     logger.d('Adding event to firestore');
     return _eventCollection.add({
@@ -90,7 +86,6 @@ class FirestoreEventsService {
       'instructions': instructions,
       'address': address,
       'imageUrl': imageUrl,
-      'attendees': attendees,
       'maxAttendees': maxAttendees,
     });
   }
@@ -103,7 +98,6 @@ class FirestoreEventsService {
     String? instructions,
     String? address,
     String? imageUrl,
-    int? attendees,
     int? maxAttendees,
   }) {
     logger.d('Updating event by $id from firestore');
@@ -114,7 +108,6 @@ class FirestoreEventsService {
       if (instructions != null) 'instructions': instructions,
       if (address != null) 'address': address,
       if (imageUrl != null) 'imageUrl': imageUrl,
-      if (attendees != null) 'attendees': attendees,
       if (maxAttendees != null) 'maxAttendees': maxAttendees,
     });
   }
@@ -127,35 +120,38 @@ class FirestoreEventsService {
   Future<bool> registerUser(String eventId, String phoneNumber) async {
     logger.d('Registering user $phoneNumber to event $eventId');
     DocumentReference eventDocRef = _eventCollection.doc(eventId);
-    DocumentSnapshot eventDoc = await eventDocRef.get();
+    CollectionReference usersRef = eventDocRef.collection('registered_users');
 
-    // Check if the document exists
+    // Verificar que el evento exista
+    DocumentSnapshot eventDoc = await eventDocRef.get();
     if (!eventDoc.exists) {
       logger.d('Event does not exist.');
       return false;
     }
 
-    Map<String, dynamic> eventData = eventDoc.data() as Map<String, dynamic>;
-    if (eventData['attendees'] >= eventData['maxAttendees']) {
-      logger.d('Event is full.');
+    // Contar el número de asistentes registrados de forma más eficiente
+    try {
+      QuerySnapshot snapshot = await usersRef.get();
+      int currentAttendees = snapshot.docs.length;
+
+      int maxAttendees =
+          (eventDoc.data() as Map<String, dynamic>)['maxAttendees'] as int;
+      if (currentAttendees >= maxAttendees) {
+        logger.d('Event is full.');
+        return false;
+      }
+
+      // Intentar registrar al usuario
+      DocumentReference userDocRef = usersRef.doc(phoneNumber);
+      await userDocRef.set({
+        'phone_number': phoneNumber,
+        'timestamp': FieldValue.serverTimestamp()
+      }, SetOptions(merge: true));
+      logger.d('User registered successfully.');
+      return true;
+    } catch (e) {
+      logger.e('Error during registration: $e');
       return false;
     }
-
-    // Check if the user is already registered
-    DocumentSnapshot userDoc =
-        await eventDocRef.collection('registered_users').doc(phoneNumber).get();
-    if (userDoc.exists) {
-      logger.d('User already registered.');
-      return false;
-    }
-
-    // Register the user if not already registered
-    await eventDocRef.collection('registered_users').doc(phoneNumber).set({
-      'phoneNumber': phoneNumber,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-    await eventDocRef.update({'attendees': FieldValue.increment(1)});
-    logger.d('User registered successfully.');
-    return true;
   }
 }
