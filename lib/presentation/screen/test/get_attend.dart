@@ -62,6 +62,13 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
                             return ListTile(
                               title: Text(attendee.phoneNumber),
                               subtitle: Text('${attendee.timestamp}'),
+                              trailing: GestureDetector(
+                                onTap: () => _showRemoveAttendDialog(
+                                    context,
+                                    _eventIdController.text,
+                                    attendee.phoneNumber),
+                                child: Icon(Icons.delete),
+                              ),
                             );
                           },
                         );
@@ -82,6 +89,35 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
           );
         }
       },
+    );
+  }
+
+  void _showRemoveAttendDialog(
+      BuildContext context, String eventId, String phoneNumber) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Remove Attendee'),
+        content: Text('Enter the phone number of the attendee to remove:'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              BlocProvider.of<EventBloc>(context).add(
+                RemoveAttendeFromEvent(
+                  eventId: eventId,
+                  phoneNumber: phoneNumber,
+                ),
+              );
+              Navigator.pop(context);
+            },
+            child: Text('Remove'),
+          ),
+        ],
+      ),
     );
   }
 }

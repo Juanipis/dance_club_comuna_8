@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 
 class FirestoreEventsService {
@@ -178,5 +179,26 @@ class FirestoreEventsService {
 
     logger.d('Attendees: $attendees');
     return attendees;
+  }
+
+  Future<bool> removeAttendee(String eventId, String phoneNumber) async {
+    logger.d('Removing attendee $phoneNumber from event $eventId');
+    CollectionReference usersRef =
+        _eventCollection.doc(eventId).collection('registered_users');
+    DocumentReference userDocRef = usersRef.doc(phoneNumber);
+
+    try {
+      await userDocRef.delete();
+      logger.d('Attendee removed successfully.');
+      return true;
+    } catch (e) {
+      logger.e('Error removing attendee: $e');
+      // Aquí puedes manejar específicamente el error de autenticación si es necesario
+      if (e is FirebaseAuthException && e.code == 'permission-denied') {
+        logger.e(
+            'Permission Denied: The user is not allowed to perform this operation.');
+      }
+      return false;
+    }
   }
 }

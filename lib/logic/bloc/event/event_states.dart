@@ -82,3 +82,27 @@ class EventAttendeesLoadedState extends EventState {
   @override
   List<Object?> get props => [attendees];
 }
+
+// ----------------- Event Attendees Remove States -----------------
+class EventAttendRemovedState extends EventState {
+  final String message;
+
+  EventAttendRemovedState({this.message = "Asistente eliminado exitosamente"});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EventAttedRemovedErrorState extends EventState {
+  final String message;
+
+  EventAttedRemovedErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EventAttendRemovedLoadingState extends EventState {
+  @override
+  List<Object?> get props => [];
+}

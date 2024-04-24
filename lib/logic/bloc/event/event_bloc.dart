@@ -98,6 +98,18 @@ class EventBloc extends Bloc<EventEvent, EventState> {
         emit(EventAttendeesErrorState(message: e.toString()));
       }
     });
+
+    on<RemoveAttendeFromEvent>((eventInfo, emit) async {
+      logger.d('Removing attendee');
+      emit(EventAttendRemovedLoadingState());
+      try {
+        await _firestoreService.removeAttendee(
+            eventInfo.eventId, eventInfo.phoneNumber);
+        emit(EventInsertedState(succesMessage: 'User removed successfully'));
+      } catch (e) {
+        emit(EventErrorState(message: e.toString()));
+      }
+    });
   }
 
   bool isSameDay(DateTime date1, DateTime date2) {
