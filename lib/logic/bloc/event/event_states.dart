@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class EventState extends Equatable {}
@@ -56,4 +57,28 @@ class EventInsertedState extends EventState {
 class UserRegisteredState extends EventState {
   @override
   List<Object?> get props => [];
+}
+
+// ----------------- Event Attendees -----------------
+class EventAttendeesLoadingState extends EventState {
+  @override
+  List<Object> get props => [];
+}
+
+class EventAttendeesErrorState extends EventState {
+  final String message;
+
+  EventAttendeesErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EventAttendeesLoadedState extends EventState {
+  final List<EventAttend> attendees;
+
+  EventAttendeesLoadedState(this.attendees);
+
+  @override
+  List<Object?> get props => [attendees];
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
 import 'package:logger/logger.dart';
 
 class FirestoreEventsService {
@@ -158,5 +159,24 @@ class FirestoreEventsService {
       logger.e('Error during registration: $e');
       return false;
     }
+  }
+
+  Future<List<EventAttend>> getEventAttendees(String eventId) async {
+    logger.d('Getting attendees for event $eventId');
+    List<EventAttend> attendees = [];
+    CollectionReference usersRef =
+        _eventCollection.doc(eventId).collection('registered_users');
+
+    QuerySnapshot querySnapshot = await usersRef.get();
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      attendees.add(EventAttend(
+        phoneNumber: doc.id,
+        timestamp: (data['timestamp'] as Timestamp).toDate(),
+      ));
+    }
+
+    logger.d('Attendees: $attendees');
+    return attendees;
   }
 }

@@ -87,6 +87,17 @@ class EventBloc extends Bloc<EventEvent, EventState> {
         emit(EventErrorState(message: e.toString()));
       }
     });
+
+    on<LoadEventAttendeesEvent>((eventInfo, emit) async {
+      emit(EventAttendeesLoadingState());
+      try {
+        final attendees =
+            await _firestoreService.getEventAttendees(eventInfo.eventId);
+        emit(EventAttendeesLoadedState(attendees));
+      } catch (e) {
+        emit(EventAttendeesErrorState(message: e.toString()));
+      }
+    });
   }
 
   bool isSameDay(DateTime date1, DateTime date2) {

@@ -86,3 +86,13 @@ class RegisterUserEvent extends EventEvent {
   @override
   List<Object?> get props => [eventId, phoneNumber];
 }
+
+// For event attendees
+class LoadEventAttendeesEvent extends EventEvent {
+  final String eventId;
+
+  const LoadEventAttendeesEvent({required this.eventId});
+
+  @override
+  List<Object?> get props => [eventId];
+}
