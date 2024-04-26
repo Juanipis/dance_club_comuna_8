@@ -43,7 +43,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
     on<UpdateEventEvent>((eventInfo, emit) async {
       emit(EventLoadingState());
       try {
-        await _firestoreService.updateEvent(
+        bool isUpdated = await _firestoreService.updateEvent(
           id: eventInfo.id,
           date: eventInfo.date,
           title: eventInfo.title,
@@ -53,7 +53,11 @@ class EventBloc extends Bloc<EventEvent, EventState> {
           imageUrl: eventInfo.imageUrl,
           maxAttendees: eventInfo.maxAttendees,
         );
-        emit(EventInsertedState());
+        if (isUpdated) {
+          emit(EventInsertedState());
+        } else {
+          emit(EventErrorState(message: 'Event not updated'));
+        }
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }

@@ -97,7 +97,7 @@ class FirestoreEventsService {
     }
   }
 
-  Future<void> updateEvent({
+  Future<bool> updateEvent({
     required String id,
     DateTime? date,
     String? title,
@@ -106,17 +106,25 @@ class FirestoreEventsService {
     String? address,
     String? imageUrl,
     int? maxAttendees,
-  }) {
+  }) async {
     logger.d('Updating event by $id from firestore');
-    return _eventCollection.doc(id).update({
-      if (date != null) 'date': Timestamp.fromDate(date),
-      if (title != null) 'title': title,
-      if (description != null) 'description': description,
-      if (instructions != null) 'instructions': instructions,
-      if (address != null) 'address': address,
-      if (imageUrl != null) 'imageUrl': imageUrl,
-      if (maxAttendees != null) 'maxAttendees': maxAttendees,
-    });
+    try {
+      Map<String, dynamic> data = {};
+      if (date != null) data['date'] = Timestamp.fromDate(date);
+      if (title != null) data['title'] = title;
+      if (description != null) data['description'] = description;
+      if (instructions != null) data['instructions'] = instructions;
+      if (address != null) data['address'] = address;
+      if (imageUrl != null) data['imageUrl'] = imageUrl;
+      if (maxAttendees != null) data['maxAttendees'] = maxAttendees;
+
+      await _eventCollection.doc(id).update(data);
+      logger.d('Event updated successfully');
+      return true;
+    } catch (e) {
+      logger.e('Error updating event: $e');
+      return false;
+    }
   }
 
   Future<void> removeEvent(String id) {

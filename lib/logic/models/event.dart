@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Event {
   String id;
   DateTime date;
@@ -40,5 +42,17 @@ class Event {
       imageUrl: imageUrl ?? this.imageUrl,
       maxAttendees: maxAttendees ?? this.maxAttendees,
     );
+  }
+
+  Map<String, dynamic> toJsonNoId() {
+    return {
+      'date': Timestamp.now(),
+      'title': title,
+      'description': description,
+      'instructions': instructions,
+      'address': address,
+      'imageUrl': imageUrl,
+      'maxAttendees': maxAttendees,
+    };
   }
 }
