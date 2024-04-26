@@ -97,7 +97,7 @@ class FirestoreEventsService {
     }
   }
 
-  Future<bool> updateEvent({
+  Future<(bool, String)> updateEvent({
     required String id,
     DateTime? date,
     String? title,
@@ -108,6 +108,30 @@ class FirestoreEventsService {
     int? maxAttendees,
   }) async {
     logger.d('Updating event by $id from firestore');
+
+    // Verificar que el evento exista
+    DocumentSnapshot doc = await _eventCollection.doc(id).get();
+    if (!doc.exists) {
+      logger.d('Event does not exist.');
+      return (false, 'Event does not exist.');
+    }
+
+    // Verificar la capacidad máxima de asistentes
+    // Si el número de asistentes registrados es mayor a la nueva capacidad máxima, no se permite la actualización
+    if (maxAttendees != null) {
+      CollectionReference usersRef =
+          _eventCollection.doc(id).collection('registered_users');
+      QuerySnapshot snapshot = await usersRef.get();
+      int currentAttendees = snapshot.docs.length;
+      if (currentAttendees > maxAttendees) {
+        logger.d(
+            'Cannot update max attendees: There are already $currentAttendees attendees.');
+        return (
+          false,
+          'Cannot update max attendees: There are already $currentAttendees attendees.'
+        );
+      }
+    }
     try {
       Map<String, dynamic> data = {};
       if (date != null) data['date'] = Timestamp.fromDate(date);
@@ -120,10 +144,10 @@ class FirestoreEventsService {
 
       await _eventCollection.doc(id).update(data);
       logger.d('Event updated successfully');
-      return true;
+      return (true, '');
     } catch (e) {
       logger.e('Error updating event: $e');
-      return false;
+      return (false, e.toString());
     }
   }
 

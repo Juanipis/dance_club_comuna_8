@@ -51,7 +51,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
       body: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: _eventIdController,
               decoration: InputDecoration(
@@ -80,7 +80,6 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
               } else if (state is LoadEventByIdState) {
                 final event = state.event;
                 // set the text controllers
-                _eventIdController.text = event.id;
                 eventTitleController.text = event.title;
                 eventDescriptionController.text = event.description;
                 eventInstructionsController.text = event.instructions;
@@ -88,18 +87,46 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                 eventImageUrlController.text = event.imageUrl;
                 eventMaxAttendeesController.text =
                     event.maxAttendees.toString();
+                DateTime selectedDate = event.date;
+                TimeOfDay selectedTime = TimeOfDay.fromDateTime(event.date);
+
+                Future<void> selectDate(BuildContext context) async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate:
+                        selectedDate, // event.date is the current event DateTime
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (picked != null && picked != selectedDate) {
+                    setState(() {
+                      selectedDate = picked;
+                    });
+                  }
+                }
+
+                Future<void> selectTime(BuildContext context) async {
+                  final TimeOfDay? picked = await showTimePicker(
+                    context: context,
+                    initialTime: selectedTime, // Use current event time
+                  );
+                  if (picked != null && picked != selectedTime) {
+                    setState(() {
+                      selectedTime = picked;
+                    });
+                  }
+                }
+
                 // event.date is the DateTime of the event
                 return Column(
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: _eventIdController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event ID',
-                          enabled: false,
-                        ),
-                      ),
+                      child: Text('Event ID: ${event.id}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          )),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -155,13 +182,48 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                         ),
                       ),
                     ),
+
+                    // Display selected date
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => selectDate(context),
+                          child: const Text('Select Date'),
+                        ),
+                        Text(
+                            'Selected date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
+                      ],
+                    ),
+
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => selectTime(context),
+                          child: Text('Select Time'),
+                        ),
+
+                        // Display selected time
+
+                        Text('Selected time: ${selectedTime.format(context)}'),
+                      ],
+                    ),
+
+                    // only show the date, dd/mm/yyyy
+
                     ElevatedButton(
                       onPressed: () {
                         final eventBloc = BlocProvider.of<EventBloc>(context);
+                        DateTime eventDateTime = DateTime(
+                          selectedDate.year,
+                          selectedDate.month,
+                          selectedDate.day,
+                          selectedTime.hour,
+                          selectedTime.minute,
+                        );
 
                         eventBloc.add(UpdateEventEvent(
-                          id: _eventIdController.text,
-                          date: DateTime.now(),
+                          id: event.id,
+                          date: eventDateTime,
                           title: eventTitleController.text,
                           description: eventDescriptionController.text,
                           instructions: eventInstructionsController.text,
