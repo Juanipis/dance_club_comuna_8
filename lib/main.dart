@@ -1,10 +1,12 @@
 import 'package:dance_club_comuna_8/firebase_options.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
+import 'package:dance_club_comuna_8/presentation/screen/test/get_attend.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/insert_test.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/login_test.dart';
 import 'package:dance_club_comuna_8/logic/services/auth_service.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart';
+import 'package:dance_club_comuna_8/presentation/screen/test/update_event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/view_events.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -117,6 +119,22 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: const Text('Ver eventos'),
             ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EventAttendeesWidget()));
+                },
+                child: const Text('Ver asistentes')),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const UpdateEventPage()));
+                },
+                child: const Text('Actualizar evento')),
           ],
         ),
       ),

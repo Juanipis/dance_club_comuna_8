@@ -43,7 +43,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
     on<UpdateEventEvent>((eventInfo, emit) async {
       emit(EventLoadingState());
       try {
-        await _firestoreService.updateEvent(
+        var (isUpdated, errorIndex) = await _firestoreService.updateEvent(
           id: eventInfo.id,
           date: eventInfo.date,
           title: eventInfo.title,
@@ -53,7 +53,15 @@ class EventBloc extends Bloc<EventEvent, EventState> {
           imageUrl: eventInfo.imageUrl,
           maxAttendees: eventInfo.maxAttendees,
         );
-        emit(EventInsertedState());
+        if (isUpdated && errorIndex == 0) {
+          emit(EventUpdatedState());
+        } else if (errorIndex == 1) {
+          emit(EventDosentExistState());
+        } else if (errorIndex == 2) {
+          emit(EventCannotUpdateMaxAttendeesState());
+        } else {
+          emit(EventErrorState(message: 'Error updating event'));
+        }
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }
@@ -83,6 +91,29 @@ class EventBloc extends Bloc<EventEvent, EventState> {
           emit(EventErrorState(
               message: 'Event is full or user already registered'));
         }
+      } catch (e) {
+        emit(EventErrorState(message: e.toString()));
+      }
+    });
+
+    on<LoadEventAttendeesEvent>((eventInfo, emit) async {
+      emit(EventAttendeesLoadingState());
+      try {
+        final attendees =
+            await _firestoreService.getEventAttendees(eventInfo.eventId);
+        emit(EventAttendeesLoadedState(attendees));
+      } catch (e) {
+        emit(EventAttendeesErrorState(message: e.toString()));
+      }
+    });
+
+    on<RemoveAttendeFromEvent>((eventInfo, emit) async {
+      logger.d('Removing attendee');
+      emit(EventAttendRemovedLoadingState());
+      try {
+        await _firestoreService.removeAttendee(
+            eventInfo.eventId, eventInfo.phoneNumber);
+        emit(EventInsertedState(succesMessage: 'User removed successfully'));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }

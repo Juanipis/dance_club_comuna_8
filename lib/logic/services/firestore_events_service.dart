@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 
 class FirestoreEventsService {
@@ -95,7 +97,7 @@ class FirestoreEventsService {
     }
   }
 
-  Future<void> updateEvent({
+  Future<(bool, int)> updateEvent({
     required String id,
     DateTime? date,
     String? title,
@@ -104,17 +106,51 @@ class FirestoreEventsService {
     String? address,
     String? imageUrl,
     int? maxAttendees,
-  }) {
+  }) async {
     logger.d('Updating event by $id from firestore');
-    return _eventCollection.doc(id).update({
-      if (date != null) 'date': Timestamp.fromDate(date),
-      if (title != null) 'title': title,
-      if (description != null) 'description': description,
-      if (instructions != null) 'instructions': instructions,
-      if (address != null) 'address': address,
-      if (imageUrl != null) 'imageUrl': imageUrl,
-      if (maxAttendees != null) 'maxAttendees': maxAttendees,
-    });
+    // Error int instruction
+    // 0: Event successfully updated
+    // 1: Event does not exist
+    // 2: Cannot update max attendees: There are already $currentAttendees attendees.
+    // 3: Error updating event: $e
+
+    // Verificar que el evento exista
+    DocumentSnapshot doc = await _eventCollection.doc(id).get();
+    if (!doc.exists) {
+      logger.d('Event does not exist.');
+      return (false, 1);
+    }
+
+    // Verificar la capacidad máxima de asistentes
+    // Si el número de asistentes registrados es mayor a la nueva capacidad máxima, no se permite la actualización
+    if (maxAttendees != null) {
+      CollectionReference usersRef =
+          _eventCollection.doc(id).collection('registered_users');
+      QuerySnapshot snapshot = await usersRef.get();
+      int currentAttendees = snapshot.docs.length;
+      if (currentAttendees > maxAttendees) {
+        logger.d(
+            'Cannot update max attendees: There are already $currentAttendees attendees.');
+        return (false, 2);
+      }
+    }
+    try {
+      Map<String, dynamic> data = {};
+      if (date != null) data['date'] = Timestamp.fromDate(date);
+      if (title != null) data['title'] = title;
+      if (description != null) data['description'] = description;
+      if (instructions != null) data['instructions'] = instructions;
+      if (address != null) data['address'] = address;
+      if (imageUrl != null) data['imageUrl'] = imageUrl;
+      if (maxAttendees != null) data['maxAttendees'] = maxAttendees;
+
+      await _eventCollection.doc(id).update(data);
+      logger.d('Event updated successfully');
+      return (true, 0);
+    } catch (e) {
+      logger.e('Error updating event: $e');
+      return (false, 3);
+    }
   }
 
   Future<void> removeEvent(String id) {
@@ -156,6 +192,46 @@ class FirestoreEventsService {
       return true;
     } catch (e) {
       logger.e('Error during registration: $e');
+      return false;
+    }
+  }
+
+  Future<List<EventAttend>> getEventAttendees(String eventId) async {
+    logger.d('Getting attendees for event $eventId');
+    List<EventAttend> attendees = [];
+    CollectionReference usersRef =
+        _eventCollection.doc(eventId).collection('registered_users');
+
+    QuerySnapshot querySnapshot = await usersRef.get();
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      attendees.add(EventAttend(
+        phoneNumber: doc.id,
+        timestamp: (data['timestamp'] as Timestamp).toDate(),
+      ));
+    }
+
+    logger.d('Attendees: $attendees');
+    return attendees;
+  }
+
+  Future<bool> removeAttendee(String eventId, String phoneNumber) async {
+    logger.d('Removing attendee $phoneNumber from event $eventId');
+    CollectionReference usersRef =
+        _eventCollection.doc(eventId).collection('registered_users');
+    DocumentReference userDocRef = usersRef.doc(phoneNumber);
+
+    try {
+      await userDocRef.delete();
+      logger.d('Attendee removed successfully.');
+      return true;
+    } catch (e) {
+      logger.e('Error removing attendee: $e');
+      // Aquí puedes manejar específicamente el error de autenticación si es necesario
+      if (e is FirebaseAuthException && e.code == 'permission-denied') {
+        logger.e(
+            'Permission Denied: The user is not allowed to perform this operation.');
+      }
       return false;
     }
   }
