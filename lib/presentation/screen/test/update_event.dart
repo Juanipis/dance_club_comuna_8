@@ -219,7 +219,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                       children: [
                         ElevatedButton(
                           onPressed: () => selectTime(context),
-                          child: Text('Select Time'),
+                          child: const Text('Select Time'),
                         ),
 
                         // Display selected time

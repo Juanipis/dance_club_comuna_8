@@ -7,7 +7,7 @@ import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_states.dart';
 
 class EventAttendeesWidget extends StatefulWidget {
-  EventAttendeesWidget({Key? key}) : super(key: key);
+  const EventAttendeesWidget({super.key});
 
   @override
   _EventAttendeesWidgetState createState() => _EventAttendeesWidgetState();
@@ -22,17 +22,17 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
       builder: (context, authState) {
         if (authState is Authenticated) {
           return Scaffold(
-            appBar: AppBar(title: Text("Event Attendees")),
+            appBar: AppBar(title: const Text("Event Attendees")),
             body: Column(
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: TextField(
                     controller: _eventIdController,
                     decoration: InputDecoration(
                       labelText: 'Enter Event ID',
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.search),
+                        icon: const Icon(Icons.search),
                         onPressed: () =>
                             BlocProvider.of<EventBloc>(context).add(
                           LoadEventAttendeesEvent(
@@ -53,7 +53,7 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
                     },
                     builder: (context, state) {
                       if (state is EventAttendeesLoadingState) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (state is EventAttendeesLoadedState) {
                         return ListView.builder(
                           itemCount: state.attendees.length,
@@ -67,13 +67,13 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
                                     context,
                                     _eventIdController.text,
                                     attendee.phoneNumber),
-                                child: Icon(Icons.delete),
+                                child: const Icon(Icons.delete),
                               ),
                             );
                           },
                         );
                       } else {
-                        return Center(
+                        return const Center(
                             child: Text('Enter an event ID to start.'));
                       }
                     },
@@ -83,7 +83,7 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
             ),
           );
         } else {
-          return Scaffold(
+          return const Scaffold(
             body:
                 Center(child: Text('You must be logged in to view this page.')),
           );
@@ -97,12 +97,12 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Remove Attendee'),
-        content: Text('Enter the phone number of the attendee to remove:'),
+        title: const Text('Remove Attendee'),
+        content: const Text('Enter the phone number of the attendee to remove:'),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -114,7 +114,7 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
               );
               Navigator.pop(context);
             },
-            child: Text('Remove'),
+            child: const Text('Remove'),
           ),
         ],
       ),

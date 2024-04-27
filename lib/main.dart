@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => EventAttendeesWidget()));
+                          builder: (context) => const EventAttendeesWidget()));
                 },
                 child: const Text('Ver asistentes')),
             ElevatedButton(
