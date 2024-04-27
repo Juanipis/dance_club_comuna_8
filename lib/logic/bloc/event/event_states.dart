@@ -106,3 +106,42 @@ class EventAttendRemovedLoadingState extends EventState {
   @override
   List<Object?> get props => [];
 }
+
+// --- Event Update States
+
+class EventUpdatedState extends EventState {
+  final String message = "Evento actualizado exitosamente";
+
+  EventUpdatedState();
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EventDosentExistState extends EventState {
+  final String message = "El evento no existe";
+
+  EventDosentExistState();
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EventCannotUpdateMaxAttendeesState extends EventState {
+  final String message =
+      "No se puede actualizar el número máximo de asistentes, ya que la cantidad de asistentes actuales es mayor a la nueva capacidad máxima, si desea actualizar la capacidad máxima, elimine asistentes primero.";
+
+  EventCannotUpdateMaxAttendeesState();
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EventUpdateErrorState extends EventState {
+  final String message;
+
+  EventUpdateErrorState({required this.message});
+
+  @override
+  List<Object?> get props => [message];
+}

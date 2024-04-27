@@ -17,7 +17,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-      if (state is Authenticated || true) {
+      if (state is Authenticated) {
         return buildUpdateEventForm(context);
       } else {
         return Scaffold(
@@ -70,7 +70,27 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
             listener: (BuildContext context, EventState state) {
               if (state is EventErrorState) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: ${state.message}')),
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+              if (state is EventUpdatedState) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+              if (state is EventDosentExistState) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+              if (state is EventCannotUpdateMaxAttendeesState) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
+                );
+              }
+              if (state is EventUpdateErrorState) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.message)),
                 );
               }
             },
