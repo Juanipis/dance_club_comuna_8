@@ -15,3 +15,9 @@ class AuthError extends AuthState {
 
   AuthError(this.message);
 }
+
+class NotAuthenticated extends AuthState {
+  final String message = 'No tienes permiso para ver este contenido.';
+
+  NotAuthenticated();
+}

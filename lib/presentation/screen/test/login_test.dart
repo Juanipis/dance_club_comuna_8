@@ -12,6 +12,37 @@ class LoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is Authenticated) {
+          // Usuario autenticado,  Mostrar información
+          return Scaffold(
+            appBar: AppBar(title: const Text("Login")),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text('You are already logged in!'),
+                  ElevatedButton(
+                    onPressed: () {
+                      BlocProvider.of<AuthBloc>(context)
+                          .add(SignOutRequested());
+                    },
+                    child: const Text('Logout'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          // Usuario no autenticado, permitir login
+          return buildUpdateEventForm(context);
+        }
+      },
+    );
+  }
+
+  Widget buildUpdateEventForm(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Login")),
       body: BlocListener<AuthBloc, AuthState>(
