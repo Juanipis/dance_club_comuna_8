@@ -85,6 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: const Text('Agregar Evento'),
             ),
+            Text("Hola"),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
