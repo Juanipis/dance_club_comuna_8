@@ -98,7 +98,8 @@ class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Remove Attendee'),
-        content: const Text('Enter the phone number of the attendee to remove:'),
+        content:
+            const Text('Enter the phone number of the attendee to remove:'),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context),
