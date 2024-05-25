@@ -5,6 +5,7 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 class UpdateEventPage extends StatefulWidget {
   const UpdateEventPage({super.key});
@@ -14,6 +15,21 @@ class UpdateEventPage extends StatefulWidget {
 }
 
 class _UpdateEventPageState extends State<UpdateEventPage> {
+  final TextEditingController _eventIdController = TextEditingController();
+  final TextEditingController eventTitleController = TextEditingController();
+  final TextEditingController eventDescriptionController =
+      TextEditingController();
+  final TextEditingController eventInstructionsController =
+      TextEditingController();
+  final TextEditingController eventAddressController = TextEditingController();
+  final TextEditingController eventImageUrlController = TextEditingController();
+  final TextEditingController eventMaxAttendeesController =
+      TextEditingController();
+  late DateTime selectedDate;
+  final TextEditingController eventDateController = TextEditingController();
+  final TextEditingController eventTimeController = TextEditingController();
+  Logger logg = Logger();
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
@@ -31,17 +47,6 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
       }
     });
   }
-
-  final TextEditingController _eventIdController = TextEditingController();
-  final TextEditingController eventTitleController = TextEditingController();
-  final TextEditingController eventDescriptionController =
-      TextEditingController();
-  final TextEditingController eventInstructionsController =
-      TextEditingController();
-  final TextEditingController eventAddressController = TextEditingController();
-  final TextEditingController eventImageUrlController = TextEditingController();
-  final TextEditingController eventMaxAttendeesController =
-      TextEditingController();
 
   Widget buildUpdateEventForm(BuildContext context) {
     return Scaffold(
@@ -107,10 +112,11 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                 eventImageUrlController.text = event.imageUrl;
                 eventMaxAttendeesController.text =
                     event.maxAttendees.toString();
-                DateTime selectedDate = event.date;
+                selectedDate = event.date;
+
                 TimeOfDay selectedTime = TimeOfDay.fromDateTime(event.date);
 
-                Future<void> selectDate(BuildContext context) async {
+                Future<DateTime> selectDate(BuildContext context) async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
                     initialDate:
@@ -118,144 +124,194 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2100),
                   );
-                  if (picked != null && picked != selectedDate) {
-                    setState(() {
-                      selectedDate = picked;
-                    });
+                  if (picked != null) {
+                    return picked;
+                  } else {
+                    return selectedDate;
                   }
                 }
 
-                Future<void> selectTime(BuildContext context) async {
+                Future<TimeOfDay> selectTime(BuildContext context) async {
                   final TimeOfDay? picked = await showTimePicker(
                     context: context,
                     initialTime: selectedTime, // Use current event time
                   );
-                  if (picked != null && picked != selectedTime) {
-                    setState(() {
-                      selectedTime = picked;
-                    });
+                  if (picked != null) {
+                    return picked;
+                  } else {
+                    return selectedTime;
                   }
                 }
 
                 // event.date is the DateTime of the event
-                return Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Event ID: ${event.id}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          )),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: eventTitleController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event Title',
+                return SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Event ID: ${event.id}',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            )),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: eventTitleController,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Event Title',
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: eventDescriptionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event Description',
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: eventDescriptionController,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Event Description',
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: eventInstructionsController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event Instructions',
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: eventInstructionsController,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Event Instructions',
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: eventAddressController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event Address',
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: eventAddressController,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Event Address',
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: eventImageUrlController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event Image URL',
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: eventImageUrlController,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Event Image URL',
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: eventMaxAttendeesController,
-                        decoration: const InputDecoration(
-                          labelText: 'Enter Event Max Attendees',
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          controller: eventMaxAttendeesController,
+                          decoration: const InputDecoration(
+                            labelText: 'Enter Event Max Attendees',
+                          ),
                         ),
                       ),
-                    ),
 
-                    // Display selected date
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => selectDate(context),
-                          child: const Text('Select Date'),
-                        ),
-                        Text(
-                            'Selected date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'),
-                      ],
-                    ),
+                      // Display selected date
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => {
+                              selectDate(context).then((value) {
+                                setState(() {
+                                  selectedDate = value;
+                                  // set the eventDateController to the selected date formatted like dd/mm/yyyy
+                                  eventDateController.text = selectedDate
+                                      .toIso8601String()
+                                      .substring(0, 10);
+                                  logg.i('Selected date: $selectedDate');
+                                });
+                              })
+                            },
+                            child: const Text('Select Date'),
+                          ),
+                          Text('New date: ${eventDateController.text}'),
+                        ],
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              'Previous date: ${selectedDate.toIso8601String().substring(0, 10)}')),
 
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => selectTime(context),
-                          child: const Text('Select Time'),
-                        ),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () =>
+                                selectTime(context).then((value) => {
+                                      setState(() {
+                                        selectedTime = value;
+                                        // format on 24 hour time;
+                                        eventTimeController.text =
+                                            selectedTime.format(context);
+                                      })
+                                    }),
+                            child: const Text('Select Time'),
+                          ),
 
-                        // Display selected time
+                          // Display selected time
 
-                        Text('Selected time: ${selectedTime.format(context)}'),
-                      ],
-                    ),
+                          Text('Selected time: ${eventTimeController.text}'),
+                        ],
+                      ),
 
-                    // only show the date, dd/mm/yyyy
+                      Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              'Previous time: ${selectedTime.format(context)}')),
 
-                    ElevatedButton(
-                      onPressed: () {
-                        final eventBloc = BlocProvider.of<EventBloc>(context);
-                        DateTime eventDateTime = DateTime(
-                          selectedDate.year,
-                          selectedDate.month,
-                          selectedDate.day,
-                          selectedTime.hour,
-                          selectedTime.minute,
-                        );
+                      // only show the date, dd/mm/yyyy
 
-                        eventBloc.add(UpdateEventEvent(
-                          id: event.id,
-                          date: eventDateTime,
-                          title: eventTitleController.text,
-                          description: eventDescriptionController.text,
-                          instructions: eventInstructionsController.text,
-                          address: eventAddressController.text,
-                          imageUrl: eventImageUrlController.text,
-                          maxAttendees:
-                              int.parse(eventMaxAttendeesController.text),
-                        ));
-                      },
-                      child: const Text('Update Event'),
-                    ),
-                  ],
+                      ElevatedButton(
+                        onPressed: () {
+                          final eventBloc = BlocProvider.of<EventBloc>(context);
+                          // convert the eventDateController to a DateTime
+
+                          DateTime eventDate = event.date;
+                          if (eventDateController.text.isNotEmpty) {
+                            eventDate =
+                                DateTime.parse(eventDateController.text);
+                          }
+
+                          TimeOfDay eventTime = selectedTime;
+                          if (eventTimeController.text.isNotEmpty) {
+                            List<String> time =
+                                eventTimeController.text.split(' ');
+                            List<String> hourMinute = time[0].split(':');
+                            int hour = int.parse(hourMinute[0]);
+                            int minute = int.parse(hourMinute[1]);
+                            if (time[1] == 'PM') {
+                              hour += 12;
+                            }
+                            eventTime = TimeOfDay(hour: hour, minute: minute);
+                          }
+
+                          DateTime eventDateTime = DateTime(
+                            eventDate.year,
+                            eventDate.month,
+                            eventDate.day,
+                            eventTime.hour,
+                            eventTime.minute,
+                          );
+
+                          eventBloc.add(UpdateEventEvent(
+                            id: event.id,
+                            date: eventDateTime,
+                            title: eventTitleController.text,
+                            description: eventDescriptionController.text,
+                            instructions: eventInstructionsController.text,
+                            address: eventAddressController.text,
+                            imageUrl: eventImageUrlController.text,
+                            maxAttendees:
+                                int.parse(eventMaxAttendeesController.text),
+                          ));
+                        },
+                        child: const Text('Update Event'),
+                      ),
+                    ],
+                  ),
                 );
               } else if (state is EventInsertedState) {
                 return const Center(
