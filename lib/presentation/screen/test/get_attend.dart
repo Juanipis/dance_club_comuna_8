@@ -10,7 +10,7 @@ class EventAttendeesWidget extends StatefulWidget {
   const EventAttendeesWidget({super.key});
 
   @override
-  _EventAttendeesWidgetState createState() => _EventAttendeesWidgetState();
+  State<StatefulWidget> createState() => _EventAttendeesWidgetState();
 }
 
 class _EventAttendeesWidgetState extends State<EventAttendeesWidget> {
