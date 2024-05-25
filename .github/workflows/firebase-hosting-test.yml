@@ -16,9 +16,6 @@ jobs:
     with:
       flutter_channel: stable
       flutter_version: 3.19.5
-      min_coverage: 0
-      test_optimization: false
-      coverage_excludes: true
 
   build:
     name: Build
