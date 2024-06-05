@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "name": "Flutter (Chrome) devcontainer",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "request": "launch",
+      "args": [
+        "--web-port",
+        "3000",
+        "--web-hostname",
+        "0.0.0.0"
+      ],
+      "type": "dart"
+    }
+  ]
+}
