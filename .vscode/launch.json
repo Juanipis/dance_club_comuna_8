@@ -8,8 +8,6 @@
       "args": [
         "--web-port",
         "3000",
-        "--web-hostname",
-        "0.0.0.0"
       ],
       "type": "dart"
     }
