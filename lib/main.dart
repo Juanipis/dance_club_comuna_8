@@ -1,6 +1,11 @@
 import 'package:dance_club_comuna_8/firebase_options.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
+import 'package:dance_club_comuna_8/presentation/screen/about/about_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/contact/contact_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/events/events_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/home/home_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/presentations/presentations_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/get_attend.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/insert_test.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/login_test.dart';
@@ -11,6 +16,7 @@ import 'package:dance_club_comuna_8/presentation/screen/test/view_events.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
@@ -46,7 +52,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Club de danza comuna 8',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade200),
           useMaterial3: true,
         ),
         home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -64,18 +70,113 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var logger = Logger();
+  var selectedScreenIndex = 0;
+  var resources = {
+    'leadingLogo': 'assets/images/logo.png',
+    'title': 'Danzas la ladera',
+    'imageBackground': 'assets/images/background.jpg',
+  };
+  var backgrounds = [
+    'assets/images/background.jpg',
+    'assets/images/background2.jpg',
+    'assets/images/background3.jpg',
+    'assets/images/background4.jpg',
+    'assets/images/background5.jpg',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+    var screens = [
+      (
+        buildHomeScreen(context),
+        'Página principal',
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
+      (buildAboutScreen(), '¿Quiénes somos?'),
+      (buildPresentationsScreen(), 'Presentaciones'),
+      (buildEventsScreen(), 'Eventos'),
+      (buildContactScreen(), 'Contacto'),
+    ];
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor:
+                Theme.of(context).colorScheme.primary, // Usar color del tema
+            expandedHeight: 300.0,
+            floating: false,
+            pinned: true,
+            leading: Image.asset(resources['leadingLogo'] as String, width: 50),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Image.asset(
+                    backgrounds[selectedScreenIndex],
+                    width: MediaQuery.of(context).size.width,
+                    height: 300,
+                    fit: BoxFit.cover,
+                  ),
+                  Text(
+                    resources['title'] as String,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 60,
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              for (var i = 0; i < screens.length; i++)
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      logger.i('Selected screen index: $i');
+                      selectedScreenIndex = i;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: selectedScreenIndex == i
+                              ? Colors.orange
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      screens[i].$2,
+                      style: TextStyle(
+                        color: selectedScreenIndex == i
+                            ? Colors.orange
+                            : Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SliverToBoxAdapter(
+            child: screens[selectedScreenIndex].$1,
+          )
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+
+/*
+ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -120,9 +221,4 @@ class _MyHomePageState extends State<MyHomePage> {
                           builder: (context) => const UpdateEventPage()));
                 },
                 child: const Text('Actualizar evento')),
-          ],
-        ),
-      ),
-    );
-  }
-}
+ */
