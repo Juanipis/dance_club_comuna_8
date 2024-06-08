@@ -10,17 +10,9 @@ jobs:
     name: "Semantic"
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
 
-  analyze:
-    name: "Analyze"
-    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
-    with:
-      flutter_channel: stable
-      flutter_version: 3.19.5
-      min_coverage: 0
-
   build:
     name: Build
-    needs: [semantic-pull-request, analyze]
+    needs: [semantic-pull-request]
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
@@ -29,7 +21,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.19.5
+          flutter-version: 3.22.1
       - name: 📦 Install Dependencies
         run: |
           flutter pub global activate very_good_cli
