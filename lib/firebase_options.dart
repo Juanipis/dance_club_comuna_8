@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     projectId: 'dance-club-comuna-8',
     storageBucket: 'dance-club-comuna-8.appspot.com',
   );
+
 }
