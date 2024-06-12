@@ -164,7 +164,9 @@ class _RegisterEventState extends State<RegisterEvent> {
               ElevatedButton(
                 onPressed: () {
                   eventBloc.add(RegisterUserEvent(
-                      eventId: widget.eventId, phoneNumber: phoneNumber.text));
+                      eventId: widget.eventId,
+                      phoneNumber: phoneNumber.text,
+                      name: "test"));
                 },
                 child: const Text('Register'),
               ),

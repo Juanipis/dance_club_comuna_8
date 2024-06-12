@@ -1,6 +1,7 @@
 import 'package:dance_club_comuna_8/firebase_options.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_register_bloc.dart';
 import 'package:dance_club_comuna_8/presentation/screen/about/about_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/contact/contact_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/events/events_screen.dart';
@@ -48,6 +49,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthBloc>(
           create: (context) => AuthBloc(authService: authService),
         ),
+        BlocProvider<EventRegisterBloc>(
+          create: (context) => EventRegisterBloc(firestoreEventsService),
+        ),
       ],
       child: MaterialApp(
         title: 'Club de danza comuna 8',
@@ -94,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       (buildAboutScreen(), '¿Quiénes somos?'),
       (buildPresentationsScreen(), 'Presentaciones'),
-      (buildEventsScreen(), 'Eventos'),
+      (const BuildEventsScreen(), 'Eventos'),
       (buildContactScreen(), 'Contacto'),
     ];
     return Scaffold(

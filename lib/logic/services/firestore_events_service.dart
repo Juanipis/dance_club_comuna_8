@@ -158,7 +158,8 @@ class FirestoreEventsService {
     return _eventCollection.doc(id).delete();
   }
 
-  Future<bool> registerUser(String eventId, String phoneNumber) async {
+  Future<bool> registerUser(
+      String eventId, String phoneNumber, String name) async {
     logger.d('Registering user $phoneNumber to event $eventId');
     DocumentReference eventDocRef = _eventCollection.doc(eventId);
     CollectionReference usersRef = eventDocRef.collection('registered_users');
@@ -186,7 +187,8 @@ class FirestoreEventsService {
       DocumentReference userDocRef = usersRef.doc(phoneNumber);
       await userDocRef.set({
         'phone_number': phoneNumber,
-        'timestamp': FieldValue.serverTimestamp()
+        'timestamp': FieldValue.serverTimestamp(),
+        'name': name,
       }, SetOptions(merge: true));
       logger.d('User registered successfully.');
       return true;
@@ -208,6 +210,7 @@ class FirestoreEventsService {
       attendees.add(EventAttend(
         phoneNumber: doc.id,
         timestamp: (data['timestamp'] as Timestamp).toDate(),
+        name: data['name'],
       ));
     }
 
@@ -234,5 +237,13 @@ class FirestoreEventsService {
       }
       return false;
     }
+  }
+
+  Future<int> getEventAttendeesCount(String eventId) async {
+    logger.d('Getting attendees count for event $eventId');
+    CollectionReference usersRef =
+        _eventCollection.doc(eventId).collection('registered_users');
+    QuerySnapshot snapshot = await usersRef.get();
+    return snapshot.docs.length;
   }
 }
