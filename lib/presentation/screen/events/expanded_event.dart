@@ -1,5 +1,5 @@
-import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_register_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +38,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
 
     var formattedDate =
         DateFormat('EEEE, d MMMM, HH:mm', 'es_ES').format(widget.event.date);
+    bool isEventFull = widget.event.attendes >= widget.event.maxAttendees;
 
     return Scaffold(
       appBar: AppBar(
@@ -105,14 +106,16 @@ class _ExpandedEventState extends State<ExpandedEvent> {
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return buildAlertDialog(
-                            context, widget.event.title, widget.event.id);
-                      });
-                },
+                onPressed: isEventFull
+                    ? null
+                    : () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return buildAlertDialog(
+                                  context, widget.event.title, widget.event.id);
+                            });
+                      },
                 icon: const Icon(Icons.event_available),
                 label: const Text('Registrarse'),
                 style: ElevatedButton.styleFrom(
@@ -121,6 +124,14 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
+              if (isEventFull)
+                const Text(
+                  'Evento lleno',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 16,
+                  ),
+                ),
             ],
           ),
         ),
@@ -129,13 +140,13 @@ class _ExpandedEventState extends State<ExpandedEvent> {
   }
 }
 
-BlocListener<EventBloc, EventState> buildAlertDialog(
+BlocListener<EventRegisterBloc, EventState> buildAlertDialog(
     BuildContext dialogContext, String title, String eventId) {
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController name = TextEditingController();
-  EventBloc eventBloc = BlocProvider.of<EventBloc>(dialogContext);
   Logger logger = Logger();
-  return BlocListener<EventBloc, EventState>(
+  // create a new context for the dialog di
+  return BlocListener<EventRegisterBloc, EventState>(
     listener: (context, state) {
       if (state is UserRegisteredState) {
         showDialog(
@@ -205,10 +216,13 @@ BlocListener<EventBloc, EventState> buildAlertDialog(
           onPressed: () {
             logger.d(
                 'Registrando usuario, evento: $eventId teléfono: ${phoneNumber.text} nombre: ${name.text}');
-            eventBloc.add(RegisterUserEvent(
+            BlocProvider.of<EventRegisterBloc>(dialogContext).add(
+              RegisterUserEvent(
                 eventId: eventId,
                 phoneNumber: phoneNumber.text,
-                name: name.text));
+                name: name.text,
+              ),
+            );
           },
           child: const Text('Aceptar'),
         ),

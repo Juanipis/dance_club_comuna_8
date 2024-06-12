@@ -41,6 +41,17 @@ Widget eventCard({
         const SizedBox(height: 10),
         Text(formattedDate),
         const SizedBox(height: 10),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.people, color: Colors.grey),
+            const SizedBox(width: 8),
+            Text(
+              'Asistentes: ${event.attendes}/ ${event.maxAttendees}',
+              style: const TextStyle(fontSize: 10),
+            ),
+          ],
+        ),
         ElevatedButton(
             onPressed: () {
               //push to ExpandedEvent(event: event)
