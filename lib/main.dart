@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:dance_club_comuna_8/firebase_options.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
@@ -15,9 +17,7 @@ import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart
 import 'package:dance_club_comuna_8/presentation/screen/test/update_event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/test/view_events.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logger/logger.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
@@ -91,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     var screens = [
       (
         buildHomeScreen(context),
@@ -101,7 +102,59 @@ class _MyHomePageState extends State<MyHomePage> {
       (const BuildEventsScreen(), 'Eventos'),
       (buildContactScreen(), 'Contacto'),
     ];
+    var actionsBiggerScreen = [
+      for (var i = 0; i < screens.length; i++)
+        TextButton(
+          onPressed: () {
+            setState(() {
+              logger.i('Selected screen index: $i');
+              selectedScreenIndex = i;
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: selectedScreenIndex == i
+                      ? Colors.orange
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+            ),
+            child: Text(
+              screens[i].$2,
+              style: TextStyle(
+                color: selectedScreenIndex == i ? Colors.orange : Colors.white,
+              ),
+            ),
+          ),
+        ),
+    ];
+    var actionsDrawerSmallScreen = [
+      for (var i = 0; i < screens.length; i++)
+        ListTile(
+          title: Text(screens[i].$2),
+          onTap: () {
+            setState(() {
+              logger.i('Selected screen index: $i');
+              selectedScreenIndex = i;
+            });
+            Navigator.pop(context);
+          },
+        ),
+    ];
+
     return Scaffold(
+      drawer: screenWidth < 558
+          ? Drawer(
+              shape: const BeveledRectangleBorder(),
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: actionsDrawerSmallScreen,
+              ),
+            )
+          : null,
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
@@ -110,7 +163,17 @@ class _MyHomePageState extends State<MyHomePage> {
             expandedHeight: 300.0,
             floating: false,
             pinned: true,
-            leading: Image.asset(resources['leadingLogo'] as String, width: 50),
+            leading: screenWidth < 558
+                ? Builder(
+                    builder: (context) => Container(
+                      // color: Colors.red, // Si se quiere cambiar el fondo del color
+                      child: IconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                      ),
+                    ),
+                  )
+                : Image.asset(resources['leadingLogo'] as String, width: 50),
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 alignment: AlignmentDirectional.center,
@@ -123,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   Text(
                     resources['title'] as String,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 60,
@@ -132,37 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            actions: [
-              for (var i = 0; i < screens.length; i++)
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      logger.i('Selected screen index: $i');
-                      selectedScreenIndex = i;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: selectedScreenIndex == i
-                              ? Colors.orange
-                              : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      screens[i].$2,
-                      style: TextStyle(
-                        color: selectedScreenIndex == i
-                            ? Colors.orange
-                            : Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+            actions: screenWidth > 550 ? actionsBiggerScreen : [],
           ),
           SliverToBoxAdapter(
             child: screens[selectedScreenIndex].$1,
@@ -172,9 +206,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
-
 
 
 
