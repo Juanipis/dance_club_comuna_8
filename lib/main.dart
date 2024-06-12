@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       (buildAboutScreen(), '¿Quiénes somos?'),
       (buildPresentationsScreen(), 'Presentaciones'),
-      (buildEventsScreen(), 'Eventos'),
+      (const BuildEventsScreen(), 'Eventos'),
       (buildContactScreen(), 'Contacto'),
     ];
     return Scaffold(
