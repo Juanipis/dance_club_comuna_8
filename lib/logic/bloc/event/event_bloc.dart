@@ -74,6 +74,9 @@ class EventBloc extends Bloc<EventEvent, EventState> {
         DateTime now = DateTime.now();
         DateTime end = eventInfo.endTime;
         allEvents = await _firestoreService.getUpcomingEvents(now, end);
+        for (var event in allEvents) {
+          event.attendes = await getAttendesByEventId(event.id);
+        }
         emit(EventsLoadedState(allEvents));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
@@ -84,7 +87,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       emit(EventLoadingState());
       try {
         bool success = await _firestoreService.registerUser(
-            eventInfo.eventId, eventInfo.phoneNumber);
+            eventInfo.eventId, eventInfo.phoneNumber, eventInfo.name);
         if (success) {
           emit(UserRegisteredState());
         } else {
@@ -152,5 +155,13 @@ class EventBloc extends Bloc<EventEvent, EventState> {
   List<Event> filterUpcomingEvents() {
     DateTime now = DateTime.now();
     return allEvents.where((event) => event.date.isAfter(now)).toList();
+  }
+
+  Future<int> getAttendesByEventId(String eventId) async {
+    try {
+      return await _firestoreService.getEventAttendeesCount(eventId);
+    } catch (e) {
+      return -1;
+    }
   }
 }

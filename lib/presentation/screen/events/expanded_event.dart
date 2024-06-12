@@ -98,7 +98,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                   const Icon(Icons.people, color: Colors.grey),
                   const SizedBox(width: 8),
                   Text(
-                    'Cupo máximo: ${widget.event.maxAttendees}',
+                    'Asistentes: ${widget.event.attendes}/ ${widget.event.maxAttendees}',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ],
@@ -206,7 +206,9 @@ BlocListener<EventBloc, EventState> buildAlertDialog(
             logger.d(
                 'Registrando usuario, evento: $eventId teléfono: ${phoneNumber.text} nombre: ${name.text}');
             eventBloc.add(RegisterUserEvent(
-                eventId: eventId, phoneNumber: phoneNumber.text));
+                eventId: eventId,
+                phoneNumber: phoneNumber.text,
+                name: name.text));
           },
           child: const Text('Aceptar'),
         ),

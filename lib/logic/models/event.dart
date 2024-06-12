@@ -9,6 +9,7 @@ class Event {
   String address;
   String imageUrl;
   int maxAttendees;
+  int attendes = 0;
 
   Event({
     required this.id,
