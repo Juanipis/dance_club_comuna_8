@@ -14,3 +14,5 @@ class PasswordResetRequested extends AuthEvent {
 
   PasswordResetRequested(this.email);
 }
+
+class AppStarted extends AuthEvent {}

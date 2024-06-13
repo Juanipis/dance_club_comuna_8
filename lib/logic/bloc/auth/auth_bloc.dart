@@ -6,7 +6,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthService authService;
 
-  AuthBloc({required this.authService}) : super(NotAuthenticated()) {
+  AuthBloc({required this.authService}) : super(AuthInitial()) {
+    on<AppStarted>((event, emit) async {
+      final isSignedIn = await authService.isSignedIn();
+      if (isSignedIn) {
+        final user = authService.getCurrentUser();
+        emit(Authenticated(user?.email ?? ''));
+      } else {
+        emit(NotAuthenticated());
+      }
+    });
+
     on<SignInRequested>((event, emit) async {
       emit(AuthLoading());
       bool isAuth = await authService.signInWithEmailAndPassword(

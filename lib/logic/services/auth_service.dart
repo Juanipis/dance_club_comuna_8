@@ -6,7 +6,23 @@ class AuthService {
   final logger = Logger();
 
   AuthService({FirebaseAuth? firebaseAuth})
-      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+      : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance {
+    _setPersistence();
+  }
+
+  Future<void> _setPersistence() async {
+    await _firebaseAuth.setPersistence(Persistence.LOCAL);
+    // Opciones disponibles: Persistence.LOCAL, Persistence.SESSION, Persistence.NONE
+  }
+
+  User? getCurrentUser() {
+    return _firebaseAuth.currentUser;
+  }
+
+  Future<bool> isSignedIn() async {
+    final user = _firebaseAuth.currentUser;
+    return user != null;
+  }
 
   Future<bool> signInWithEmailAndPassword(String email, String password) async {
     logger.d('Signing in with email and password');

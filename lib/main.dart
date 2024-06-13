@@ -1,3 +1,5 @@
+import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:dance_club_comuna_8/firebase_options.dart';
@@ -47,7 +49,8 @@ class MyApp extends StatelessWidget {
           create: (context) => EventBloc(firestoreEventsService),
         ),
         BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(authService: authService),
+          create: (context) =>
+              AuthBloc(authService: authService)..add(AppStarted()),
         ),
         BlocProvider<EventRegisterBloc>(
           create: (context) => EventRegisterBloc(firestoreEventsService),
@@ -130,6 +133,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         ),
+      IconButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const AdminScreen()));
+          },
+          icon: const Icon(Icons.lock))
     ];
     var actionsDrawerSmallScreen = [
       for (var i = 0; i < screens.length; i++)
