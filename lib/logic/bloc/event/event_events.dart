@@ -109,3 +109,10 @@ class RemoveAttendeFromEvent extends EventEvent {
   @override
   List<Object?> get props => [eventId, phoneNumber];
 }
+
+class ResetEventState extends EventEvent {
+  const ResetEventState();
+
+  @override
+  List<Object?> get props => [];
+}
