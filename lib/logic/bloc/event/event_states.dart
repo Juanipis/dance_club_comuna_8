@@ -145,3 +145,8 @@ class EventUpdateErrorState extends EventState {
   @override
   List<Object?> get props => [message];
 }
+
+class EventBlocStart extends EventState {
+  @override
+  List<Object?> get props => [];
+}

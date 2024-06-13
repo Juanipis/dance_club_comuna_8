@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -55,6 +56,8 @@ class MyApp extends StatelessWidget {
         BlocProvider<EventRegisterBloc>(
           create: (context) => EventRegisterBloc(firestoreEventsService),
         ),
+        BlocProvider<EventAdminBloc>(
+            create: (context) => EventAdminBloc(firestoreEventsService)),
       ],
       child: MaterialApp(
         title: 'Club de danza comuna 8',

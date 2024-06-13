@@ -1,6 +1,7 @@
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_states.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/add_event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +62,10 @@ Widget buildAdminScreen(BuildContext context) {
     children: [
       const Text("Hola ¿Qué desea hacer hoy?"),
       ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AddEventScreen()));
+        },
         child: const Text("Crear evento"),
       ),
     ],
