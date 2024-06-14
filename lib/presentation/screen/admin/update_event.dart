@@ -4,6 +4,7 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 class UpdateEventScreen extends StatefulWidget {
   final String eventId;
@@ -14,7 +15,9 @@ class UpdateEventScreen extends StatefulWidget {
 }
 
 class _UpdateEventScreenState extends State<UpdateEventScreen> {
+  Logger logger = Logger();
   Event? eventData;
+  bool eventDataLoaded = false;
   final TextEditingController idController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -28,7 +31,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime.now().subtract(const Duration(days: 1)),
       lastDate: DateTime(2025),
     );
@@ -42,7 +45,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   Future<void> selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: selectedTime ?? TimeOfDay.now(),
     );
     if (picked != null && picked != selectedTime) {
       setState(() {
@@ -144,18 +147,20 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
             );
           }
           if (state is LoadEventByIdState) {
-            eventData = state.event;
-            idController.text = widget.eventId;
-            titleController.text = eventData!.title;
-            descriptionController.text = eventData!.description;
-            instructionsController.text = eventData!.instructions;
-            addressController.text = eventData!.address;
-            imageUrlController.text = eventData!.imageUrl;
-            maxAttendeesController.text = eventData!.maxAttendees.toString();
-
-            // set the date and time to the event date and time
-            selectedDate = eventData!.date;
-            selectedTime = TimeOfDay.fromDateTime(eventData!.date);
+            if (!eventDataLoaded) {
+              logger.d('Event loaded');
+              eventData = state.event;
+              idController.text = widget.eventId;
+              titleController.text = eventData!.title;
+              descriptionController.text = eventData!.description;
+              instructionsController.text = eventData!.instructions;
+              addressController.text = eventData!.address;
+              imageUrlController.text = eventData!.imageUrl;
+              maxAttendeesController.text = eventData!.maxAttendees.toString();
+              selectedDate = eventData!.date;
+              selectedTime = TimeOfDay.fromDateTime(eventData!.date);
+              eventDataLoaded = true;
+            }
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -205,20 +210,67 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                     ),
                     keyboardType: TextInputType.number,
                   ),
-                  ElevatedButton(
-                    onPressed: () => selectDate(context),
-                    child: const Text('Seleccionar fecha'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                        onPressed: () => selectDate(context),
+                        child: const Text(
+                          'Seleccionar fecha',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        selectedDate != null
+                            ? 'Fecha: ${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}'
+                            : 'Fecha no seleccionada',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color:
+                              selectedDate != null ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(selectedDate != null
-                      ? 'Fecha seleccionada: ${selectedDate!.toLocal()}'
-                      : 'No se ha seleccionado fecha'),
-                  ElevatedButton(
-                    onPressed: () => selectTime(context),
-                    child: const Text('Seleccionar hora'),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                        onPressed: () => selectTime(context),
+                        child: const Text(
+                          'Seleccionar hora',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        selectedTime != null
+                            ? 'Hora: ${selectedTime!.format(context)}'
+                            : 'Hora no seleccionada',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color:
+                              selectedTime != null ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(selectedTime != null
-                      ? 'Hora seleccionada: ${selectedTime!.format(context)}'
-                      : 'No se ha seleccionado hora'),
                   ElevatedButton(
                     onPressed: () => saveEvent(context),
                     child: const Text('Guardar Evento'),

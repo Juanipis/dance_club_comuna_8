@@ -155,10 +155,17 @@ class _MyHomePageState extends State<MyHomePage> {
             Navigator.pop(context);
           },
         ),
+      ListTile(
+        title: const Text('Admin'),
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AdminScreen()));
+        },
+      ),
     ];
 
     return Scaffold(
-      drawer: screenWidth < 558
+      drawer: screenWidth < 650
           ? Drawer(
               shape: const BeveledRectangleBorder(),
               child: ListView(
@@ -175,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
             expandedHeight: 300.0,
             floating: false,
             pinned: true,
-            leading: screenWidth < 558
+            leading: screenWidth < 650
                 ? Builder(
                     builder: (context) => Container(
                       // color: Colors.red, // Si se quiere cambiar el fondo del color
