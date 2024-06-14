@@ -1,6 +1,8 @@
 import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
+import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/attendes_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/update_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,6 +59,50 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
                                           )));
                             },
                             icon: const Icon(Icons.edit)),
+                        IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AttendesScreen(eventId: event.id)));
+                            },
+                            icon: const Icon(Icons.people)),
+                        //An icon button of a trash can to delete the event, it opens an alert dialog to confirm the action
+                        IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Eliminar evento"),
+                                  content: const Text(
+                                      "¿Está seguro que desea eliminar este evento?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () async {
+                                        final eventAdminBloc =
+                                            BlocProvider.of<EventAdminBloc>(
+                                                context);
+                                        await removeEvent(context, event);
+                                        eventAdminBloc
+                                            .add(LoadUpcomingEventsEvent(
+                                          endTime: DateTime.now()
+                                              .add(const Duration(days: 100)),
+                                        ));
+                                      },
+                                      child: const Text("Sí"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text("No"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.delete)),
                       ],
                     ),
                   )
@@ -74,5 +120,12 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
         },
       ),
     );
+  }
+
+  Future<void> removeEvent(BuildContext context, Event event) async {
+    BlocProvider.of<EventAdminBloc>(context)
+        .add(DeleteEventEvent(id: event.id));
+    Navigator.pop(context);
+    await Future.delayed(const Duration(seconds: 3));
   }
 }
