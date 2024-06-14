@@ -107,6 +107,16 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
         emit(EventErrorState(message: e.toString()));
       }
     });
+
+    on<DeleteEventEvent>((eventInfo, emit) async {
+      emit(EventLoadingState());
+      try {
+        await _firestoreService.removeEvent(eventInfo.id);
+        emit(DeleteEventState());
+      } catch (e) {
+        emit(EventErrorState(message: e.toString()));
+      }
+    });
   }
 
   bool isSameDay(DateTime date1, DateTime date2) {

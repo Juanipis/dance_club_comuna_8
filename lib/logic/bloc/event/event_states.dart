@@ -45,6 +45,15 @@ class LoadEventByIdState extends EventState {
   List<Object> get props => [event];
 }
 
+class DeleteEventState extends EventState {
+  final String message;
+
+  DeleteEventState({this.message = "Evento eliminado exitosamente"});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class EventInsertedState extends EventState {
   final String succesMessage;
 
