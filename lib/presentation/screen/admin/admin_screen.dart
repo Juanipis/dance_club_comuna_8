@@ -2,6 +2,7 @@ import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_states.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/add_event.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/events_viewer.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,6 +69,14 @@ Widget buildAdminScreen(BuildContext context) {
         },
         child: const Text("Crear evento"),
       ),
+      ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const EventsViewerScreen()));
+          },
+          child: const Text("Editar eventos y asistentes")),
     ],
   );
 }

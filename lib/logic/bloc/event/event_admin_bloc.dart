@@ -47,6 +47,7 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
     on<UpdateEventEvent>((eventInfo, emit) async {
       emit(EventLoadingState());
       try {
+        logger.d('Updating event');
         var (isUpdated, errorIndex) = await _firestoreService.updateEvent(
           id: eventInfo.id,
           date: eventInfo.date,
@@ -78,26 +79,7 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
         DateTime now = DateTime.now();
         DateTime end = eventInfo.endTime;
         allEvents = await _firestoreService.getUpcomingEvents(now, end);
-        for (var event in allEvents) {
-          event.attendes = await getAttendesByEventId(event.id);
-        }
         emit(EventsLoadedState(allEvents));
-      } catch (e) {
-        emit(EventErrorState(message: e.toString()));
-      }
-    });
-
-    on<RegisterUserEvent>((eventInfo, emit) async {
-      emit(EventLoadingState());
-      try {
-        bool success = await _firestoreService.registerUser(
-            eventInfo.eventId, eventInfo.phoneNumber, eventInfo.name);
-        if (success) {
-          emit(UserRegisteredState());
-        } else {
-          emit(EventErrorState(
-              message: 'Event is full or user already registered'));
-        }
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }
