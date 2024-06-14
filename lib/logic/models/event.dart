@@ -20,6 +20,8 @@ class Event {
     required this.address,
     required this.imageUrl,
     required this.maxAttendees,
+    // attendes is optional
+    this.attendes = 0,
   });
 
   Event copyWith({

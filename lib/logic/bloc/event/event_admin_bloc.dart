@@ -78,7 +78,8 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
       try {
         DateTime now = DateTime.now();
         DateTime end = eventInfo.endTime;
-        allEvents = await _firestoreService.getUpcomingEvents(now, end);
+        allEvents =
+            await _firestoreService.getUpcomingEventsWithAttendees(now, end);
         emit(EventsLoadedState(allEvents));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));

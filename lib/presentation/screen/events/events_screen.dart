@@ -42,11 +42,16 @@ class BuildEventsScreenState extends State<BuildEventsScreen> {
         if (state is EventLoadingState) {
           return circularProgressIndicator();
         } else if (state is EventsLoadedState) {
-          return Column(
-            children: [
-              for (var event in state.events)
-                eventCard(event: event, context: context)
-            ],
+          return Center(
+            child: Wrap(
+              spacing: 10.0, // Espacio horizontal entre tarjetas
+              runSpacing: 10.0, // Espacio vertical entre filas
+
+              children: [
+                for (var event in state.events)
+                  eventCard(event: event, context: context)
+              ],
+            ),
           );
         } else if (state is EventErrorState) {
           return Center(
