@@ -72,6 +72,48 @@ class FirestoreEventsService {
     return events;
   }
 
+  Future<List<Event>> getUpcomingEventsWithAttendees(
+      DateTime startDate, DateTime endDate) async {
+    logger.d('Getting upcoming events from firestore');
+    List<Event> events = [];
+
+    QuerySnapshot querySnapshot = await _eventCollection
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate)
+        .get();
+
+    // In the document we have a collection called registered_users
+    // We need to get the length of this collection and add it to the event object
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      // Get the registered_users collection reference
+      CollectionReference registeredUsersCollection =
+          doc.reference.collection('registered_users');
+
+      // Get the number of attendees
+      QuerySnapshot registeredUsersSnapshot =
+          await registeredUsersCollection.get();
+      int attendeesCount = registeredUsersSnapshot.docs.length;
+
+      events.add(Event(
+        id: doc.id,
+        date: data['date'].toDate(),
+        title: data['title'],
+        description: data['description'],
+        instructions: data['instructions'],
+        address: data['address'],
+        imageUrl: data['imageUrl'],
+        maxAttendees: data['maxAttendees'],
+        attendes: attendeesCount,
+      ));
+    }
+
+    logger.d('Upcoming events: $events');
+    return events;
+  }
+
   Future<void> addEvent(
       {required DateTime date,
       required String title,

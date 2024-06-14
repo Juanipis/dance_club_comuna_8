@@ -44,7 +44,28 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
                 for (var event in state.events)
                   ListTile(
                     title: Text(event.title),
-                    subtitle: Text(event.date.toString()),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //Date in format dd/mm/yyyy
+                        Row(
+                          children: [
+                            Text(
+                                "${event.date.day}/${event.date.month}/${event.date.year} - "),
+                            // Hour
+                            Text("${event.date.hour}:${event.date.minute}"),
+                          ],
+                        ),
+
+                        Row(
+                          children: [
+                            const Icon(Icons.people),
+                            Text("${event.attendes}/${event.maxAttendees}"),
+                          ],
+                        ),
+                      ],
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
