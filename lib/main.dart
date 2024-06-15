@@ -181,6 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? Builder(
                     builder: (context) => Container(
                       // color: Colors.red, // Si se quiere cambiar el fondo del color
+                      color: Colors.transparent,
                       child: IconButton(
                         icon: const Icon(Icons.menu),
                         onPressed: () => Scaffold.of(context).openDrawer(),

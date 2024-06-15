@@ -1,5 +1,4 @@
 import 'package:dance_club_comuna_8/logic/models/event.dart';
-import 'package:dance_club_comuna_8/presentation/screen/events/expanded_event.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';

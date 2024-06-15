@@ -51,35 +51,6 @@ class FirestoreEventsService {
     );
   }
 
-  Future<List<Event>> getUpcomingEvents(
-      DateTime startDate, DateTime endDate) async {
-    logger.d('Getting upcoming events from firestore');
-    List<Event> events = [];
-
-    QuerySnapshot querySnapshot = await _eventCollection
-        .where('date', isGreaterThanOrEqualTo: startDate)
-        .where('date', isLessThanOrEqualTo: endDate)
-        .get();
-
-    for (var doc in querySnapshot.docs) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      events.add(Event(
-        id: doc.id,
-        date: data['date'].toDate(),
-        endDate: data['endDate'].toDate(),
-        title: data['title'],
-        description: data['description'],
-        instructions: data['instructions'],
-        address: data['address'],
-        imageUrl: data['imageUrl'],
-        maxAttendees: data['maxAttendees'],
-      ));
-    }
-
-    logger.d('Upcoming events: $events');
-    return events;
-  }
-
   Future<List<Event>> getUpcomingEventsWithAttendees(
       DateTime startDate, DateTime endDate) async {
     logger.d('Getting upcoming events from firestore');

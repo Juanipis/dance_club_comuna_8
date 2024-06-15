@@ -33,6 +33,7 @@ class _AttendesScreenState extends State<AttendesScreen> {
                 Navigator.pop(context);
                 await Future.delayed(const Duration(seconds: 1));
                 eventBloc.add(LoadUpcomingEventsEvent(
+                    startTime: DateTime.now(), //TODO: Change to real date
                     endTime: DateTime.now().add(const Duration(days: 100))));
               },
             )),

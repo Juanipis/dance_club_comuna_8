@@ -75,9 +75,11 @@ class DeleteEventEvent extends EventEvent {
 }
 
 class LoadUpcomingEventsEvent extends EventEvent {
+  final DateTime startTime;
   final DateTime endTime;
 
-  const LoadUpcomingEventsEvent({required this.endTime});
+  const LoadUpcomingEventsEvent(
+      {required this.startTime, required this.endTime});
 
   @override
   List<Object> get props => [];

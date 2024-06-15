@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
 Widget buildAboutScreen() {
-  return Container(
-    child: const Text('About Screen'),
-  );
+  return const Text('About Screen');
 }

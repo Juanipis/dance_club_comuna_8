@@ -43,8 +43,9 @@ class EventNavigationPageState extends State<EventNavigationPage> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<EventBloc>(context, listen: false).add(
-        LoadUpcomingEventsEvent(
+    BlocProvider.of<EventBloc>(context, listen: false)
+        .add(LoadUpcomingEventsEvent(
+            startTime: DateTime.now(), //TODO: Change to real date
             endTime: DateTime.now().add(const Duration(days: 31))));
   }
 

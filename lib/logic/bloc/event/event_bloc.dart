@@ -26,7 +26,7 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       logger.d('Loading upcoming events');
       emit(EventLoadingState());
       try {
-        DateTime now = DateTime.now();
+        DateTime now = eventInfo.startTime;
         DateTime end = eventInfo.endTime;
         allEvents =
             await _firestoreService.getUpcomingEventsWithAttendees(now, end);

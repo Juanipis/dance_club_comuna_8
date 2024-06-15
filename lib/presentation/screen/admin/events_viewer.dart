@@ -19,6 +19,7 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
   void initState() {
     super.initState();
     BlocProvider.of<EventAdminBloc>(context).add(LoadUpcomingEventsEvent(
+        startTime: DateTime.now(), //TODO: Change to real date
         endTime: DateTime.now().add(const Duration(days: 100))));
   }
 
@@ -107,6 +108,8 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
                                         await removeEvent(context, event);
                                         eventAdminBloc
                                             .add(LoadUpcomingEventsEvent(
+                                          startTime: DateTime
+                                              .now(), //TODO: Change to real date
                                           endTime: DateTime.now()
                                               .add(const Duration(days: 100)),
                                         ));
