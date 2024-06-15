@@ -15,16 +15,6 @@ class BuildEventsScreen extends StatefulWidget {
 }
 
 class BuildEventsScreenState extends State<BuildEventsScreen> {
-  var testEvent = Event(
-      id: "1",
-      date: DateTime(2025),
-      title: "Sesión #10 de salsa en el año",
-      description: "description",
-      instructions: "instructions",
-      address: "address",
-      imageUrl: "",
-      maxAttendees: 10);
-
   @override
   void initState() {
     super.initState();

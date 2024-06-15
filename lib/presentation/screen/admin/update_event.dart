@@ -27,6 +27,8 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   final TextEditingController maxAttendeesController = TextEditingController();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  DateTime? selectedEndDate;
+  TimeOfDay? selectedEndTime;
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -54,6 +56,56 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
     }
   }
 
+  Future<void> selectEndDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedEndDate ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      lastDate: DateTime(2025),
+    );
+    if (picked != null && picked != selectedEndDate) {
+      setState(() {
+        selectedEndDate = picked;
+      });
+    }
+  }
+
+  Future<void> selectEndTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedEndTime ?? TimeOfDay.now(),
+    );
+    if (picked != null && picked != selectedEndTime) {
+      setState(() {
+        selectedEndTime = picked;
+      });
+    }
+  }
+
+  bool checkDates() {
+    if (selectedDate == null ||
+        selectedTime == null ||
+        selectedEndDate == null ||
+        selectedEndTime == null) {
+      return false;
+    }
+    final startDateTime = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+    final endDateTime = DateTime(
+      selectedEndDate!.year,
+      selectedEndDate!.month,
+      selectedEndDate!.day,
+      selectedEndTime!.hour,
+      selectedEndTime!.minute,
+    );
+    return startDateTime.isBefore(endDateTime);
+  }
+
   void saveEvent(BuildContext context) {
     final eventBloc = BlocProvider.of<EventAdminBloc>(context);
     final title = titleController.text;
@@ -63,8 +115,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
     if (title.isEmpty ||
         maxAttendees == null ||
         maxAttendees <= 0 ||
-        selectedDate == null ||
-        selectedTime == null) {
+        !checkDates()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text(
@@ -81,6 +132,13 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
         selectedDate!.day,
         selectedTime!.hour,
         selectedTime!.minute,
+      ),
+      endDate: DateTime(
+        selectedEndDate!.year,
+        selectedEndDate!.month,
+        selectedEndDate!.day,
+        selectedEndTime!.hour,
+        selectedEndTime!.minute,
       ),
       title: title,
       description: descriptionController.text,
@@ -159,6 +217,8 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
               maxAttendeesController.text = eventData!.maxAttendees.toString();
               selectedDate = eventData!.date;
               selectedTime = TimeOfDay.fromDateTime(eventData!.date);
+              selectedEndDate = eventData!.endDate;
+              selectedEndTime = TimeOfDay.fromDateTime(eventData!.endDate);
               eventDataLoaded = true;
             }
 
@@ -267,6 +327,70 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                           fontSize: 16,
                           color:
                               selectedTime != null ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                        onPressed: () => selectEndDate(context),
+                        child: const Text(
+                          'Seleccionar fecha de fin',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        selectedEndDate != null
+                            ? 'Fecha de fin: ${selectedEndDate!.day}-${selectedEndDate!.month}-${selectedEndDate!.year}'
+                            : 'Fecha de fin no seleccionada',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: selectedEndDate != null
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                        onPressed: () => selectEndTime(context),
+                        child: const Text(
+                          'Seleccionar hora de fin',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        selectedEndTime != null
+                            ? 'Hora de fin: ${selectedEndTime!.format(context)}'
+                            : 'Hora de fin no seleccionada',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: selectedEndTime != null
+                              ? Colors.green
+                              : Colors.red,
                         ),
                       ),
                     ],

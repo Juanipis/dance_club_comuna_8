@@ -22,51 +22,6 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       }
     });
 
-    on<InserEventEvent>((eventInfo, emit) async {
-      emit(EventLoadingState());
-      try {
-        await _firestoreService.addEvent(
-          date: eventInfo.date,
-          title: eventInfo.title,
-          description: eventInfo.description,
-          instructions: eventInfo.instructions,
-          address: eventInfo.address,
-          imageUrl: eventInfo.imageUrl,
-          maxAttendees: eventInfo.maxAttendees,
-        );
-        emit(EventInsertedState());
-      } catch (e) {
-        emit(EventErrorState(message: e.toString()));
-      }
-    });
-
-    on<UpdateEventEvent>((eventInfo, emit) async {
-      emit(EventLoadingState());
-      try {
-        var (isUpdated, errorIndex) = await _firestoreService.updateEvent(
-          id: eventInfo.id,
-          date: eventInfo.date,
-          title: eventInfo.title,
-          description: eventInfo.description,
-          instructions: eventInfo.instructions,
-          address: eventInfo.address,
-          imageUrl: eventInfo.imageUrl,
-          maxAttendees: eventInfo.maxAttendees,
-        );
-        if (isUpdated && errorIndex == 0) {
-          emit(EventUpdatedState());
-        } else if (errorIndex == 1) {
-          emit(EventDosentExistState());
-        } else if (errorIndex == 2) {
-          emit(EventCannotUpdateMaxAttendeesState());
-        } else {
-          emit(EventErrorState(message: 'Error updating event'));
-        }
-      } catch (e) {
-        emit(EventErrorState(message: e.toString()));
-      }
-    });
-
     on<LoadUpcomingEventsEvent>((eventInfo, emit) async {
       logger.d('Loading upcoming events');
       emit(EventLoadingState());

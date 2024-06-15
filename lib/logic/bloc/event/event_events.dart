@@ -15,6 +15,7 @@ class LoadEventEventById extends EventEvent {
 
 class InserEventEvent extends EventEvent {
   final DateTime date;
+  final DateTime endDate;
   final String title;
   final String description;
   final String instructions;
@@ -24,6 +25,7 @@ class InserEventEvent extends EventEvent {
 
   const InserEventEvent(
       {required this.date,
+      required this.endDate,
       required this.title,
       required this.description,
       required this.instructions,
@@ -39,6 +41,7 @@ class InserEventEvent extends EventEvent {
 class UpdateEventEvent extends EventEvent {
   final String id;
   final DateTime date;
+  final DateTime endDate;
   final String title;
   final String description;
   final String instructions;
@@ -49,6 +52,7 @@ class UpdateEventEvent extends EventEvent {
   const UpdateEventEvent(
       {required this.id,
       required this.date,
+      required this.endDate,
       required this.title,
       required this.description,
       required this.instructions,

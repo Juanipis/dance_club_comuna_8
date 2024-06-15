@@ -64,6 +64,7 @@ class _InsertEventPageState extends State<InsertEventPage> {
                 final eventBloc = BlocProvider.of<EventBloc>(context);
                 eventBloc.add(InserEventEvent(
                   date: DateTime.now(),
+                  endDate: DateTime.now().add(const Duration(days: 1)),
                   title: titleController.text,
                   description: descriptionController.text,
                   instructions: "Ninguna",

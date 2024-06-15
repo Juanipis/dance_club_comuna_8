@@ -299,6 +299,7 @@ class _UpdateEventPageState extends State<UpdateEventPage> {
                           eventBloc.add(UpdateEventEvent(
                             id: event.id,
                             date: eventDateTime,
+                            endDate: eventDateTime.add(const Duration(days: 1)),
                             title: eventTitleController.text,
                             description: eventDescriptionController.text,
                             instructions: eventInstructionsController.text,

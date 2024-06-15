@@ -31,6 +31,7 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
       try {
         await _firestoreService.addEvent(
           date: eventInfo.date,
+          endDate: eventInfo.endDate,
           title: eventInfo.title,
           description: eventInfo.description,
           instructions: eventInfo.instructions,
@@ -51,6 +52,7 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
         var (isUpdated, errorIndex) = await _firestoreService.updateEvent(
           id: eventInfo.id,
           date: eventInfo.date,
+          endDate: eventInfo.endDate,
           title: eventInfo.title,
           description: eventInfo.description,
           instructions: eventInfo.instructions,

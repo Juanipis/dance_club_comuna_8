@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Event {
   String id;
   DateTime date;
+  DateTime endDate;
   String title;
   String description;
   String instructions;
@@ -20,6 +21,7 @@ class Event {
     required this.address,
     required this.imageUrl,
     required this.maxAttendees,
+    required this.endDate,
     // attendes is optional
     this.attendes = 0,
   });
@@ -27,6 +29,7 @@ class Event {
   Event copyWith({
     String? id,
     DateTime? date,
+    DateTime? endDate,
     String? title,
     String? description,
     String? instructions,
@@ -38,6 +41,7 @@ class Event {
     return Event(
       id: id ?? this.id,
       date: date ?? this.date,
+      endDate: endDate ?? this.endDate,
       title: title ?? this.title,
       description: description ?? this.description,
       instructions: instructions ?? this.instructions,
@@ -50,6 +54,7 @@ class Event {
   Map<String, dynamic> toJsonNoId() {
     return {
       'date': Timestamp.now(),
+      'endDate': Timestamp.now(),
       'title': title,
       'description': description,
       'instructions': instructions,

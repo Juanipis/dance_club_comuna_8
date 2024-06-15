@@ -17,6 +17,7 @@ class FirestoreEventsService {
         return Event(
           id: doc.id,
           date: data['date'].toDate(),
+          endDate: data['endDate'].toDate(),
           title: data['title'],
           description: data['description'],
           instructions: data['instructions'],
@@ -35,6 +36,7 @@ class FirestoreEventsService {
     return Event(
       id: doc.id,
       date: data['date'].toDate(),
+      endDate: data['endDate'].toDate(),
       title: data['title'],
       description: data['description'],
       instructions: data['instructions'],
@@ -59,6 +61,7 @@ class FirestoreEventsService {
       events.add(Event(
         id: doc.id,
         date: data['date'].toDate(),
+        endDate: data['endDate'].toDate(),
         title: data['title'],
         description: data['description'],
         instructions: data['instructions'],
@@ -100,6 +103,7 @@ class FirestoreEventsService {
       events.add(Event(
         id: doc.id,
         date: data['date'].toDate(),
+        endDate: data['endDate'].toDate(),
         title: data['title'],
         description: data['description'],
         instructions: data['instructions'],
@@ -116,6 +120,7 @@ class FirestoreEventsService {
 
   Future<void> addEvent(
       {required DateTime date,
+      required DateTime endDate,
       required String title,
       required String description,
       required String instructions,
@@ -126,6 +131,7 @@ class FirestoreEventsService {
     try {
       await _eventCollection.add({
         'date': Timestamp.fromDate(date),
+        'endDate': Timestamp.fromDate(endDate),
         'title': title,
         'description': description,
         'instructions': instructions,
@@ -142,6 +148,7 @@ class FirestoreEventsService {
   Future<(bool, int)> updateEvent({
     required String id,
     DateTime? date,
+    DateTime? endDate,
     String? title,
     String? description,
     String? instructions,
@@ -179,6 +186,7 @@ class FirestoreEventsService {
     try {
       Map<String, dynamic> data = {};
       if (date != null) data['date'] = Timestamp.fromDate(date);
+      if (endDate != null) data['endDate'] = Timestamp.fromDate(endDate);
       if (title != null) data['title'] = title;
       if (description != null) data['description'] = description;
       if (instructions != null) data['instructions'] = instructions;

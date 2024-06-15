@@ -38,6 +38,8 @@ class _ExpandedEventState extends State<ExpandedEvent> {
 
     var formattedDate =
         DateFormat('EEEE, d MMMM, HH:mm', 'es_ES').format(widget.event.date);
+    var formattedEndDate =
+        DateFormat('HH:mm', 'es_ES').format(widget.event.endDate);
     bool isEventFull = widget.event.attendes >= widget.event.maxAttendees;
 
     return Scaffold(
@@ -77,6 +79,11 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                   fontSize: 16,
                   color: Colors.grey[600],
                 ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Finaliza a las: $formattedEndDate',
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               Text(

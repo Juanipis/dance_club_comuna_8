@@ -20,6 +20,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
   final TextEditingController maxAttendeesController = TextEditingController();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  DateTime? selectedEndDate;
+  TimeOfDay? selectedEndTime;
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -47,6 +49,56 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
+  Future<void> selectEndDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      lastDate: DateTime(2025),
+    );
+    if (picked != null && picked != selectedEndDate) {
+      setState(() {
+        selectedEndDate = picked;
+      });
+    }
+  }
+
+  Future<void> selectEndTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null && picked != selectedEndTime) {
+      setState(() {
+        selectedEndTime = picked;
+      });
+    }
+  }
+
+  bool checkDates() {
+    if (selectedDate == null ||
+        selectedTime == null ||
+        selectedEndDate == null ||
+        selectedEndTime == null) {
+      return false;
+    }
+    final startDateTime = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+    final endDateTime = DateTime(
+      selectedEndDate!.year,
+      selectedEndDate!.month,
+      selectedEndDate!.day,
+      selectedEndTime!.hour,
+      selectedEndTime!.minute,
+    );
+    return startDateTime.isBefore(endDateTime);
+  }
+
   void saveEvent(BuildContext context) {
     final eventBloc = BlocProvider.of<EventAdminBloc>(context);
     final title = titleController.text;
@@ -56,8 +108,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
     if (title.isEmpty ||
         maxAttendees == null ||
         maxAttendees <= 0 ||
-        selectedDate == null ||
-        selectedTime == null) {
+        !checkDates()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text(
@@ -73,6 +124,13 @@ class _AddEventScreenState extends State<AddEventScreen> {
         selectedDate!.day,
         selectedTime!.hour,
         selectedTime!.minute,
+      ),
+      endDate: DateTime(
+        selectedEndDate!.year,
+        selectedEndDate!.month,
+        selectedEndDate!.day,
+        selectedEndTime!.hour,
+        selectedEndTime!.minute,
       ),
       title: title,
       description: descriptionController.text,
@@ -153,20 +211,50 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   ),
                   keyboardType: TextInputType.number,
                 ),
-                ElevatedButton(
-                  onPressed: () => selectDate(context),
-                  child: const Text('Seleccionar fecha'),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => selectDate(context),
+                      child: const Text('Seleccionar fecha'),
+                    ),
+                    Text(selectedDate != null
+                        ? 'Fecha seleccionada: ${selectedDate!.toLocal()}'
+                        : 'No se ha seleccionado fecha'),
+                  ],
                 ),
-                Text(selectedDate != null
-                    ? 'Fecha seleccionada: ${selectedDate!.toLocal()}'
-                    : 'No se ha seleccionado fecha'),
-                ElevatedButton(
-                  onPressed: () => selectTime(context),
-                  child: const Text('Seleccionar hora'),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => selectTime(context),
+                      child: const Text('Seleccionar hora'),
+                    ),
+                    Text(selectedTime != null
+                        ? 'Hora seleccionada: ${selectedTime!.format(context)}'
+                        : 'No se ha seleccionado hora'),
+                  ],
                 ),
-                Text(selectedTime != null
-                    ? 'Hora seleccionada: ${selectedTime!.format(context)}'
-                    : 'No se ha seleccionado hora'),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => selectEndDate(context),
+                      child: const Text('Seleccionar fecha de fin'),
+                    ),
+                    Text(selectedEndDate != null
+                        ? 'Fecha de fin seleccionada: ${selectedEndDate!.toLocal()}'
+                        : 'No se ha seleccionado fecha de fin'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => selectEndTime(context),
+                      child: const Text('Seleccionar hora de fin'),
+                    ),
+                    Text(selectedEndTime != null
+                        ? 'Hora de fin seleccionada: ${selectedEndTime!.format(context)}'
+                        : 'No se ha seleccionado hora de fin'),
+                  ],
+                ),
                 ElevatedButton(
                   onPressed: () => saveEvent(context),
                   child: const Text('Guardar Evento'),
