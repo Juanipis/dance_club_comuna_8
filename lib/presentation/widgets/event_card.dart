@@ -7,6 +7,9 @@ import 'package:intl/intl.dart';
 Widget eventCard({
   required Event event,
   required BuildContext context,
+  required Future<void> Function(
+          BuildContext context, dynamic eventId, String title)
+      refreshEvents,
 }) {
   initializeDateFormatting();
 
@@ -54,10 +57,7 @@ Widget eventCard({
         ),
         ElevatedButton(
             onPressed: () {
-              //push to ExpandedEvent(event: event)
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ExpandedEvent(event: event);
-              }));
+              refreshEvents(context, event.id, event.title);
             },
             child: const Text('Inscribirse')),
         const SizedBox(height: 10),

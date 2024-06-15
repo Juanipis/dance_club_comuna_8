@@ -33,8 +33,13 @@ class FirestoreEventsService {
     logger.d('Getting event by $id from firestore');
     DocumentSnapshot doc = await _eventCollection.doc(id).get();
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    // get attendees count
+    CollectionReference usersRef = doc.reference.collection('registered_users');
+    QuerySnapshot snapshot = await usersRef.get();
+    int attendeesCount = snapshot.docs.length;
     return Event(
       id: doc.id,
+      attendes: attendeesCount,
       date: data['date'].toDate(),
       endDate: data['endDate'].toDate(),
       title: data['title'],

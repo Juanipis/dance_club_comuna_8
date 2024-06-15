@@ -12,13 +12,8 @@ import 'package:dance_club_comuna_8/presentation/screen/contact/contact_screen.d
 import 'package:dance_club_comuna_8/presentation/screen/events/events_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/home/home_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/presentations/presentations_screen.dart';
-import 'package:dance_club_comuna_8/presentation/screen/test/get_attend.dart';
-import 'package:dance_club_comuna_8/presentation/screen/test/insert_test.dart';
-import 'package:dance_club_comuna_8/presentation/screen/test/login_test.dart';
 import 'package:dance_club_comuna_8/logic/services/auth_service.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart';
-import 'package:dance_club_comuna_8/presentation/screen/test/update_event.dart';
-import 'package:dance_club_comuna_8/presentation/screen/test/view_events.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -225,54 +220,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
-
-
-/*
-ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const InsertEventPage()),
-                );
-              },
-              child: const Text('Agregar Evento'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginWidget()),
-                );
-              },
-              child: const Text('Iniciar sesión'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const EventNavigationPage()),
-                );
-              },
-              child: const Text('Ver eventos'),
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const EventAttendeesWidget()));
-                },
-                child: const Text('Ver asistentes')),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UpdateEventPage()));
-                },
-                child: const Text('Actualizar evento')),
- */
