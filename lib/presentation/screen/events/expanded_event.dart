@@ -108,7 +108,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Instrucciones: $event.instructions}',
+                      'Instrucciones: ${event.instructions}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 16),
