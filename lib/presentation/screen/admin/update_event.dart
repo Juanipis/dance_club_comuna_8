@@ -167,9 +167,6 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
             Navigator.pop(context);
-            eventBloc.add(LoadUpcomingEventsEvent(
-                startTime: DateTime.now(), //TODO: Change to real date
-                endTime: DateTime.now().add(const Duration(days: 100))));
           },
         ),
       ),

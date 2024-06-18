@@ -31,10 +31,6 @@ class _AttendesScreenState extends State<AttendesScreen> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () async {
                 Navigator.pop(context);
-                await Future.delayed(const Duration(seconds: 1));
-                eventBloc.add(LoadUpcomingEventsEvent(
-                    startTime: DateTime.now(), //TODO: Change to real date
-                    endTime: DateTime.now().add(const Duration(days: 100))));
               },
             )),
         body: BlocBuilder<EventAdminBloc, EventState>(

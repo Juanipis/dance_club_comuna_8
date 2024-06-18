@@ -1,4 +1,7 @@
+import 'package:logger/logger.dart';
+
 class DateHelper {
+  Logger logger = Logger();
   static DateTime startOfToday() {
     return DateTime(
         DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
@@ -44,12 +47,17 @@ class DateHelper {
   }
 
   static DateTime startOfAll() {
-    return DateTime.now();
+    return DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day, 0, 0, 0);
   }
 
   static DateTime endOfAll() {
     return DateTime(DateTime.now().year, DateTime.now().month,
             DateTime.now().day, 23, 59, 59)
         .add(const Duration(days: 31));
+  }
+
+  static DateTime past() {
+    return DateTime(2020, 1, 1, 0, 0, 0);
   }
 }
