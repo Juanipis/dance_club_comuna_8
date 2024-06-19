@@ -1,5 +1,7 @@
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_bloc.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_storage_service.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -24,19 +26,23 @@ Future<void> main() async {
   final FirestoreEventsService firestoreEventsService =
       FirestoreEventsService();
   final AuthService authService = AuthService();
+  final FirestoreStorageService bucketService = FirestoreStorageService();
   runApp(MyApp(
       firestoreEventsService: firestoreEventsService,
-      authService: authService));
+      authService: authService,
+      bucketService: bucketService));
 }
 
 class MyApp extends StatelessWidget {
   final FirestoreEventsService firestoreEventsService;
   final AuthService authService;
+  final FirestoreStorageService bucketService;
 
   const MyApp(
       {super.key,
       required this.firestoreEventsService,
-      required this.authService});
+      required this.authService,
+      required this.bucketService});
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -53,6 +59,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<EventAdminBloc>(
             create: (context) => EventAdminBloc(firestoreEventsService)),
+        BlocProvider<ImageBloc>(
+            create: (context) =>
+                ImageBloc(firestoreStorageService: bucketService)),
       ],
       child: MaterialApp(
         title: 'Club de danza comuna 8',
