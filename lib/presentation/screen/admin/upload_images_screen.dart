@@ -52,7 +52,7 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                             fileBytes = bytes;
                             imageSelected = true;
                             fileName =
-                                'image_${DateTime.now().millisecondsSinceEpoch}.png';
+                                'image_${DateTime.now().millisecondsSinceEpoch}';
                             logger.d('Image selected');
                           });
                         }
@@ -71,6 +71,10 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                           labelText: 'Nombre de la imagen',
                           hintText: 'Nombre de la imagen'),
                     ),
+                    Text(
+                        "Tamaño de la imagen: ${fileBytes?.length ?? 0} bytes"),
+                    const Text(
+                        "La imagen se va a guardar en .png, no añada la extensión")
                   ],
                 ),
               ),
@@ -82,7 +86,7 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                       BlocProvider.of<ImageBloc>(context)
                           .add(UploadImageUnit8ListEvent(
                         path: 'images',
-                        imageName: imageNameController.text,
+                        imageName: '${imageNameController.text}.png',
                         fileBytes: fileBytes!,
                       ));
                       Navigator.of(context).pop();
@@ -157,6 +161,9 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                 );
               },
             );
+          } else if (state is ImageUploadedState) {
+            BlocProvider.of<ImageBloc>(context)
+                .add(const GetImagesPathsEvent(path: 'images'));
           }
           return const Center(child: Text('No hay imágenes'));
         },
