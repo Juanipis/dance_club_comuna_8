@@ -8,6 +8,7 @@ import 'package:logger/logger.dart';
 class EventBloc extends Bloc<EventEvent, EventState> {
   final FirestoreEventsService _firestoreService;
   List<Event> allEvents = [];
+  Map<String, List<Event>> cache = {};
 
   Logger logger = Logger();
 
@@ -28,8 +29,15 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       try {
         DateTime now = eventInfo.startTime;
         DateTime end = eventInfo.endTime;
-        allEvents =
-            await _firestoreService.getUpcomingEventsWithAttendees(now, end);
+        String cacheKey = "${now.toIso8601String()}::${end.toIso8601String()}";
+        if (cache.containsKey(cacheKey)) {
+          logger.d('Using cached events');
+          allEvents = cache[cacheKey]!;
+        } else {
+          allEvents =
+              await _firestoreService.getUpcomingEventsWithAttendees(now, end);
+          cache[cacheKey] = allEvents;
+        }
         emit(EventsLoadedState(allEvents));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
@@ -43,6 +51,8 @@ class EventBloc extends Bloc<EventEvent, EventState> {
             eventInfo.eventId, eventInfo.phoneNumber, eventInfo.name);
         if (success) {
           emit(UserRegisteredState());
+          // Invalidate cache to reflect new registration
+          cache.clear();
         } else {
           emit(EventErrorState(
               message: 'Event is full or user already registered'));
@@ -62,59 +72,5 @@ class EventBloc extends Bloc<EventEvent, EventState> {
         emit(EventAttendeesErrorState(message: e.toString()));
       }
     });
-
-    on<RemoveAttendeFromEvent>((eventInfo, emit) async {
-      logger.d('Removing attendee');
-      emit(EventAttendRemovedLoadingState());
-      try {
-        await _firestoreService.removeAttendee(
-            eventInfo.eventId, eventInfo.phoneNumber);
-        emit(EventInsertedState(succesMessage: 'User removed successfully'));
-      } catch (e) {
-        emit(EventErrorState(message: e.toString()));
-      }
-    });
-  }
-
-  bool isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
-  }
-
-  List<Event> filterEventsForToday() {
-    DateTime now = DateTime.now();
-    return allEvents.where((event) => isSameDay(event.date, now)).toList();
-  }
-
-  List<Event> filterEventsForTomorrow() {
-    DateTime now = DateTime.now();
-    DateTime tomorrow =
-        DateTime(now.year, now.month, now.day + 1, 23, 59, 59, 999);
-    return allEvents.where((event) => isSameDay(event.date, tomorrow)).toList();
-  }
-
-  List<Event> filterEventsForThisWeek() {
-    DateTime now = DateTime.now();
-    DateTime endOfWeek = now.add(Duration(days: 7 - now.weekday));
-    endOfWeek = DateTime(
-        endOfWeek.year, endOfWeek.month, endOfWeek.day, 23, 59, 59, 999);
-    return allEvents
-        .where((event) =>
-            event.date.isAfter(now) && event.date.isBefore(endOfWeek))
-        .toList();
-  }
-
-  List<Event> filterUpcomingEvents() {
-    DateTime now = DateTime.now();
-    return allEvents.where((event) => event.date.isAfter(now)).toList();
-  }
-
-  Future<int> getAttendesByEventId(String eventId) async {
-    try {
-      return await _firestoreService.getEventAttendeesCount(eventId);
-    } catch (e) {
-      return -1;
-    }
   }
 }

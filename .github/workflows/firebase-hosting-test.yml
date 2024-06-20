@@ -26,7 +26,10 @@ jobs:
         run: |
           flutter pub get
       - name: 🛠️ Build the application
-        run: flutter build web
+        run: |
+          echo "RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }}" > .env
+          flutter pub get
+          flutter build web
       - name: ⬇️ Archive Production Artifact
         uses: actions/upload-artifact@master
         with:

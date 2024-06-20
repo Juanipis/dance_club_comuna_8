@@ -20,7 +20,7 @@ class _AdminScreenState extends State<AdminScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Admin Screen"),
+        title: const Text("Panel de administración"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -60,32 +60,92 @@ class _AdminScreenState extends State<AdminScreen> {
 }
 
 Widget buildAdminScreen(BuildContext context) {
-  return Column(
-    children: [
-      const Text("Hola ¿Qué desea hacer hoy?"),
-      ElevatedButton(
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddEventScreen()));
-        },
-        child: const Text("Crear evento"),
+  return SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Hola, ¿qué desea hacer hoy?",
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 20),
+          AdminOptionCard(
+            title: "Crear evento",
+            icon: Icons.event,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const AddEventScreen()));
+            },
+          ),
+          AdminOptionCard(
+            title: "Editar eventos y asistentes",
+            icon: Icons.edit,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const EventsViewerScreen()));
+            },
+          ),
+          AdminOptionCard(
+            title: "Subir imágenes",
+            icon: Icons.image,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const UploadImagesScreen()));
+            },
+          ),
+        ],
       ),
-      ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const EventsViewerScreen()));
-          },
-          child: const Text("Editar eventos y asistentes")),
-      ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const UploadImagesScreen()));
-          },
-          child: const Text("Subir imágenes")),
-    ],
+    ),
   );
+}
+
+class AdminOptionCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const AdminOptionCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 4,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(icon, size: 30, color: Theme.of(context).primaryColor),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Text(title,
+                    style: Theme.of(context).textTheme.headlineSmall),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

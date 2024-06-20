@@ -61,7 +61,11 @@ Widget eventCard({
   return Card(
     child: Column(
       children: [
-        image,
+        SizedBox(
+          width: 300,
+          height: 200,
+          child: image,
+        ),
         Text(event.title, style: const TextStyle(fontSize: 17)),
         const SizedBox(height: 10),
         Text(formattedDate),

@@ -187,34 +187,66 @@ class RegisterDialog extends StatefulWidget {
 class _RegisterDialogState extends State<RegisterDialog> {
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController name = TextEditingController();
-  Logger logger = Logger();
   bool isLoading = false;
+  bool isPolicyAccepted = false;
   String? error;
+  Logger logger = Logger();
+
+  bool isValidPhoneNumber(String number) {
+    RegExp regex = RegExp(r'^(\+?\d{1,3}?)?[1-9][0-9]{7,14}$');
+    return regex.hasMatch(number);
+  }
+
+  void showPolicyDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Política de Tratamiento de Datos'),
+        content: const SingleChildScrollView(
+          child: Text('### Política de Tratamiento de Datos Personales\n\n'
+              '**El club de danzas la ladera** se compromete a garantizar la protección de la privacidad de los datos personales de nuestros usuarios. Esta política detalla los procedimientos y principios que aplicamos en el manejo de dichos datos.\n\n'
+              '#### 1. Información que recopilamos\n\n'
+              'Para el registro y participación en eventos, recopilamos los siguientes datos personales:\n\n'
+              '- Nombre completo\n'
+              '- Número de teléfono\n\n'
+              '#### 2. Uso de la información\n\n'
+              'Los datos recopilados se utilizan exclusivamente para los siguientes fines:\n\n'
+              '- Registrar y confirmar su participación en los eventos.\n'
+              '- Facilitar la organización y logística de los eventos, incluyendo la llamada a lista para verificar asistencia.\n'
+              '- Comunicaciones relacionadas con el evento para el cual se ha registrado.\n\n'
+              '#### 3. Protección de datos\n\n'
+              'Nos comprometemos a proteger sus datos personales mediante la implementación de medidas técnicas y organizativas adecuadas para prevenir la pérdida, mal uso, alteración, acceso no autorizado y robo de los datos suministrados. Solo el personal autorizado tendrá acceso a sus datos personales, y no se compartirán con terceros sin su consentimiento expreso, salvo por obligación legal.\n\n'
+              '#### 4. Derechos del titular de los datos\n\n'
+              'De acuerdo con la normativa vigente en Colombia sobre protección de datos personales, usted tiene derecho a:\n\n'
+              '- Conocer, actualizar y rectificar sus datos personales frente a [Nombre de tu organización o aplicación].\n'
+              '- Solicitar prueba de la autorización otorgada.\n'
+              '- Ser informado respecto al uso que se ha dado a sus datos personales.\n'
+              '- Presentar quejas ante la Superintendencia de Industria y Comercio por infracciones a lo dispuesto en la normativa vigente.\n'
+              '- Revocar la autorización y/o solicitar la supresión del dato cuando en el tratamiento no se respeten los principios, derechos y garantías constitucionales y legales.\n'
+              '- Acceder en forma gratuita a sus datos personales que hayan sido objeto del tratamiento.\n\n'
+              '#### 5. Vigencia\n\n'
+              'La presente política de tratamiento de datos personales está vigente desde [Fecha de inicio] y permanecerá efectiva hasta que se realice una actualización que será comunicada a los usuarios.\n\n'
+              'Para más información, preguntas o preocupaciones acerca de nuestras políticas de privacidad, por favor, póngase en contacto con nosotros a través de [Correo electrónico de contacto] o [Número de teléfono de contacto].'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<EventRegisterBloc, EventState>(
       listener: (context, state) {
         if (state is UserRegisteredState) {
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: const Text('Registro exitoso'),
-              content: const Text('Te has registrado exitosamente.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    BlocProvider.of<EventBloc>(context).add(
-                      LoadEventEventById(id: widget.eventId),
-                    );
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
+          Navigator.pop(context); // Close the dialog
+          Navigator.pop(context); // Optionally close the previous context
         } else if (state is EventErrorState) {
           setState(() {
             isLoading = false;
@@ -231,46 +263,67 @@ class _RegisterDialogState extends State<RegisterDialog> {
                 children: [
                   TextField(
                     controller: name,
-                    decoration: const InputDecoration(
-                      labelText: 'Nombre',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Nombre'),
                   ),
                   TextField(
                     controller: phoneNumber,
-                    decoration: const InputDecoration(
-                      labelText: 'Número de teléfono',
-                    ),
+                    decoration:
+                        const InputDecoration(labelText: 'Número de teléfono'),
                   ),
                   if (error != null)
-                    Text(
-                      error!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  const Text(
-                      'Al registrarte aceptas nuestra política de tratamiento de datos'),
+                    Text(error!, style: const TextStyle(color: Colors.red)),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPolicyAccepted,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isPolicyAccepted = value ?? false;
+                          });
+                        },
+                      ),
+                      const Expanded(
+                        child:
+                            Text('Acepto la política de tratamiento de datos'),
+                      ),
+                      GestureDetector(
+                        onTap: showPolicyDialog,
+                        child: const Text(
+                          'Saber más',
+                          style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                isLoading = true;
-              });
-              logger.d(
-                  'Registrando usuario, evento: ${widget.eventId} teléfono: ${phoneNumber.text} nombre: ${name.text}');
-              BlocProvider.of<EventRegisterBloc>(context).add(
-                RegisterUserEvent(
-                  eventId: widget.eventId,
-                  phoneNumber: phoneNumber.text,
-                  name: name.text,
-                ),
-              );
+              if (isValidPhoneNumber(phoneNumber.text) && isPolicyAccepted) {
+                setState(() {
+                  isLoading = true;
+                });
+                logger.d(
+                    'Registrando usuario, evento: ${widget.eventId}, teléfono: ${phoneNumber.text}, nombre: ${name.text}');
+                BlocProvider.of<EventRegisterBloc>(context).add(
+                  RegisterUserEvent(
+                    eventId: widget.eventId,
+                    phoneNumber: phoneNumber.text,
+                    name: name.text,
+                  ),
+                );
+              } else {
+                setState(() {
+                  error = 'Número de teléfono inválido o política no aceptada.';
+                });
+              }
             },
             child: const Text('Aceptar'),
           ),

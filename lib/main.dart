@@ -3,7 +3,9 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/images/image_bloc.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_storage_service.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
 import 'package:dance_club_comuna_8/firebase_options.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
@@ -20,13 +22,23 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final reCaptchaKey = dotenv.env['RECAPTCHA_V3_SITE_KEY'] ?? 'default_key';
+  await FirebaseAppCheck.instance.activate(
+    webProvider: ReCaptchaV3Provider(reCaptchaKey),
+    androidProvider: AndroidProvider.debug,
+  );
+
   final FirestoreEventsService firestoreEventsService =
       FirestoreEventsService();
   final AuthService authService = AuthService();
   final FirestoreStorageService bucketService = FirestoreStorageService();
+
   runApp(MyApp(
       firestoreEventsService: firestoreEventsService,
       authService: authService,
