@@ -28,6 +28,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   TimeOfDay? selectedEndTime;
 
   List<ImageBucket> images = [];
+  int selectedImageIndex = 0;
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -232,10 +233,12 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       ),
                     ),
                     DropdownButton<ImageBucket>(
-                      value: images.isNotEmpty ? images[0] : null,
+                      value:
+                          images.isNotEmpty ? images[selectedImageIndex] : null,
                       onChanged: (ImageBucket? value) {
                         setState(() {
                           imageUrlController.text = value!.imagePath;
+                          selectedImageIndex = images.indexOf(value);
                         });
                       },
                       dropdownColor: Colors.white,
