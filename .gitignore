@@ -44,3 +44,6 @@ app.*.map.json
 
 #firebase
 /.firebase
+
+#env
+.env
