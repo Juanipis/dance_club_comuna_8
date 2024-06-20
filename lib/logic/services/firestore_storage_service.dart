@@ -43,7 +43,10 @@ class FirestoreStorageService {
       String path, String imageName, Uint8List fileBytes) async {
     logger.d('Uploading image to storage');
     try {
-      await _storage.ref(path).child(imageName).putData(fileBytes);
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+      await _storage.ref(path).child(imageName).putData(fileBytes, metadata);
       String downloadUrl =
           await _storage.ref(path).child(imageName).getDownloadURL();
       return ImageBucket(imagePath: downloadUrl, imageName: imageName);

@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'package:logger/logger.dart';
+import 'package:mime_type/mime_type.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path/path.dart' as mime_path;
 
 class UploadImagesScreen extends StatefulWidget {
   const UploadImagesScreen({super.key});
@@ -45,16 +47,29 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                     const Text('Seleccione la imagen que desea subir'),
                     ElevatedButton(
                       onPressed: () async {
-                        Uint8List? bytes =
-                            await ImagePickerWeb.getImageAsBytes();
-                        if (bytes != null) {
-                          setState(() {
-                            fileBytes = bytes;
-                            imageSelected = true;
-                            fileName =
-                                'image_${DateTime.now().millisecondsSinceEpoch}';
+                        var mediaData = await ImagePickerWeb
+                            .getImageInfo(); //TODO: if we want to use android or ios we need to use ImagePicker().getImage(source: ImageSource.gallery)
+                        if (mediaData != null) {
+                          String? mimeType =
+                              mime(mime_path.basename(mediaData.fileName!));
+                          if (mimeType == 'image/jpeg' ||
+                              mimeType == 'image/png' ||
+                              mimeType == null) {
+                            setState(() {
+                              fileBytes = mediaData.data;
+                              imageSelected = true;
+                              fileName =
+                                  'image_${DateTime.now().millisecondsSinceEpoch}';
+                            });
                             logger.d('Image selected');
-                          });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Por favor seleccione una imagen de tipo JPG o PNG.'),
+                              ),
+                            );
+                          }
                         }
                       },
                       child: const Text('Seleccionar imagen'),
@@ -74,7 +89,9 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                     Text(
                         "Tamaño de la imagen: ${fileBytes?.length ?? 0} bytes"),
                     const Text(
-                        "La imagen se va a guardar en .png, no añada la extensión")
+                        "Se recomienda que la imagen no exceda los 500kb, dado que puede hacer que se incurra en costos adicionales, utilice un compresor de imágenes para reducir el tamaño de la imagen."),
+                    const Text(
+                        "La imagen se va a guardar en .jpg, no añada la extensión")
                   ],
                 ),
               ),
@@ -83,13 +100,36 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                   child: const Text('Subir'),
                   onPressed: () {
                     if (fileBytes != null) {
+                      String imageName = imageNameController.text;
+
+                      // Verificar y eliminar cualquier extensión de archivo
+                      imageName = imageName.replaceAll(RegExp(r'\..*'), '');
+
+                      // Verificar que el nombre no contenga caracteres especiales
+                      final validCharacters = RegExp(r'^[a-zA-Z0-9_]+$');
+                      if (!validCharacters.hasMatch(imageName)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'El nombre de la imagen no debe contener caracteres especiales.'),
+                          ),
+                        );
+                        return;
+                      }
+
                       BlocProvider.of<ImageBloc>(context)
                           .add(UploadImageUnit8ListEvent(
                         path: 'images',
-                        imageName: '${imageNameController.text}.png',
+                        imageName: '$imageName.jpg',
                         fileBytes: fileBytes!,
                       ));
                       Navigator.of(context).pop();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Seleccione una imagen'),
+                        ),
+                      );
                     }
                   },
                 ),
