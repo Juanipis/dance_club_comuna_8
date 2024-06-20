@@ -28,7 +28,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final reCaptchaKey = dotenv.env['RECAPTCHA_V3_SITE_KEY'] ?? 'default_key';
+  const reCaptchaKey = String.fromEnvironment('RECAPTCHA_V3_SITE_KEY',
+      defaultValue: 'default_key');
   await FirebaseAppCheck.instance.activate(
     webProvider: ReCaptchaV3Provider(reCaptchaKey),
     androidProvider: AndroidProvider.debug,
