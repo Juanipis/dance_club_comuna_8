@@ -1,6 +1,10 @@
 import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_states.dart';
+import 'package:dance_club_comuna_8/logic/models/image_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,6 +26,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
   TimeOfDay? selectedTime;
   DateTime? selectedEndDate;
   TimeOfDay? selectedEndTime;
+
+  List<ImageBucket> images = [];
+  int selectedImageIndex = 0;
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -142,6 +149,22 @@ class _AddEventScreenState extends State<AddEventScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // with the bloc provider  get the images paths, this will be used to show the images in the dropdown
+    BlocProvider.of<ImageBloc>(context)
+        .add(const GetImagesPathsEvent(path: 'images'));
+
+    BlocProvider.of<ImageBloc>(context).stream.listen((state) {
+      if (state is ImagesPathsLoadedState) {
+        setState(() {
+          images = state.images;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final eventBloc = BlocProvider.of<EventAdminBloc>(context);
     return Scaffold(
@@ -198,11 +221,36 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     labelText: 'Dirección del Evento',
                   ),
                 ),
-                TextField(
-                  controller: imageUrlController,
-                  decoration: const InputDecoration(
-                    labelText: 'URL de la imagen del Evento',
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 7,
+                      child: TextField(
+                        controller: imageUrlController,
+                        decoration: const InputDecoration(
+                          labelText: 'URL de la imagen del Evento',
+                        ),
+                      ),
+                    ),
+                    DropdownButton<ImageBucket>(
+                      value:
+                          images.isNotEmpty ? images[selectedImageIndex] : null,
+                      onChanged: (ImageBucket? value) {
+                        setState(() {
+                          imageUrlController.text = value!.imagePath;
+                          selectedImageIndex = images.indexOf(value);
+                        });
+                      },
+                      dropdownColor: Colors.white,
+                      iconSize: 20,
+                      items: images
+                          .map((image) => DropdownMenuItem<ImageBucket>(
+                                value: image,
+                                child: Text(image.imageName),
+                              ))
+                          .toList(),
+                    ),
+                  ],
                 ),
                 TextField(
                   controller: maxAttendeesController,

@@ -1,7 +1,11 @@
 import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_states.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/logic/models/image_bucket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -29,12 +33,14 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   TimeOfDay? selectedTime;
   DateTime? selectedEndDate;
   TimeOfDay? selectedEndTime;
+  List<ImageBucket> images = [];
+  int selectedImageIndex = 0;
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
       lastDate: DateTime(2025),
     );
     if (picked != null && picked != selectedDate) {
@@ -59,7 +65,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
   Future<void> selectEndDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedEndDate ?? DateTime.now(),
+      initialDate: DateTime.now(),
       firstDate: DateTime.now().subtract(const Duration(days: 1)),
       lastDate: DateTime(2025),
     );
@@ -154,6 +160,16 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
     super.initState();
     BlocProvider.of<EventAdminBloc>(context)
         .add(LoadEventEventById(id: widget.eventId));
+    BlocProvider.of<ImageBloc>(context)
+        .add(const GetImagesPathsEvent(path: 'images'));
+
+    BlocProvider.of<ImageBloc>(context).stream.listen((state) {
+      if (state is ImagesPathsLoadedState) {
+        setState(() {
+          images = state.images;
+        });
+      }
+    });
   }
 
   @override
@@ -255,11 +271,37 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
                       labelText: 'Dirección del Evento',
                     ),
                   ),
-                  TextField(
-                    controller: imageUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'URL de la imagen del Evento',
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 7,
+                        child: TextField(
+                          controller: imageUrlController,
+                          decoration: const InputDecoration(
+                            labelText: 'URL de la imagen del Evento',
+                          ),
+                        ),
+                      ),
+                      DropdownButton<ImageBucket>(
+                        value: images.isNotEmpty
+                            ? images[selectedImageIndex]
+                            : null,
+                        onChanged: (ImageBucket? value) {
+                          setState(() {
+                            imageUrlController.text = value!.imagePath;
+                            selectedImageIndex = images.indexOf(value);
+                          });
+                        },
+                        dropdownColor: Colors.white,
+                        iconSize: 20,
+                        items: images
+                            .map((image) => DropdownMenuItem<ImageBucket>(
+                                  value: image,
+                                  child: Text(image.imageName),
+                                ))
+                            .toList(),
+                      ),
+                    ],
                   ),
                   TextField(
                     controller: maxAttendeesController,

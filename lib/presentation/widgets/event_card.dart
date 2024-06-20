@@ -22,6 +22,29 @@ Widget eventCard({
           fit: BoxFit.cover,
           width: 300,
           height: 200,
+          loadingBuilder: (BuildContext context, Widget child,
+              ImageChunkEvent? loadingProgress) {
+            if (loadingProgress == null) {
+              return child;
+            } else {
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          (loadingProgress.expectedTotalBytes ?? 1)
+                      : null,
+                ),
+              );
+            }
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              placeHolderImage,
+              fit: BoxFit.cover,
+              width: 300,
+              height: 200,
+            );
+          },
         )
       : Image.asset(
           placeHolderImage,
