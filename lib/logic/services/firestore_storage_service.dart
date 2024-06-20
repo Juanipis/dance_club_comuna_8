@@ -39,7 +39,6 @@ class FirestoreStorageService {
     }
   }
 
-  //upload image as bytes
   Future<ImageBucket> uploadImageAsBytes(
       String path, String imageName, Uint8List fileBytes) async {
     logger.d('Uploading image to storage');
@@ -51,6 +50,15 @@ class FirestoreStorageService {
     } catch (e) {
       logger.e('Error uploading image: $e');
       return ImageBucket(imagePath: '', imageName: '');
+    }
+  }
+
+  Future<void> deleteImage(String path, String imageName) async {
+    logger.d('Deleting image from storage');
+    try {
+      await _storage.ref(path).child(imageName).delete();
+    } catch (e) {
+      logger.e('Error deleting image: $e');
     }
   }
 }

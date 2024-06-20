@@ -31,6 +31,21 @@ class ImagesPathsLoadedState extends ImageState {
   List<Object?> get props => [images];
 }
 
+class UploadingImageState extends ImageState {
+  @override
+  List<Object> get props => [];
+}
+
+class ImageDeletedState extends ImageState {
+  @override
+  List<Object> get props => [];
+}
+
+class ImageDeletingState extends ImageState {
+  @override
+  List<Object> get props => [];
+}
+
 class ImageErrorState extends ImageState {
   final String message;
 

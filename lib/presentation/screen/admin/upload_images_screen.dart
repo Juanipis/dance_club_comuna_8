@@ -137,7 +137,12 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () {},
+                        onPressed: () {
+                          BlocProvider.of<ImageBloc>(context).add(
+                              DeleteImageEvent(
+                                  path: image.imagePath,
+                                  imageName: image.imageName));
+                        },
                       ),
                       IconButton(
                         icon: const Icon(Icons.copy),
@@ -161,11 +166,42 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                 );
               },
             );
-          } else if (state is ImageUploadedState) {
+          } else if (state is UploadingImageState) {
+            const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Subiendo imagen'),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
+          } else if (state is ImageUploadedState ||
+              state is ImageDeletedState) {
             BlocProvider.of<ImageBloc>(context)
                 .add(const GetImagesPathsEvent(path: 'images'));
+          } else if (state is UploadingImageState) {
+            return const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Cargando imágenes'),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
+          } else if (state is ImageDeletingState) {
+            return const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Eliminando imagen'),
+                  CircularProgressIndicator(),
+                ],
+              ),
+            );
           }
-          return const Center(child: Text('No hay imágenes'));
+          return const Center(child: CircularProgressIndicator());
         },
       ),
       floatingActionButton: FloatingActionButton(

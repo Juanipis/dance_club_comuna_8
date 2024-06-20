@@ -9,7 +9,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
   ImageBloc({required this.firestoreStorageService})
       : super(ImageInitialState()) {
     on<UploadImageEvent>((event, emit) async {
-      emit(ImageLoadingState());
+      emit(UploadingImageState());
       final image = await firestoreStorageService.uploadImage(
           event.path, event.imagePath, event.imageName);
       if (image.imagePath.isNotEmpty) {
@@ -30,7 +30,7 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
     });
 
     on<UploadImageUnit8ListEvent>((event, emit) async {
-      emit(ImageLoadingState());
+      emit(UploadingImageState());
       final image = await firestoreStorageService.uploadImageAsBytes(
           event.path, event.imageName, event.fileBytes);
       if (image.imagePath.isNotEmpty) {
@@ -38,6 +38,12 @@ class ImageBloc extends Bloc<ImageEvent, ImageState> {
       } else {
         emit(ImageErrorState(message: 'Error uploading image'));
       }
+    });
+
+    on<DeleteImageEvent>((event, emit) async {
+      emit(ImageDeletingState());
+      await firestoreStorageService.deleteImage(event.path, event.imageName);
+      emit(ImageDeletedState());
     });
   }
 }

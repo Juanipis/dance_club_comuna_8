@@ -30,6 +30,16 @@ class UploadImageUnit8ListEvent extends ImageEvent {
   List<Object?> get props => [path, imageName, fileBytes];
 }
 
+class DeleteImageEvent extends ImageEvent {
+  final String path;
+  final String imageName;
+
+  const DeleteImageEvent({required this.path, required this.imageName});
+
+  @override
+  List<Object?> get props => [path, imageName];
+}
+
 class GetImagesPathsEvent extends ImageEvent {
   final String path;
 
