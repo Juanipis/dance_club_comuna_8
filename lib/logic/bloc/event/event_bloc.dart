@@ -7,9 +7,6 @@ import 'package:logger/logger.dart';
 
 class EventBloc extends Bloc<EventEvent, EventState> {
   final FirestoreEventsService _firestoreService;
-  List<Event> allEvents = [];
-  Map<String, List<Event>> cache = {};
-
   Logger logger = Logger();
 
   EventBloc(this._firestoreService) : super(EventLoadingState()) {
@@ -29,16 +26,9 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       try {
         DateTime now = eventInfo.startTime;
         DateTime end = eventInfo.endTime;
-        String cacheKey = "${now.toIso8601String()}::${end.toIso8601String()}";
-        if (cache.containsKey(cacheKey)) {
-          logger.d('Using cached events');
-          allEvents = cache[cacheKey]!;
-        } else {
-          allEvents =
-              await _firestoreService.getUpcomingEventsWithAttendees(now, end);
-          cache[cacheKey] = allEvents;
-        }
-        emit(EventsLoadedState(allEvents));
+        List<Event> events =
+            await _firestoreService.getUpcomingEventsWithAttendees(now, end);
+        emit(EventsLoadedState(events));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }
@@ -51,8 +41,6 @@ class EventBloc extends Bloc<EventEvent, EventState> {
             eventInfo.eventId, eventInfo.phoneNumber, eventInfo.name);
         if (success) {
           emit(UserRegisteredState());
-          // Invalidate cache to reflect new registration
-          cache.clear();
         } else {
           emit(EventErrorState(
               message: 'Event is full or user already registered'));
