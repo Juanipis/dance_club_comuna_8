@@ -29,6 +29,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
   List<ImageBucket> images = [];
   int selectedImageIndex = 0;
+  bool isImageLoading = false;
 
   Future<void> selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -151,7 +152,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
   @override
   void initState() {
     super.initState();
-    // with the bloc provider  get the images paths, this will be used to show the images in the dropdown
     BlocProvider.of<ImageBloc>(context)
         .add(const GetImagesPathsEvent(path: 'images'));
 
@@ -161,6 +161,18 @@ class _AddEventScreenState extends State<AddEventScreen> {
           images = state.images;
         });
       }
+    });
+
+    imageUrlController.addListener(() {
+      setState(() {
+        isImageLoading = true;
+      });
+      // Simulate network image loading
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          isImageLoading = false;
+        });
+      });
     });
   }
 
@@ -193,7 +205,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
             );
           }
 
-          return Padding(
+          return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
@@ -203,24 +215,28 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     labelText: 'Título del Evento (obligatorio)',
                   ),
                 ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: descriptionController,
                   decoration: const InputDecoration(
                     labelText: 'Descripción del Evento',
                   ),
                 ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: instructionsController,
                   decoration: const InputDecoration(
                     labelText: 'Instrucciones del Evento',
                   ),
                 ),
+                const SizedBox(height: 16),
                 TextField(
                   controller: addressController,
                   decoration: const InputDecoration(
                     labelText: 'Dirección del Evento',
                   ),
                 ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
@@ -232,6 +248,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(width: 16),
                     DropdownButton<ImageBucket>(
                       value:
                           images.isNotEmpty ? images[selectedImageIndex] : null,
@@ -252,6 +269,19 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                isImageLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : imageUrlController.text.isNotEmpty
+                        ? Image.network(
+                            imageUrlController.text,
+                            height: 150,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Text('No se pudo cargar la imagen');
+                            },
+                          )
+                        : const SizedBox.shrink(),
+                const SizedBox(height: 16),
                 TextField(
                   controller: maxAttendeesController,
                   decoration: const InputDecoration(
@@ -259,53 +289,74 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   ),
                   keyboardType: TextInputType.number,
                 ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     ElevatedButton(
                       onPressed: () => selectDate(context),
                       child: const Text('Seleccionar fecha'),
                     ),
+                    const SizedBox(width: 16),
                     Text(selectedDate != null
                         ? 'Fecha seleccionada: ${selectedDate!.toLocal()}'
                         : 'No se ha seleccionado fecha'),
                   ],
                 ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     ElevatedButton(
                       onPressed: () => selectTime(context),
                       child: const Text('Seleccionar hora'),
                     ),
+                    const SizedBox(width: 16),
                     Text(selectedTime != null
                         ? 'Hora seleccionada: ${selectedTime!.format(context)}'
                         : 'No se ha seleccionado hora'),
                   ],
                 ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     ElevatedButton(
                       onPressed: () => selectEndDate(context),
                       child: const Text('Seleccionar fecha de fin'),
                     ),
+                    const SizedBox(width: 16),
                     Text(selectedEndDate != null
                         ? 'Fecha de fin seleccionada: ${selectedEndDate!.toLocal()}'
                         : 'No se ha seleccionado fecha de fin'),
                   ],
                 ),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     ElevatedButton(
                       onPressed: () => selectEndTime(context),
                       child: const Text('Seleccionar hora de fin'),
                     ),
+                    const SizedBox(width: 16),
                     Text(selectedEndTime != null
                         ? 'Hora de fin seleccionada: ${selectedEndTime!.format(context)}'
                         : 'No se ha seleccionado hora de fin'),
                   ],
                 ),
-                ElevatedButton(
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
                   onPressed: () => saveEvent(context),
-                  child: const Text('Guardar Evento'),
+                  icon: const Icon(Icons.save),
+                  label: const Text('Guardar Evento'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    textStyle:
+                        Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                  ),
                 ),
               ],
             ),
