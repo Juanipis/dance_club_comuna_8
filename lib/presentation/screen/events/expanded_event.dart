@@ -218,14 +218,14 @@ class _RegisterDialogState extends State<RegisterDialog> {
               'Nos comprometemos a proteger sus datos personales mediante la implementación de medidas técnicas y organizativas adecuadas para prevenir la pérdida, mal uso, alteración, acceso no autorizado y robo de los datos suministrados. Solo el personal autorizado tendrá acceso a sus datos personales, y no se compartirán con terceros sin su consentimiento expreso, salvo por obligación legal.\n\n'
               '#### 4. Derechos del titular de los datos\n\n'
               'De acuerdo con la normativa vigente en Colombia sobre protección de datos personales, usted tiene derecho a:\n\n'
-              '- Conocer, actualizar y rectificar sus datos personales frente a [Nombre de tu organización o aplicación].\n'
+              '- Conocer, actualizar y rectificar sus datos personales frente a Club de danzas comuna 8.\n'
               '- Solicitar prueba de la autorización otorgada.\n'
               '- Ser informado respecto al uso que se ha dado a sus datos personales.\n'
               '- Presentar quejas ante la Superintendencia de Industria y Comercio por infracciones a lo dispuesto en la normativa vigente.\n'
               '- Revocar la autorización y/o solicitar la supresión del dato cuando en el tratamiento no se respeten los principios, derechos y garantías constitucionales y legales.\n'
               '- Acceder en forma gratuita a sus datos personales que hayan sido objeto del tratamiento.\n\n'
               '#### 5. Vigencia\n\n'
-              'La presente política de tratamiento de datos personales está vigente desde [Fecha de inicio] y permanecerá efectiva hasta que se realice una actualización que será comunicada a los usuarios.\n\n'
+              'La presente política de tratamiento de datos personales está vigente desde 8/4/204 y permanecerá efectiva hasta que se realice una actualización que será comunicada a los usuarios.\n\n'
               'Para más información, preguntas o preocupaciones acerca de nuestras políticas de privacidad, por favor, póngase en contacto con nosotros a través de [Correo electrónico de contacto] o [Número de teléfono de contacto].'),
         ),
         actions: <Widget>[
@@ -240,14 +240,26 @@ class _RegisterDialogState extends State<RegisterDialog> {
     );
   }
 
+  void _showSnackBar(String message, bool isSuccess) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<EventRegisterBloc, EventState>(
       listener: (context, state) {
         if (state is UserRegisteredState) {
           Navigator.pop(context); // Close the dialog
-          Navigator.pop(context); // Optionally close the previous context
+          _showSnackBar('Registrado correctamente', true);
+          Navigator.pop(context); // Close the expanded event
         } else if (state is EventErrorState) {
+          _showSnackBar(
+              'No se logró realizar el registro. ${state.message}', false);
           setState(() {
             isLoading = false;
             error = state.message;
