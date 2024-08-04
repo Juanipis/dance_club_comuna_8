@@ -18,6 +18,16 @@ class EventLoadedState extends EventState {
   List<Object> get props => [events];
 }
 
+class AttendanceUpdatedState extends EventState {
+  final String message;
+
+  AttendanceUpdatedState(
+      {this.message = "Asistencia actualizada exitosamente"});
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class EventsLoadedState extends EventState {
   final List<Event> events;
 

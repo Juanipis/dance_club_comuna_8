@@ -111,6 +111,17 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
       }
     });
 
+    on<SaveAttendeesAttendanceEvent>((event, emit) async {
+      emit(EventLoadingState());
+      try {
+        await _firestoreService.saveAttendeesAttendance(
+            event.eventId, event.attendees);
+        emit(AttendanceUpdatedState());
+      } catch (e) {
+        emit(EventErrorState(message: e.toString()));
+      }
+    });
+
     on<DeleteEventEvent>((eventInfo, emit) async {
       emit(EventLoadingState());
       try {

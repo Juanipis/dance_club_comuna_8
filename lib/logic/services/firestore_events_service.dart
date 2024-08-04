@@ -189,6 +189,7 @@ class FirestoreEventsService {
     logger.d('Registering user $phoneNumber to event $eventId');
     DocumentReference eventDocRef = _eventCollection.doc(eventId);
     CollectionReference usersRef = eventDocRef.collection('registered_users');
+    // get the ip of the user
 
     // Verificar que el evento exista
     DocumentSnapshot eventDoc = await eventDocRef.get();
@@ -215,12 +216,35 @@ class FirestoreEventsService {
         'phone_number': phoneNumber,
         'timestamp': FieldValue.serverTimestamp(),
         'name': name,
+        'attended': false,
       }, SetOptions(merge: true));
       logger.d('User registered successfully.');
       return true;
     } catch (e) {
       logger.e('Error during registration: $e');
       return false;
+    }
+  }
+
+  Future<void> saveAttendeesAttendance(
+      String eventId, List<EventAttend> attendees) async {
+    logger.d('Saving attendees attendance for event $eventId');
+    CollectionReference usersRef =
+        _eventCollection.doc(eventId).collection('registered_users');
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    for (var attendee in attendees) {
+      DocumentReference userDocRef = usersRef.doc(attendee.phoneNumber);
+      batch.update(userDocRef, {'attended': attendee.attended});
+    }
+
+    try {
+      await batch.commit();
+      logger.d('Attendance saved successfully.');
+    } catch (e) {
+      logger.e('Error saving attendance: $e');
+      rethrow;
     }
   }
 
@@ -237,6 +261,7 @@ class FirestoreEventsService {
         phoneNumber: doc.id,
         timestamp: (data['timestamp'] as Timestamp).toDate(),
         name: data['name'],
+        attended: data['attended'] ?? false,
       ));
     }
 

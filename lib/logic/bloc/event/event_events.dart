@@ -1,3 +1,4 @@
+import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class EventEvent extends Equatable {
@@ -11,6 +12,17 @@ class LoadEventEventById extends EventEvent {
 
   @override
   List<Object?> get props => [id];
+}
+
+class SaveAttendeesAttendanceEvent extends EventEvent {
+  final String eventId;
+  final List<EventAttend> attendees;
+
+  const SaveAttendeesAttendanceEvent(
+      {required this.eventId, required this.attendees});
+
+  @override
+  List<Object?> get props => [eventId, attendees];
 }
 
 class InserEventEvent extends EventEvent {
