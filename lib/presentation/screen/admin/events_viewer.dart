@@ -4,6 +4,7 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:dance_club_comuna_8/logic/models/date_helper.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/attendes_screen.dart';
+
 import 'package:dance_club_comuna_8/presentation/screen/admin/update_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,7 +35,7 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
     await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => AttendesScreen(eventId: eventId)));
+            builder: (context) => AttendeesScreen(eventId: eventId)));
     if (!context.mounted) return;
     BlocProvider.of<EventAdminBloc>(context)
         .add(LoadUpcomingEventsEvent(startTime: startDate, endTime: endDate));
