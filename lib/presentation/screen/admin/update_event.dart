@@ -174,8 +174,6 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final eventBloc = BlocProvider.of<EventAdminBloc>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Evento'),

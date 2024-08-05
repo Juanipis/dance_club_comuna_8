@@ -6,9 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
-import 'package:mime_type/mime_type.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:path/path.dart' as mime_path;
 
 class UploadImagesScreen extends StatefulWidget {
   const UploadImagesScreen({super.key});

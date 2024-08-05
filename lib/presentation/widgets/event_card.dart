@@ -12,7 +12,7 @@ Widget eventCard({
 }) {
   initializeDateFormatting();
 
-  var placeHolderImage = 'assets/images/placeholder1.jpg';
+  var placeHolderImage = 'assets/images/placeholder.webp';
   var isNetworkImage =
       event.imageUrl.startsWith('http') || event.imageUrl.startsWith('https');
 

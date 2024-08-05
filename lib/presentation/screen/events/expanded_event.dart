@@ -46,7 +46,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is LoadEventByIdState) {
             Event event = state.event;
-            var placeHolderImage = 'assets/images/placeholder1.jpg';
+            var placeHolderImage = 'assets/images/placeholder.webp';
             var isNetworkImage = event.imageUrl.startsWith('http') ||
                 event.imageUrl.startsWith('https');
 

@@ -26,6 +26,9 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  Logger logger = Logger();
+  logger.i(
+      const String.fromEnvironment('DEBUG_KEY', defaultValue: 'default_key'));
 
   await FirebaseAppCheck.instance.activate(
     webProvider: kReleaseMode
@@ -34,7 +37,7 @@ Future<void> main() async {
             defaultValue: 'default_key'))
         : ReCaptchaV3Provider(const String.fromEnvironment('DEBUG_KEY',
             defaultValue: 'default_key')),
-    androidProvider: AndroidProvider.playIntegrity,
+    // androidProvider: AndroidProvider.playIntegrity,
   );
 
   final FirestoreEventsService firestoreEventsService =
@@ -79,12 +82,12 @@ class MyApp extends StatelessWidget {
                 ImageBloc(firestoreStorageService: bucketService)),
       ],
       child: MaterialApp(
-        title: 'Club de danza comuna 8',
+        title: 'Danzas la ladera alma y tradición',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade200),
           useMaterial3: true,
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        home: const MyHomePage(title: 'Danzas la ladera alma y tradición'),
       ),
     );
   }
@@ -103,15 +106,15 @@ class _MyHomePageState extends State<MyHomePage> {
   var selectedScreenIndex = 0;
   var resources = {
     'leadingLogo': 'assets/images/logo.png',
-    'title': 'Danzas la ladera',
-    'imageBackground': 'assets/images/background.jpg',
+    'title': 'Danzas la ladera alma y tradición',
+    'imageBackground': 'assets/images/0014.webp',
   };
   var backgrounds = [
-    'assets/images/background.jpg',
-    'assets/images/background2.jpg',
-    'assets/images/background3.jpg',
-    'assets/images/background4.jpg',
-    'assets/images/background5.jpg',
+    'assets/images/0014.webp',
+    'assets/images/0015.webp',
+    'assets/images/0014.webp',
+    'assets/images/0010.webp',
+    'assets/images/0015.webp',
   ];
 
   @override
@@ -123,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
         'Página principal',
       ),
       (buildAboutScreen(), '¿Quiénes somos?'),
-      (buildPresentationsScreen(), 'Presentaciones'),
+      (const BuildPresentationsScreen(), 'Presentaciones'),
       (const BuildEventsScreen(), 'Eventos'),
       (buildContactScreen(), 'Contacto'),
     ];
@@ -212,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   )
-                : Image.asset(resources['leadingLogo'] as String, width: 50),
+                : null,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 alignment: AlignmentDirectional.center,
@@ -222,6 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     width: MediaQuery.of(context).size.width,
                     height: 300,
                     fit: BoxFit.cover,
+                    alignment: const Alignment(1.0, -0.3),
                   ),
                   Text(
                     resources['title'] as String,

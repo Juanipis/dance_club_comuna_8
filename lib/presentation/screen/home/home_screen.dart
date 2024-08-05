@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 Widget buildHomeScreen(BuildContext context) {
   var images = [
-    'assets/images/background.jpg',
-    'assets/images/background2.jpg',
-    'assets/images/background3.jpg',
-    'https://images.pexels.com/photos/20063027/pexels-photo-20063027/free-photo-of-arte-edificio-modelo-estampado.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+    'assets/images/0001.webp',
+    'assets/images/0002.webp',
+    'assets/images/0003.webp',
+    'assets/images/0004.webp',
   ];
 
   return Column(
@@ -58,7 +58,7 @@ Widget buildHomeScreen(BuildContext context) {
         child: Row(
           children: [
             Image.asset(
-              'assets/images/background.jpg', // Reemplaza con la ruta de tu imagen
+              'assets/images/0006.webp',
               width: 150,
               height: 150,
               fit: BoxFit.cover,
