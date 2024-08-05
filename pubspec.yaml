@@ -53,6 +53,7 @@ dependencies:
   image: ^4.2.0
   firebase_app_check: ^0.3.0+1
   flutter_dotenv: ^5.1.0
+  flutter_markdown: ^0.7.3
 
 dev_dependencies:
   flutter_test:

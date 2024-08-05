@@ -1,4 +1,11 @@
+import 'package:dance_club_comuna_8/logic/models/blog_post.dart';
+import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BuildPresentationsScreen extends StatefulWidget {
   const BuildPresentationsScreen({super.key});
@@ -9,10 +16,108 @@ class BuildPresentationsScreen extends StatefulWidget {
 }
 
 class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<PresentationsBloc>().add(GetPresentationsEvent());
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      context.read<PresentationsBloc>().add(GetPresentationsEvent());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: const Text('Presentations Screen'),
+    return BlocBuilder<PresentationsBloc, PresentationsState>(
+      builder: (context, state) {
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<PresentationsBloc>().add(RefreshPresentationsEvent());
+          },
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Presentaciones',
+                    style: Theme.of(context).textTheme.displaySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                if (state is PresentationsLoadedState)
+                  ...state.posts.map(_buildPostCard),
+                if (state is PresentationsLoadingState)
+                  const Center(child: CircularProgressIndicator()),
+                if (state is PresentationsErrorState)
+                  Center(child: Text(state.message)),
+                if (state is PresentationsNoMorePostsState)
+                  const Center(child: Text('No hay más presentaciones')),
+              ],
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  Widget _buildPostCard(BlogPost post) {
+    // Reemplazar secuencias que deberían representar saltos de línea o párrafos
+    String formattedContent = post.content.replaceAll(r'\n', '\n');
+
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              post.title,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              'Fecha: ${post.date.toString()}',
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            const SizedBox(height: 16.0),
+            MarkdownBody(
+              data: formattedContent,
+              selectable: true,
+              styleSheet: MarkdownStyleSheet(
+                p: const TextStyle(fontSize: 14.0),
+                h1: const TextStyle(fontSize: 20.0),
+                h2: const TextStyle(fontSize: 18.0),
+                h3: const TextStyle(fontSize: 16.0),
+                h4: const TextStyle(fontSize: 14.0),
+                h5: const TextStyle(fontSize: 12.0),
+                h6: const TextStyle(fontSize: 10.0),
+              ),
+              onTapLink: (text, href, title) {
+                if (href != null) {
+                  launchUrl(Uri.parse(href));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }

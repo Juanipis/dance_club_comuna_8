@@ -1,6 +1,8 @@
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/images/image_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_presentations_service.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_storage_service.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -44,23 +46,27 @@ Future<void> main() async {
       FirestoreEventsService();
   final AuthService authService = AuthService();
   final FirestoreStorageService bucketService = FirestoreStorageService();
-
+  final FirestorePresentationsService firestorePresentationsService =
+      FirestorePresentationsService();
   runApp(MyApp(
       firestoreEventsService: firestoreEventsService,
       authService: authService,
-      bucketService: bucketService));
+      bucketService: bucketService,
+      firestorePresentationsService: firestorePresentationsService));
 }
 
 class MyApp extends StatelessWidget {
   final FirestoreEventsService firestoreEventsService;
   final AuthService authService;
   final FirestoreStorageService bucketService;
+  final FirestorePresentationsService firestorePresentationsService;
 
   const MyApp(
       {super.key,
       required this.firestoreEventsService,
       required this.authService,
-      required this.bucketService});
+      required this.bucketService,
+      required this.firestorePresentationsService});
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -80,6 +86,11 @@ class MyApp extends StatelessWidget {
         BlocProvider<ImageBloc>(
             create: (context) =>
                 ImageBloc(firestoreStorageService: bucketService)),
+        BlocProvider<PresentationsBloc>(
+          create: (context) => PresentationsBloc(
+            firestorePresentationsService: (firestorePresentationsService),
+          ),
+        ),
       ],
       child: MaterialApp(
         title: 'Danzas la ladera alma y tradición',
