@@ -1,27 +1,105 @@
-import 'package:dance_club_comuna_8/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/images/image_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_presentations_service.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_storage_service.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:dance_club_comuna_8/firebase_options.dart';
+import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/event/event_register_bloc.dart';
+import 'package:dance_club_comuna_8/presentation/screen/about/about_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/contact/contact_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/events/events_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/home/home_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/presentations/presentations_screen.dart';
+import 'package:dance_club_comuna_8/logic/services/auth_service.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  Logger logger = Logger();
+  logger.i(
+      const String.fromEnvironment('DEBUG_KEY', defaultValue: 'default_key'));
+
+  await FirebaseAppCheck.instance.activate(
+    webProvider: kReleaseMode
+        ? ReCaptchaV3Provider(const String.fromEnvironment(
+            'RECAPTCHA_V3_SITE_KEY',
+            defaultValue: 'default_key'))
+        : ReCaptchaV3Provider(const String.fromEnvironment('DEBUG_KEY',
+            defaultValue: 'default_key')),
+    // androidProvider: AndroidProvider.playIntegrity,
+  );
+
+  final FirestoreEventsService firestoreEventsService =
+      FirestoreEventsService();
+  final AuthService authService = AuthService();
+  final FirestoreStorageService bucketService = FirestoreStorageService();
+  final FirestorePresentationsService firestorePresentationsService =
+      FirestorePresentationsService();
+  runApp(MyApp(
+      firestoreEventsService: firestoreEventsService,
+      authService: authService,
+      bucketService: bucketService,
+      firestorePresentationsService: firestorePresentationsService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final FirestoreEventsService firestoreEventsService;
+  final AuthService authService;
+  final FirestoreStorageService bucketService;
+  final FirestorePresentationsService firestorePresentationsService;
 
-  // This widget is the root of your application.
+  const MyApp(
+      {super.key,
+      required this.firestoreEventsService,
+      required this.authService,
+      required this.bucketService,
+      required this.firestorePresentationsService});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Club de danza comuna 8',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<EventBloc>(
+          create: (context) => EventBloc(firestoreEventsService),
+        ),
+        BlocProvider<AuthBloc>(
+          create: (context) =>
+              AuthBloc(authService: authService)..add(AppStarted()),
+        ),
+        BlocProvider<EventRegisterBloc>(
+          create: (context) => EventRegisterBloc(firestoreEventsService),
+        ),
+        BlocProvider<EventAdminBloc>(
+            create: (context) => EventAdminBloc(firestoreEventsService)),
+        BlocProvider<ImageBloc>(
+            create: (context) =>
+                ImageBloc(firestoreStorageService: bucketService)),
+        BlocProvider<PresentationsBloc>(
+          create: (context) => PresentationsBloc(
+            firestorePresentationsService: (firestorePresentationsService),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Danzas la ladera alma y tradición',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade200),
+          useMaterial3: true,
+        ),
+        home: const MyHomePage(title: 'Danzas la ladera alma y tradición'),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -35,39 +113,149 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  var logger = Logger();
+  var selectedScreenIndex = 0;
+  var resources = {
+    'leadingLogo': 'assets/images/logo.png',
+    'title': 'Danzas la ladera alma y tradición',
+    'imageBackground': 'assets/images/0014.webp',
+  };
+  var backgrounds = [
+    'assets/images/0014.webp',
+    'assets/images/0015.webp',
+    'assets/images/0014.webp',
+    'assets/images/0010.webp',
+    'assets/images/0015.webp',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+    final screenWidth = MediaQuery.of(context).size.width;
+    var screens = [
+      (
+        buildHomeScreen(context),
+        'Página principal',
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      (buildAboutScreen(), '¿Quiénes somos?'),
+      (const BuildPresentationsScreen(), 'Presentaciones'),
+      (const BuildEventsScreen(), 'Eventos'),
+      (buildContactScreen(), 'Contacto'),
+    ];
+    var actionsBiggerScreen = [
+      for (var i = 0; i < screens.length; i++)
+        TextButton(
+          onPressed: () {
+            setState(() {
+              logger.i('Selected screen index: $i');
+              selectedScreenIndex = i;
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: selectedScreenIndex == i
+                      ? Colors.orange
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            child: Text(
+              screens[i].$2,
+              style: TextStyle(
+                color: selectedScreenIndex == i ? Colors.orange : Colors.white,
+              ),
             ),
-          ],
+          ),
         ),
+      IconButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const AdminScreen()));
+          },
+          icon: const Icon(Icons.lock))
+    ];
+    var actionsDrawerSmallScreen = [
+      for (var i = 0; i < screens.length; i++)
+        ListTile(
+          title: Text(screens[i].$2),
+          onTap: () {
+            setState(() {
+              logger.i('Selected screen index: $i');
+              selectedScreenIndex = i;
+            });
+            Navigator.pop(context);
+          },
+        ),
+      ListTile(
+        title: const Text('Admin'),
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AdminScreen()));
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    ];
+
+    return Scaffold(
+      drawer: screenWidth < 650
+          ? Drawer(
+              shape: const BeveledRectangleBorder(),
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: actionsDrawerSmallScreen,
+              ),
+            )
+          : null,
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            backgroundColor:
+                Theme.of(context).colorScheme.primary, // Usar color del tema
+            expandedHeight: 300.0,
+            floating: false,
+            pinned: true,
+            leading: screenWidth < 650
+                ? Builder(
+                    builder: (context) => Container(
+                      // color: Colors.red, // Si se quiere cambiar el fondo del color
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                      ),
+                    ),
+                  )
+                : null,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Image.asset(
+                    backgrounds[selectedScreenIndex],
+                    width: MediaQuery.of(context).size.width,
+                    height: 300,
+                    fit: BoxFit.cover,
+                    alignment: const Alignment(1.0, -0.3),
+                  ),
+                  Text(
+                    resources['title'] as String,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 60,
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: screenWidth > 550 ? actionsBiggerScreen : [],
+          ),
+          SliverToBoxAdapter(
+            child: screens[selectedScreenIndex].$1,
+          )
+        ],
       ),
     );
   }
