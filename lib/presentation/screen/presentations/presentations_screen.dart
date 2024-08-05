@@ -2,10 +2,9 @@ import 'package:dance_club_comuna_8/logic/models/blog_post.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_states.dart';
+import 'package:dance_club_comuna_8/presentation/screen/presentations/blog_post_screen_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class BuildPresentationsScreen extends StatefulWidget {
   const BuildPresentationsScreen({super.key});
@@ -80,24 +79,23 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
       return const Center(child: CircularProgressIndicator());
     } else if (state is PresentationsNoMorePostsState) {
       return const Center(
-          child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text('No hay más presentaciones'),
-      ));
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text('No hay más presentaciones'),
+        ),
+      );
     } else if (state is PresentationsErrorState) {
       return Center(
-          child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(state.message),
-      ));
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(state.message),
+        ),
+      );
     }
     return const SizedBox.shrink();
   }
 
   Widget _buildPostCard(BlogPost post) {
-    // Reemplazar secuencias que deberían representar saltos de línea o párrafos
-    String formattedContent = post.content.replaceAll(r'\n', '\n');
-
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Padding(
@@ -115,23 +113,27 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
               style: Theme.of(context).textTheme.labelSmall,
             ),
             const SizedBox(height: 16.0),
-            MarkdownBody(
-              data: formattedContent,
-              selectable: true,
-              styleSheet: MarkdownStyleSheet(
-                p: const TextStyle(fontSize: 14.0),
-                h1: const TextStyle(fontSize: 20.0),
-                h2: const TextStyle(fontSize: 18.0),
-                h3: const TextStyle(fontSize: 16.0),
-                h4: const TextStyle(fontSize: 14.0),
-                h5: const TextStyle(fontSize: 12.0),
-                h6: const TextStyle(fontSize: 10.0),
-              ),
-              onTapLink: (text, href, title) {
-                if (href != null) {
-                  launchUrl(Uri.parse(href));
-                }
+            post.imageUrl != null
+                ? Image.network(
+                    post.imageUrl!,
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    'assets/images/placeholder.webp',
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+            const SizedBox(height: 8.0),
+            ElevatedButton(
+              onPressed: () {
+                //create a BlogPostScreenView with the post
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => BlogPostScreenView(post: post)));
               },
+              child: const Text('Ver más'),
             ),
           ],
         ),
