@@ -4,7 +4,7 @@ import 'package:dance_club_comuna_8/logic/bloc/images/image_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker_web/image_picker_web.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:mime_type/mime_type.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,6 +21,8 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
   Logger logger = Logger();
   Uint8List? fileBytes;
   bool imageSelected = false;
+  String fileName = '';
+  Uint8List? imageBytes;
 
   Future<void> _launchURL(String path) async {
     final Uri url = Uri.parse(path);
@@ -47,16 +49,16 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
                     const Text('Seleccione la imagen que desea subir'),
                     ElevatedButton(
                       onPressed: () async {
-                        var mediaData = await ImagePickerWeb
-                            .getImageInfo(); //TODO: if we want to use android or ios we need to use ImagePicker().getImage(source: ImageSource.gallery)
-                        if (mediaData != null) {
-                          String? mimeType =
-                              mime(mime_path.basename(mediaData.fileName!));
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.gallery);
+                        if (image != null) {
+                          imageBytes = await image.readAsBytes();
+                          String? mimeType = image.mimeType;
                           if (mimeType == 'image/jpeg' ||
-                              mimeType == 'image/png' ||
-                              mimeType == null) {
+                              mimeType == 'image/png') {
                             setState(() {
-                              fileBytes = mediaData.data;
+                              fileBytes = imageBytes;
                               imageSelected = true;
                               fileName =
                                   'image_${DateTime.now().millisecondsSinceEpoch}';

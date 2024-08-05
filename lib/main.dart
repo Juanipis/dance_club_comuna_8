@@ -34,7 +34,7 @@ Future<void> main() async {
             defaultValue: 'default_key'))
         : ReCaptchaV3Provider(const String.fromEnvironment('DEBUG_KEY',
             defaultValue: 'default_key')),
-    androidProvider: AndroidProvider.debug,
+    androidProvider: AndroidProvider.playIntegrity,
   );
 
   final FirestoreEventsService firestoreEventsService =
