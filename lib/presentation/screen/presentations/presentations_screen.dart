@@ -21,8 +21,13 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<PresentationsBloc>().add(GetPresentationsEvent());
     _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _onScroll() {
@@ -36,6 +41,11 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<PresentationsBloc, PresentationsState>(
       builder: (context, state) {
+        if (state is PresentationsInitialState) {
+          context.read<PresentationsBloc>().add(GetPresentationsEvent());
+          return const Center(child: CircularProgressIndicator());
+        }
+
         return RefreshIndicator(
           onRefresh: () async {
             context.read<PresentationsBloc>().add(RefreshPresentationsEvent());
@@ -56,18 +66,32 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
                 ),
                 if (state is PresentationsLoadedState)
                   ...state.posts.map(_buildPostCard),
-                if (state is PresentationsLoadingState)
-                  const Center(child: CircularProgressIndicator()),
-                if (state is PresentationsErrorState)
-                  Center(child: Text(state.message)),
-                if (state is PresentationsNoMorePostsState)
-                  const Center(child: Text('No hay más presentaciones')),
+                _buildLoaderOrEndMessage(state),
               ],
             ),
           ),
         );
       },
     );
+  }
+
+  Widget _buildLoaderOrEndMessage(PresentationsState state) {
+    if (state is PresentationsLoadingState) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (state is PresentationsNoMorePostsState) {
+      return const Center(
+          child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text('No hay más presentaciones'),
+      ));
+    } else if (state is PresentationsErrorState) {
+      return Center(
+          child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(state.message),
+      ));
+    }
+    return const SizedBox.shrink();
   }
 
   Widget _buildPostCard(BlogPost post) {
@@ -113,11 +137,5 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 }

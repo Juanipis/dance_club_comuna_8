@@ -42,4 +42,20 @@ class FirestorePresentationsService {
       date: date,
     );
   }
+
+  Future<BlogPost> updateBlogPost(
+      String id, String title, String content, DateTime date) async {
+    await _presentationCollection.doc(id).update({
+      'title': title,
+      'content': content,
+      'date': Timestamp.fromDate(date),
+    });
+
+    return BlogPost(
+      id: id,
+      title: title,
+      content: content,
+      date: date,
+    );
+  }
 }

@@ -1,5 +1,7 @@
+import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_states.dart';
@@ -13,10 +15,25 @@ class BlogPostScreen extends StatefulWidget {
 }
 
 class _BlogPostScreenState extends State<BlogPostScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    context.read<PresentationsBloc>().add(GetPresentationsEvent());
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      context.read<PresentationsBloc>().add(GetPresentationsEvent());
+    }
   }
 
   @override
@@ -34,14 +51,26 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
       ),
       body: BlocBuilder<PresentationsBloc, PresentationsState>(
         builder: (context, state) {
-          if (state is PresentationsLoadingState) {
+          if (state is PresentationsInitialState) {
+            context.read<PresentationsBloc>().add(GetPresentationsEvent());
             return const Center(child: CircularProgressIndicator());
           } else if (state is PresentationsLoadedState) {
-            return ListView.builder(
-              itemCount: state.posts.length,
-              itemBuilder: (context, index) {
-                return _buildPostListItem(state.posts[index]);
+            return RefreshIndicator(
+              onRefresh: () async {
+                context
+                    .read<PresentationsBloc>()
+                    .add(RefreshPresentationsEvent());
               },
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: state.posts.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == state.posts.length) {
+                    return _buildLoaderOrEndMessage(state);
+                  }
+                  return _buildPostListItem(state.posts[index]);
+                },
+              ),
             );
           } else if (state is PresentationsErrorState) {
             return Center(child: Text('Error: ${state.message}'));
@@ -57,41 +86,36 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
     );
   }
 
+  Widget _buildLoaderOrEndMessage(PresentationsState state) {
+    if (state is PresentationsLoadingState) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (state is PresentationsNoMorePostsState) {
+      return const Center(child: Text('No hay más posts'));
+    }
+    return const SizedBox.shrink();
+  }
+
   Widget _buildPostListItem(BlogPost post) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: ListTile(
         title: Text(post.title),
-        subtitle: Text(post.date.toString()),
+        subtitle: Text(
+            'ID: ${post.id}\nFecha: ${DateFormat('dd/MM/yyyy').format(post.date)}'),
         trailing: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () => _navigateToEditScreen(context, post: post),
         ),
+        onTap: () => _navigateToEditScreen(context, post: post),
       ),
     );
   }
 
   void _navigateToEditScreen(BuildContext context, {BlogPost? post}) {
-    // Aquí navegarías a una pantalla de edición/creación de posts
-    // Por ahora, solo mostraremos un diálogo como placeholder
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(post == null ? 'Añadir nuevo post' : 'Editar post'),
-          content: Text(post == null
-              ? 'Aquí iría el formulario para añadir un nuevo post'
-              : 'Aquí iría el formulario para editar el post: ${post.title}'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cerrar'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlogPostEditScreen(post: post),
+      ),
     );
   }
 }

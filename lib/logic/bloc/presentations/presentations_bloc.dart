@@ -9,26 +9,33 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
   final FirestorePresentationsService firestorePresentationsService;
   List<BlogPost> cachedPosts = [];
   DocumentSnapshot? lastDocument;
+  bool hasReachedMax = false;
 
   PresentationsBloc({required this.firestorePresentationsService})
       : super(PresentationsInitialState()) {
     on<GetPresentationsEvent>((event, emit) async {
+      if (hasReachedMax) return;
+
       try {
-        emit(PresentationsLoadingState());
+        if (state is! PresentationsLoadedState) {
+          emit(PresentationsLoadingState());
+        }
+
         final posts = await firestorePresentationsService.getPosts(
           limit: 10,
           startAfter: lastDocument,
         );
 
-        if (posts.isNotEmpty) {
+        if (posts.isEmpty) {
+          hasReachedMax = true;
+          emit(PresentationsNoMorePostsState());
+        } else {
           cachedPosts.addAll(posts);
           lastDocument = await FirebaseFirestore.instance
               .collection('presentations')
               .doc(posts.last.id)
               .get();
           emit(PresentationsLoadedState(List.from(cachedPosts)));
-        } else {
-          emit(PresentationsNoMorePostsState());
         }
       } catch (e) {
         emit(PresentationsErrorState(
@@ -51,9 +58,30 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
       }
     });
 
+    on<UpdatePresentationEvent>((event, emit) async {
+      try {
+        emit(PresentationsLoadingState());
+        final updatedPost = await firestorePresentationsService.updateBlogPost(
+          event.id,
+          event.title,
+          event.content,
+          event.date,
+        );
+        final index = cachedPosts.indexWhere((post) => post.id == event.id);
+        if (index != -1) {
+          cachedPosts[index] = updatedPost;
+        }
+        emit(PresentationsLoadedState(List.from(cachedPosts)));
+      } catch (e) {
+        emit(PresentationsErrorState(
+            message: 'Error updating presentation: $e'));
+      }
+    });
+
     on<RefreshPresentationsEvent>((event, emit) async {
       cachedPosts.clear();
       lastDocument = null;
+      hasReachedMax = false;
       add(GetPresentationsEvent());
     });
   }
