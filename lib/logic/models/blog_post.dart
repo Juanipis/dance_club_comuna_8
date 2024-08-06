@@ -3,12 +3,14 @@ class BlogPost {
   final String title;
   final String content;
   final DateTime date;
+  final String? imageUrl;
 
   BlogPost({
     required this.id,
     required this.title,
     required this.content,
     required this.date,
+    this.imageUrl,
   });
 
   BlogPost copyWith({
@@ -16,12 +18,14 @@ class BlogPost {
     String? title,
     String? content,
     DateTime? date,
+    String? imageUrl,
   }) {
     return BlogPost(
       id: id ?? this.id,
       title: title ?? this.title,
       content: content ?? this.content,
       date: date ?? this.date,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
@@ -31,6 +35,7 @@ class BlogPost {
       'title': title,
       'content': content,
       'date': date,
+      'imageUrl': imageUrl,
     };
   }
 }
