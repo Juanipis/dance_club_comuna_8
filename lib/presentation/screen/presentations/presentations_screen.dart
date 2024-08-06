@@ -5,6 +5,7 @@ import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_state
 import 'package:dance_club_comuna_8/presentation/screen/presentations/blog_post_screen_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 class BuildPresentationsScreen extends StatefulWidget {
   const BuildPresentationsScreen({super.key});
@@ -16,24 +17,16 @@ class BuildPresentationsScreen extends StatefulWidget {
 
 class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
   final ScrollController _scrollController = ScrollController();
-
+  Logger logger = Logger();
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      context.read<PresentationsBloc>().add(GetPresentationsEvent());
-    }
   }
 
   @override
@@ -69,7 +62,6 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
                   children: [
                     if (state is PresentationsLoadedState)
                       ...state.posts.map(_buildPostCard),
-                    _buildLoaderOrEndMessage(state),
                   ],
                 )
               ],
@@ -81,6 +73,13 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
   }
 
   Widget _buildLoaderOrEndMessage(PresentationsState state) {
+    if (state is PresentationsLoadedState) {
+      return ElevatedButton(
+          onPressed: () {
+            context.read<PresentationsBloc>().add(GetPresentationsEvent());
+          },
+          child: const Text('Cargar más'));
+    }
     if (state is PresentationsLoadingState) {
       return const Center(child: CircularProgressIndicator());
     } else if (state is PresentationsNoMorePostsState) {
@@ -98,7 +97,8 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
         ),
       );
     }
-    return const SizedBox.shrink();
+
+    return const Center(child: Text('No hay más presentaciones'));
   }
 
   Widget _buildPostCard(BlogPost post) {
@@ -129,7 +129,7 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
                 const SizedBox(height: 16.0),
-                post.imageUrl != null
+                post.imageUrl != null && post.imageUrl!.isNotEmpty
                     ? Image.network(
                         post.imageUrl!,
                         width: cardWidth *
