@@ -23,6 +23,7 @@ class FirestorePresentationsService {
         title: data['title'],
         content: data['content'],
         date: (data['date'] as Timestamp).toDate(),
+        imageUrl: data['imageUrl'],
       );
     }).toList();
   }
