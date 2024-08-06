@@ -90,44 +90,52 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
   }
 
   Widget _buildToolbar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _buildToolbarButton('H1', () => _insertMarkdown('# ')),
-            _buildToolbarButton('H2', () => _insertMarkdown('## ')),
-            _buildToolbarButton('H3', () => _insertMarkdown('### ')),
-            _buildToolbarButton('B', () => _insertMarkdown('**bold**')),
-            _buildToolbarButton('I', () => _insertMarkdown('*italic*')),
-            _buildToolbarButton(
-                '~', () => _insertMarkdown('~~strikethrough~~')),
-            _buildToolbarButton('Link', () => _insertMarkdown('[text](url)')),
-            _buildToolbarButton('List', () => _insertMarkdown('- item\n')),
-            _buildToolbarButton('Num', () => _insertMarkdown('1. item\n')),
-            _buildToolbarButton('Quote', () => _insertMarkdown('> quote\n')),
-            _buildToolbarButton('Code', () => _insertMarkdown('`code`')),
-            _buildToolbarButton('Img', () => _showImageDialog()),
-            _buildToolbarButton(
-                'Salto de página', () => _insertMarkdown('\n\n')),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Wrap(
+        spacing: 8.0,
+        runSpacing: 4.0,
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          _buildToolbarButton(
+              'H1', () => _insertMarkdown('# '), Icons.looks_one),
+          _buildToolbarButton(
+              'H2', () => _insertMarkdown('## '), Icons.looks_two),
+          _buildToolbarButton(
+              'H3', () => _insertMarkdown('### '), Icons.looks_3),
+          _buildToolbarButton(
+              'Negrilla', () => _insertMarkdown('**bold**'), Icons.format_bold),
+          _buildToolbarButton('Itálica', () => _insertMarkdown('*italic*'),
+              Icons.format_italic),
+          _buildToolbarButton(
+              'Tachar',
+              () => _insertMarkdown('~~strikethrough~~'),
+              Icons.format_strikethrough),
+          _buildToolbarButton(
+              'Link', () => _insertMarkdown('[text](url)'), Icons.link),
+          _buildToolbarButton(
+              'List por puntos', () => _insertMarkdown('- item\n'), Icons.list),
+          _buildToolbarButton('Lista numerica',
+              () => _insertMarkdown('1. item\n'), Icons.format_list_numbered),
+          _buildToolbarButton(
+              'Cita', () => _insertMarkdown('> quote\n'), Icons.format_quote),
+          _buildToolbarButton(
+              'Código', () => _insertMarkdown('`code`'), Icons.code),
+          _buildToolbarButton('Imagen', () => _showImageDialog(), Icons.image),
+          _buildToolbarButton('Salto de página', () => _insertMarkdown('\n\n'),
+              Icons.arrow_downward),
+        ],
       ),
     );
   }
 
-  Widget _buildToolbarButton(String label, VoidCallback onPressed) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          minimumSize: const Size(40, 36),
-        ),
-        child: Text(label),
-      ),
+  Widget _buildToolbarButton(
+      String label, VoidCallback onPressed, IconData icon) {
+    return ActionChip(
+      onPressed: onPressed,
+      avatar: Icon(icon),
+      label: Text(label),
     );
   }
 
