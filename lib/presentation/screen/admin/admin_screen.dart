@@ -1,6 +1,7 @@
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_states.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/add_event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/events_viewer.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/login_form.dart';
@@ -114,6 +115,14 @@ class AdminPanelContent extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (_) => const UploadImagesScreen())),
+              ),
+              AdminOptionCard(
+                title: "Administrar blog",
+                subtitle:
+                    "Escribe, actualiza, borra posts para el blog de presentaciones",
+                icon: Icons.add_comment,
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const BlogPostScreen())),
               ),
             ],
           ),
