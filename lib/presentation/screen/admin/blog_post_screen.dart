@@ -74,6 +74,8 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
             );
           } else if (state is PresentationsErrorState) {
             return Center(child: Text('Error: ${state.message}'));
+          } else if (state is PresentationsLoadingState) {
+            return const Center(child: CircularProgressIndicator());
           } else {
             return const Center(child: Text('No hay posts disponibles'));
           }

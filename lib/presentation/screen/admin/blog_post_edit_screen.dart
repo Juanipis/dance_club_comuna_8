@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 class BlogPostEditScreen extends StatefulWidget {
   final BlogPost? post;
@@ -18,6 +19,7 @@ class BlogPostEditScreen extends StatefulWidget {
 
 class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
   late TextEditingController _titleController;
+  late TextEditingController _imageUrlController;
   late TextEditingController _contentController;
   late DateTime _selectedDate;
   bool _isPreviewMode = false;
@@ -28,6 +30,8 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
     _titleController = TextEditingController(text: widget.post?.title ?? '');
     _contentController =
         TextEditingController(text: widget.post?.content ?? '');
+    _imageUrlController =
+        TextEditingController(text: widget.post?.imageUrl ?? '');
     _selectedDate = widget.post?.date ?? DateTime.now();
     _contentController.addListener(() {
       setState(() {});
@@ -164,6 +168,14 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: _imageUrlController,
+            decoration: const InputDecoration(
+              labelText: 'URL de la imagen banner',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
             controller: _contentController,
             decoration: const InputDecoration(
               labelText: 'Contenido',
@@ -241,9 +253,52 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
     );
   }
 
-  void _savePost() {
+  Future<bool> _checkImageBytesUrl(String imageUrl) async {
+    final regex = RegExp(r'^https?:\/\/.*\.(png|jpg|jpeg|gif)$');
+    if (!regex.hasMatch(imageUrl)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('La URL de la imagen no es válida')),
+      );
+      return false;
+    }
+
+    // get the bytes of the image
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No se pudo obtener la imagen, verifique la url')),
+        );
+        return false;
+      }
+      return true;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('No se pudo obtener la imagen, verifique la url')),
+      );
+      return false;
+    }
+  }
+
+  Future<void> _savePost() async {
     final title = _titleController.text;
     final content = _contentController.text;
+    final imageUrl = _imageUrlController.text;
+    if (title.isEmpty || content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, completa todos los campos')),
+      );
+      return;
+    }
+
+    if (imageUrl.isNotEmpty) {
+      final checkImage = await _checkImageBytesUrl(imageUrl);
+      if (!checkImage) {
+        return;
+      }
+    }
 
     if (title.isEmpty || content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -258,6 +313,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
             title: title,
             content: content,
             date: _selectedDate,
+            imageUrl: imageUrl,
           ));
     } else {
       // Actualizar post existente
@@ -266,6 +322,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
             title: title,
             content: content,
             date: _selectedDate,
+            imageUrl: imageUrl,
           ));
     }
 

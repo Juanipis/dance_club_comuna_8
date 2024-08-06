@@ -29,11 +29,12 @@ class FirestorePresentationsService {
   }
 
   Future<BlogPost> addBlogPost(
-      String title, String content, DateTime date) async {
+      String title, String content, DateTime date, String imageUrl) async {
     final docRef = await _presentationCollection.add({
       'title': title,
       'content': content,
       'date': Timestamp.fromDate(date),
+      'imageUrl': imageUrl,
     });
 
     return BlogPost(
@@ -44,12 +45,13 @@ class FirestorePresentationsService {
     );
   }
 
-  Future<BlogPost> updateBlogPost(
-      String id, String title, String content, DateTime date) async {
+  Future<BlogPost> updateBlogPost(String id, String title, String content,
+      DateTime date, String imageUrl) async {
     await _presentationCollection.doc(id).update({
       'title': title,
       'content': content,
       'date': Timestamp.fromDate(date),
+      'imageUrl': imageUrl,
     });
 
     return BlogPost(
@@ -57,6 +59,7 @@ class FirestorePresentationsService {
       title: title,
       content: content,
       date: date,
+      imageUrl: imageUrl,
     );
   }
 }

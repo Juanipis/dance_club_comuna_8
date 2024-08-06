@@ -50,6 +50,7 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           event.title,
           event.content,
           event.date,
+          event.imageUrl,
         );
         cachedPosts.insert(0, post);
         emit(PresentationsLoadedState(List.from(cachedPosts)));
@@ -66,6 +67,7 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           event.title,
           event.content,
           event.date,
+          event.imageUrl,
         );
         final index = cachedPosts.indexWhere((post) => post.id == event.id);
         if (index != -1) {
