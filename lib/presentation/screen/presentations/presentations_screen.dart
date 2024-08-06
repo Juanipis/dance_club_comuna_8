@@ -62,6 +62,7 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
                   children: [
                     if (state is PresentationsLoadedState)
                       ...state.posts.map(_buildPostCard),
+                    _buildLoaderOrEndMessage(state),
                   ],
                 )
               ],
