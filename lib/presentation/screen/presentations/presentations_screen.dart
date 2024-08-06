@@ -52,7 +52,7 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
           child: SingleChildScrollView(
             controller: _scrollController,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   width: double.infinity,
@@ -63,9 +63,15 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                if (state is PresentationsLoadedState)
-                  ...state.posts.map(_buildPostCard),
-                _buildLoaderOrEndMessage(state),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (state is PresentationsLoadedState)
+                      ...state.posts.map(_buildPostCard),
+                    _buildLoaderOrEndMessage(state),
+                  ],
+                )
               ],
             ),
           ),
@@ -96,48 +102,65 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
   }
 
   Widget _buildPostCard(BlogPost post) {
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              post.title,
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              'Fecha: ${post.date.toString()}',
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-            const SizedBox(height: 16.0),
-            post.imageUrl != null
-                ? Image.network(
-                    post.imageUrl!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  )
-                : Image.asset(
-                    'assets/images/placeholder.webp',
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double cardWidth =
+            constraints.maxWidth > 500 ? 500 : constraints.maxWidth;
+
+        return Card(
+          margin: const EdgeInsets.all(15.0),
+          child: Container(
+            width: cardWidth,
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  post.title,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  maxLines:
+                      2, // Limita a 2 líneas para evitar que el título sea demasiado largo
+                  overflow: TextOverflow
+                      .ellipsis, // Añade "..." si el texto es demasiado largo
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  'Fecha: ${post.date.toString()}',
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+                const SizedBox(height: 16.0),
+                post.imageUrl != null
+                    ? Image.network(
+                        post.imageUrl!,
+                        width: cardWidth *
+                            0.9, // Ajusta el ancho de la imagen de forma responsiva
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        'assets/images/placeholder.webp',
+                        width: cardWidth *
+                            0.9, // Ajusta el ancho de la imagen de forma responsiva
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                const SizedBox(height: 8.0),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      //create a BlogPostScreenView with the post
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              BlogPostScreenView(post: post)));
+                    },
+                    child: const Text('Ver más'),
                   ),
-            const SizedBox(height: 8.0),
-            ElevatedButton(
-              onPressed: () {
-                //create a BlogPostScreenView with the post
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => BlogPostScreenView(post: post)));
-              },
-              child: const Text('Ver más'),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
