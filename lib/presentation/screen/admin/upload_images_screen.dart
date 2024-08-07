@@ -119,7 +119,7 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
 
                       BlocProvider.of<ImageBloc>(context)
                           .add(UploadImageUnit8ListEvent(
-                        path: 'images',
+                        path: '',
                         imageName: '$imageName.jpg',
                         fileBytes: fileBytes!,
                       ));
