@@ -1,6 +1,7 @@
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_events.dart';
 import 'package:dance_club_comuna_8/logic/models/blog_post.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/image_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -82,6 +83,19 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
     }
   }
 
+  Future<void> _showImageSelectionDialog() async {
+    final imageUrl = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return const ImageSelectionDialog();
+      },
+    );
+    // Put the selected image URL in the the markdown editor
+    if (imageUrl != null) {
+      _insertMarkdown('![Pon aquí la descripción de la imagen]($imageUrl)');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,9 +139,9 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
           _buildToolbarButton(
               'H3', () => _insertMarkdown('### ', '\n'), Icons.looks_3),
           _buildToolbarButton(
-              'Negrilla', () => _insertMarkdown('*', '*'), Icons.format_bold),
-          _buildToolbarButton('Itálica', () => _insertMarkdown('**', '**'),
-              Icons.format_italic),
+              'Negrilla', () => _insertMarkdown('**', '**'), Icons.format_bold),
+          _buildToolbarButton(
+              'Itálica', () => _insertMarkdown('*', '*'), Icons.format_italic),
           _buildToolbarButton('Tachar', () => _insertMarkdown('~~', '~~'),
               Icons.format_strikethrough),
           _buildToolbarButton(
@@ -140,8 +154,9 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
               'Cita', () => _insertMarkdown('> ', '\n'), Icons.format_quote),
           _buildToolbarButton(
               'Código', () => _insertMarkdown('`', '`'), Icons.code),
-          _buildToolbarButton('Imagen', () => _showImageDialog(), Icons.image),
-          _buildToolbarButton('Salto de página', () => _insertMarkdown('\n'),
+          _buildToolbarButton(
+              'Imagen', () => _showImageSelectionDialog(), Icons.image),
+          _buildToolbarButton('Salto de página', () => _insertMarkdown('\n\n'),
               Icons.arrow_downward),
         ],
       ),
@@ -154,28 +169,6 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
       onPressed: onPressed,
       avatar: Icon(icon),
       label: Text(label),
-    );
-  }
-
-  void _showImageDialog() {
-    // Aquí se implementaría la lógica para añadir imágenes
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Añadir imagen'),
-          content: const Text(
-              'La funcionalidad para añadir imágenes aún no está implementada.'),
-          actions: [
-            TextButton(
-              child: const Text('Cerrar'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
@@ -272,6 +265,16 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
               if (href != null) {
                 launchUrl(Uri.parse(href));
               }
+            },
+            imageBuilder: (Uri uri, String? param1, String? param2) {
+              return Image.network(
+                uri.toString(),
+                errorBuilder: (BuildContext context, Object error,
+                    StackTrace? stackTrace) {
+                  print('Error al cargar la imagen: $error');
+                  return const Text('Error al cargar la imagen');
+                },
+              );
             },
           ),
         ],
