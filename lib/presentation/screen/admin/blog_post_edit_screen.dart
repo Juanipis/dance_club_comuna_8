@@ -51,15 +51,35 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
     });
   }
 
-  void _insertMarkdown(String markdown) {
+  void _insertMarkdown(String markdownPrefix, [String markdownSuffix = '']) {
     final text = _contentController.text;
     final selection = _contentController.selection;
-    final newText = text.replaceRange(selection.start, selection.end, markdown);
-    _contentController.value = TextEditingValue(
-      text: newText,
-      selection:
-          TextSelection.collapsed(offset: selection.start + markdown.length),
-    );
+
+    if (selection.isValid && selection.start != selection.end) {
+      // Texto seleccionado
+      final selectedText = text.substring(selection.start, selection.end);
+      final newText = text.replaceRange(selection.start, selection.end,
+          '$markdownPrefix$selectedText$markdownSuffix');
+
+      _contentController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(
+            offset: selection.start +
+                markdownPrefix.length +
+                selectedText.length +
+                markdownSuffix.length),
+      );
+    } else {
+      // No hay texto seleccionado, insertar en la posición actual
+      final newText = text.replaceRange(
+          selection.start, selection.end, '$markdownPrefix$markdownSuffix');
+
+      _contentController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(
+            offset: selection.start + markdownPrefix.length),
+      );
+    }
   }
 
   @override
@@ -99,31 +119,29 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           _buildToolbarButton(
-              'H1', () => _insertMarkdown('# '), Icons.looks_one),
+              'H1', () => _insertMarkdown('# ', '\n'), Icons.looks_one),
           _buildToolbarButton(
-              'H2', () => _insertMarkdown('## '), Icons.looks_two),
+              'H2', () => _insertMarkdown('## ', '\n'), Icons.looks_two),
           _buildToolbarButton(
-              'H3', () => _insertMarkdown('### '), Icons.looks_3),
+              'H3', () => _insertMarkdown('### ', '\n'), Icons.looks_3),
           _buildToolbarButton(
-              'Negrilla', () => _insertMarkdown('**bold**'), Icons.format_bold),
-          _buildToolbarButton('Itálica', () => _insertMarkdown('*italic*'),
+              'Negrilla', () => _insertMarkdown('*', '*'), Icons.format_bold),
+          _buildToolbarButton('Itálica', () => _insertMarkdown('**', '**'),
               Icons.format_italic),
-          _buildToolbarButton(
-              'Tachar',
-              () => _insertMarkdown('~~strikethrough~~'),
+          _buildToolbarButton('Tachar', () => _insertMarkdown('~~', '~~'),
               Icons.format_strikethrough),
           _buildToolbarButton(
-              'Link', () => _insertMarkdown('[text](url)'), Icons.link),
-          _buildToolbarButton(
-              'List por puntos', () => _insertMarkdown('- item\n'), Icons.list),
+              'Link', () => _insertMarkdown('[texto](url)'), Icons.link),
+          _buildToolbarButton('List por puntos',
+              () => _insertMarkdown('\n- ', '\n'), Icons.list),
           _buildToolbarButton('Lista numerica',
-              () => _insertMarkdown('1. item\n'), Icons.format_list_numbered),
+              () => _insertMarkdown('\n1. ', '\n'), Icons.format_list_numbered),
           _buildToolbarButton(
-              'Cita', () => _insertMarkdown('> quote\n'), Icons.format_quote),
+              'Cita', () => _insertMarkdown('> ', '\n'), Icons.format_quote),
           _buildToolbarButton(
-              'Código', () => _insertMarkdown('`code`'), Icons.code),
+              'Código', () => _insertMarkdown('`', '`'), Icons.code),
           _buildToolbarButton('Imagen', () => _showImageDialog(), Icons.image),
-          _buildToolbarButton('Salto de página', () => _insertMarkdown('\n\n'),
+          _buildToolbarButton('Salto de página', () => _insertMarkdown('\n'),
               Icons.arrow_downward),
         ],
       ),
