@@ -20,7 +20,7 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
   @override
   void initState() {
     super.initState();
-    context.read<ImageBloc>().add(const GetImagesPathsEvent(path: 'images'));
+    context.read<ImageBloc>().add(const GetImagesPathsEvent(path: ''));
   }
 
   @override
