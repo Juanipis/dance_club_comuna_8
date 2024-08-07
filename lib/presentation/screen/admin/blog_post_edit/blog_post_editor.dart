@@ -29,11 +29,12 @@ class BlogPostEditor extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField(titleController, 'Title'),
+          _buildTextField(titleController, 'Título'),
           const SizedBox(height: 16),
-          _buildTextField(imageUrlController, 'Banner Image URL'),
+          _buildTextField(
+              imageUrlController, 'URL de la imagen banner (opcional)'),
           const SizedBox(height: 16),
-          _buildTextField(contentController, 'Content', maxLines: maxLines),
+          _buildTextField(contentController, 'Contenido', maxLines: maxLines),
           const SizedBox(height: 16),
           _buildDatePicker(context),
         ],
@@ -62,7 +63,7 @@ class BlogPostEditor extends StatelessWidget {
         const SizedBox(width: 16),
         ElevatedButton(
           onPressed: () => _selectDate(context),
-          child: const Text('Change date'),
+          child: const Text('Cambiar fecha'),
         ),
       ],
     );

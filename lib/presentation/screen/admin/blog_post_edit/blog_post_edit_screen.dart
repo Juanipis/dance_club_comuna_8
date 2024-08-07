@@ -112,13 +112,14 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
           imageUrl: imageUrl,
         ));
       }
+      _showSnackBar("Post guardado con éxito");
       Navigator.of(context).pop();
     }
   }
 
   bool _validateInputs(String title, String content) {
     if (title.isEmpty || content.isEmpty) {
-      _showSnackBar('Please complete all fields');
+      _showSnackBar('Por favor complete todos los campos');
       return false;
     }
     return true;
@@ -128,7 +129,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
     if (imageUrl.isNotEmpty) {
       final isValid = await ImageValidator.isValidImageUrl(imageUrl);
       if (!isValid && mounted) {
-        _showSnackBar('Invalid image URL. Please check and try again.');
+        _showSnackBar('URL de imagen no válida, intentelo de nuevo');
         return false;
       }
     }

@@ -23,27 +23,27 @@ class MarkdownToolbar extends StatelessWidget {
                 'H2', () => _insertMarkdown('## ', '\n'), Icons.looks_two),
             _buildToolbarButton(
                 'H3', () => _insertMarkdown('### ', '\n'), Icons.looks_3),
-            _buildToolbarButton(
-                'Bold', () => _insertMarkdown('**', '**'), Icons.format_bold),
-            _buildToolbarButton(
-                'Italic', () => _insertMarkdown('*', '*'), Icons.format_italic),
-            _buildToolbarButton('Strike', () => _insertMarkdown('~~', '~~'),
+            _buildToolbarButton('Negrita', () => _insertMarkdown('**', '**'),
+                Icons.format_bold),
+            _buildToolbarButton('Itálica', () => _insertMarkdown('*', '*'),
+                Icons.format_italic),
+            _buildToolbarButton('Tachar', () => _insertMarkdown('~~', '~~'),
                 Icons.format_strikethrough),
             _buildToolbarButton(
                 'Link', () => _insertMarkdown('[text](url)'), Icons.link),
+            _buildToolbarButton('Lista por puntos',
+                () => _insertMarkdown('\n- ', '\n\n'), Icons.list),
             _buildToolbarButton(
-                'Bullet List', () => _insertMarkdown('\n- ', '\n'), Icons.list),
-            _buildToolbarButton(
-                'Numbered List',
-                () => _insertMarkdown('\n1. ', '\n'),
+                'Lista numerada',
+                () => _insertMarkdown('\n1. ', '\n\n'),
                 Icons.format_list_numbered),
+            _buildToolbarButton('Cita', () => _insertMarkdown('> ', '\n\n'),
+                Icons.format_quote),
             _buildToolbarButton(
-                'Quote', () => _insertMarkdown('> ', '\n'), Icons.format_quote),
-            _buildToolbarButton(
-                'Code', () => _insertMarkdown('`', '`'), Icons.code),
-            _buildToolbarButton(
-                'Image', () => _showImageSelectionDialog(context), Icons.image),
-            _buildToolbarButton('Page Break', () => _insertMarkdown('\n\n'),
+                'Código', () => _insertMarkdown('`', '`'), Icons.code),
+            _buildToolbarButton('Imagen',
+                () => _showImageSelectionDialog(context), Icons.image),
+            _buildToolbarButton('Salto de linea', () => _insertMarkdown('\n\n'),
                 Icons.arrow_downward),
           ],
         ),
@@ -97,7 +97,7 @@ class MarkdownToolbar extends StatelessWidget {
       },
     );
     if (imageUrl != null) {
-      _insertMarkdown('![Put image description here]($imageUrl)');
+      _insertMarkdown('![Ponga la descripción de la imagen aquí]($imageUrl)');
     }
   }
 }
