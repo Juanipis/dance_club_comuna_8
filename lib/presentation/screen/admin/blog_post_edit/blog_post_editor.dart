@@ -1,3 +1,4 @@
+import 'package:dance_club_comuna_8/presentation/widgets/image_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,8 +32,7 @@ class BlogPostEditor extends StatelessWidget {
         children: [
           _buildTextField(titleController, 'Título'),
           const SizedBox(height: 16),
-          _buildTextField(
-              imageUrlController, 'URL de la imagen banner (opcional)'),
+          _buildImageUrlField(context),
           const SizedBox(height: 16),
           _buildTextField(contentController, 'Contenido', maxLines: maxLines),
           const SizedBox(height: 16),
@@ -54,6 +54,42 @@ class BlogPostEditor extends StatelessWidget {
       maxLines: maxLines ?? 1,
       keyboardType: maxLines == null ? TextInputType.multiline : null,
     );
+  }
+
+  Widget _buildImageUrlField(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            readOnly: true,
+            controller: imageUrlController,
+            decoration: const InputDecoration(
+              labelText: 'URL de la imagen banner (opcional)',
+              border: OutlineInputBorder(),
+              alignLabelWithHint: true,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.image_search),
+          onPressed: () => _showImageSelectionDialog(context),
+          tooltip: 'Seleccionar imagen',
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showImageSelectionDialog(BuildContext context) async {
+    final imageUrl = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return const ImageSelectionDialog();
+      },
+    );
+    if (imageUrl != null) {
+      imageUrlController.text = imageUrl;
+    }
   }
 
   Widget _buildDatePicker(BuildContext context) {

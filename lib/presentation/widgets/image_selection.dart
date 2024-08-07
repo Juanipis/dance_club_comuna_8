@@ -16,6 +16,7 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
   final TextEditingController _urlController = TextEditingController();
   String _selectedImageUrl = '';
   bool _isUrlMode = true;
+  bool _isImageValid = false;
 
   @override
   void initState() {
@@ -24,12 +25,33 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
   }
 
   @override
+  void dispose() {
+    _urlController.dispose();
+    super.dispose();
+  }
+
+  void _validateImage(String url) {
+    setState(() {
+      _selectedImageUrl = url;
+      _isImageValid = false; // Reset validation
+    });
+  }
+
+  void _resetSelection() {
+    setState(() {
+      _selectedImageUrl = '';
+      _isImageValid = false;
+      _urlController.clear(); // Limpiar el TextEditingController
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Seleccionar imagen'),
       content: SingleChildScrollView(
         child: SizedBox(
-          width: 300, // Ajusta el ancho según tus necesidades
+          width: 300,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -44,6 +66,7 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
                   onSelectionChanged: (Set<bool> newSelection) {
                     setState(() {
                       _isUrlMode = newSelection.first;
+                      _resetSelection(); // Resetear selección y limpiar campos
                     });
                   },
                   style: const ButtonStyle(),
@@ -56,11 +79,7 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
                   decoration: const InputDecoration(
                     labelText: 'URL de la imagen',
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedImageUrl = value;
-                    });
-                  },
+                  onChanged: _validateImage,
                 )
               else
                 BlocBuilder<ImageBloc, ImageState>(
@@ -73,13 +92,10 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
                         hint: const Text('Selecciona una imagen'),
                         onChanged: (String? newValue) {
                           if (newValue != null) {
-                            setState(() {
-                              _selectedImageUrl = newValue;
-                            });
+                            _validateImage(newValue);
                           }
                         },
-                        isExpanded:
-                            true, // Asegura que el DropdownButton ocupe el ancho disponible
+                        isExpanded: true,
                         items: state.images
                             .map<DropdownMenuItem<String>>((ImageBucket image) {
                           return DropdownMenuItem<String>(
@@ -100,7 +116,26 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
                 Image.network(
                   _selectedImageUrl,
                   height: 150,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      // Image is fully loaded
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _isImageValid = true;
+                        });
+                      });
+                      return child;
+                    }
+                    // Image is still loading
+                    return const CircularProgressIndicator();
+                  },
                   errorBuilder: (context, error, stackTrace) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        _isImageValid = false;
+                      });
+                    });
                     return const Text('No se pudo cargar la imagen');
                   },
                 ),
@@ -114,7 +149,7 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
           child: const Text('Cancelar'),
         ),
         ElevatedButton(
-          onPressed: _selectedImageUrl.isNotEmpty
+          onPressed: _isImageValid
               ? () => Navigator.of(context).pop(_selectedImageUrl)
               : null,
           child: const Text('Seleccionar'),
