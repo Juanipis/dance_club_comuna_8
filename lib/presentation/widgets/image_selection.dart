@@ -9,7 +9,7 @@ class ImageSelectionDialog extends StatefulWidget {
   const ImageSelectionDialog({super.key});
 
   @override
-  _ImageSelectionDialogState createState() => _ImageSelectionDialogState();
+  State<ImageSelectionDialog> createState() => _ImageSelectionDialogState();
 }
 
 class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
@@ -28,75 +28,84 @@ class _ImageSelectionDialogState extends State<ImageSelectionDialog> {
     return AlertDialog(
       title: const Text('Seleccionar imagen'),
       content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment<bool>(value: true, label: Text('URL')),
-                ButtonSegment<bool>(value: false, label: Text('Galería')),
-              ],
-              selected: {_isUrlMode},
-              onSelectionChanged: (Set<bool> newSelection) {
-                setState(() {
-                  _isUrlMode = newSelection.first;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            if (_isUrlMode)
-              TextField(
-                controller: _urlController,
-                decoration: const InputDecoration(
-                  labelText: 'URL de la imagen',
+        child: SizedBox(
+          width: 300, // Ajusta el ancho según tus necesidades
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment<bool>(value: true, label: Text('URL')),
+                    ButtonSegment<bool>(value: false, label: Text('Galería')),
+                  ],
+                  selected: {_isUrlMode},
+                  onSelectionChanged: (Set<bool> newSelection) {
+                    setState(() {
+                      _isUrlMode = newSelection.first;
+                    });
+                  },
+                  style: const ButtonStyle(),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedImageUrl = value;
-                  });
-                },
-              )
-            else
-              BlocBuilder<ImageBloc, ImageState>(
-                builder: (context, state) {
-                  if (state is ImagesPathsLoadedState) {
-                    return DropdownButton<String>(
-                      value: _selectedImageUrl.isNotEmpty
-                          ? _selectedImageUrl
-                          : null,
-                      hint: const Text('Selecciona una imagen'),
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _selectedImageUrl = newValue;
-                          });
-                        }
-                      },
-                      items: state.images
-                          .map<DropdownMenuItem<String>>((ImageBucket image) {
-                        return DropdownMenuItem<String>(
-                          value: image.imagePath,
-                          child: Text(image.imageName),
-                        );
-                      }).toList(),
-                    );
-                  } else if (state is ImageLoadingState) {
-                    return const CircularProgressIndicator();
-                  } else {
-                    return const Text('Error al cargar las imágenes');
-                  }
-                },
               ),
-            const SizedBox(height: 16),
-            if (_selectedImageUrl.isNotEmpty)
-              Image.network(
-                _selectedImageUrl,
-                height: 150,
-                errorBuilder: (context, error, stackTrace) {
-                  return const Text('No se pudo cargar la imagen');
-                },
-              ),
-          ],
+              const SizedBox(height: 16),
+              if (_isUrlMode)
+                TextField(
+                  controller: _urlController,
+                  decoration: const InputDecoration(
+                    labelText: 'URL de la imagen',
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedImageUrl = value;
+                    });
+                  },
+                )
+              else
+                BlocBuilder<ImageBloc, ImageState>(
+                  builder: (context, state) {
+                    if (state is ImagesPathsLoadedState) {
+                      return DropdownButton<String>(
+                        value: _selectedImageUrl.isNotEmpty
+                            ? _selectedImageUrl
+                            : null,
+                        hint: const Text('Selecciona una imagen'),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _selectedImageUrl = newValue;
+                            });
+                          }
+                        },
+                        isExpanded:
+                            true, // Asegura que el DropdownButton ocupe el ancho disponible
+                        items: state.images
+                            .map<DropdownMenuItem<String>>((ImageBucket image) {
+                          return DropdownMenuItem<String>(
+                            value: image.imagePath,
+                            child: Text(image.imageName),
+                          );
+                        }).toList(),
+                      );
+                    } else if (state is ImageLoadingState) {
+                      return const CircularProgressIndicator();
+                    } else {
+                      return const Text('Error al cargar las imágenes');
+                    }
+                  },
+                ),
+              const SizedBox(height: 16),
+              if (_selectedImageUrl.isNotEmpty)
+                Image.network(
+                  _selectedImageUrl,
+                  height: 150,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Text('No se pudo cargar la imagen');
+                  },
+                ),
+            ],
+          ),
         ),
       ),
       actions: [
