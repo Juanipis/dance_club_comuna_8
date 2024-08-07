@@ -1,4 +1,4 @@
-import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_edit_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_edit/blog_post_edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
