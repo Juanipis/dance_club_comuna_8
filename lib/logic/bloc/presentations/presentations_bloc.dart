@@ -26,17 +26,17 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           startAfter: lastDocument,
         );
 
-        if (posts.isEmpty) {
+        if (posts.isEmpty || posts.length < 10) {
           hasReachedMax = true;
-          emit(PresentationsNoMorePostsState());
-        } else {
-          cachedPosts.addAll(posts);
-          lastDocument = await FirebaseFirestore.instance
-              .collection('presentations')
-              .doc(posts.last.id)
-              .get();
-          emit(PresentationsLoadedState(List.from(cachedPosts)));
         }
+
+        cachedPosts.addAll(posts);
+        lastDocument = await FirebaseFirestore.instance
+            .collection('presentations')
+            .doc(posts.last.id)
+            .get();
+        emit(PresentationsLoadedState(List.from(cachedPosts),
+            hasReachedMax: hasReachedMax));
       } catch (e) {
         emit(PresentationsErrorState(
             message: 'Error loading presentations: $e'));
@@ -52,8 +52,16 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           event.date,
           event.imageUrl,
         );
-        cachedPosts.insert(0, post);
-        emit(PresentationsLoadedState(List.from(cachedPosts)));
+
+        final index =
+            cachedPosts.indexWhere((post) => post.date.isBefore(event.date));
+        if (index != -1) {
+          cachedPosts.insert(index, post);
+        } else {
+          cachedPosts.add(post);
+        }
+        emit(PresentationsLoadedState(List.from(cachedPosts),
+            hasReachedMax: hasReachedMax));
       } catch (e) {
         emit(PresentationsErrorState(message: 'Error adding presentation: $e'));
       }
@@ -73,7 +81,8 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
         if (index != -1) {
           cachedPosts[index] = updatedPost;
         }
-        emit(PresentationsLoadedState(List.from(cachedPosts)));
+        emit(PresentationsLoadedState(List.from(cachedPosts),
+            hasReachedMax: hasReachedMax));
       } catch (e) {
         emit(PresentationsErrorState(
             message: 'Error updating presentation: $e'));

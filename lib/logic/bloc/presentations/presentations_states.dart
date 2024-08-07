@@ -15,8 +15,9 @@ class PresentationsLoadingState extends PresentationsState {
 
 class PresentationsLoadedState extends PresentationsState {
   final List<BlogPost> posts;
+  final bool hasReachedMax;
 
-  PresentationsLoadedState(this.posts);
+  PresentationsLoadedState(this.posts, {this.hasReachedMax = false});
 
   @override
   List<Object?> get props => [posts];
