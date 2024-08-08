@@ -161,7 +161,7 @@ class _UpdateEventScreenState extends State<UpdateEventScreen> {
     BlocProvider.of<EventAdminBloc>(context)
         .add(LoadEventEventById(id: widget.eventId));
     BlocProvider.of<ImageBloc>(context)
-        .add(const GetImagesPathsEvent(path: 'images'));
+        .add(const GetImagesPathsEvent(path: ''));
 
     BlocProvider.of<ImageBloc>(context).stream.listen((state) {
       if (state is ImagesPathsLoadedState) {

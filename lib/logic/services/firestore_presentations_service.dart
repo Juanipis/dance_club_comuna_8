@@ -62,4 +62,8 @@ class FirestorePresentationsService {
       imageUrl: imageUrl,
     );
   }
+
+  Future<void> deleteBlogPost(String id) async {
+    await _presentationCollection.doc(id).delete();
+  }
 }

@@ -15,10 +15,16 @@ class BlogPostScreenView extends StatelessWidget {
         title: Text(post.title),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        // pading left and right 50
+        // padding top and bottom 40
+        padding: const EdgeInsets.fromLTRB(50.0, 40.0, 50.0, 40.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              post.title,
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
             Text(
               'Fecha: ${post.date.toString()}',
               style: Theme.of(context).textTheme.labelMedium,

@@ -153,7 +153,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   void initState() {
     super.initState();
     BlocProvider.of<ImageBloc>(context)
-        .add(const GetImagesPathsEvent(path: 'images'));
+        .add(const GetImagesPathsEvent(path: ''));
 
     BlocProvider.of<ImageBloc>(context).stream.listen((state) {
       if (state is ImagesPathsLoadedState) {

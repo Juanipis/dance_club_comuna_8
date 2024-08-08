@@ -47,3 +47,12 @@ class UpdatePresentationEvent extends PresentationsEvent {
   @override
   List<Object?> get props => [id, title, content, date];
 }
+
+class DeletePresentationEvent extends PresentationsEvent {
+  final String id;
+
+  const DeletePresentationEvent({required this.id});
+
+  @override
+  List<Object?> get props => [id];
+}
