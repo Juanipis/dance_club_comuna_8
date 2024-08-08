@@ -26,8 +26,11 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           startAfter: lastDocument,
         );
 
-        if (posts.isEmpty || posts.length < 10) {
+        if (posts.isEmpty) {
           hasReachedMax = true;
+          emit(PresentationsLoadedState(List.from(cachedPosts),
+              hasReachedMax: true));
+          return;
         }
 
         cachedPosts.addAll(posts);
@@ -35,6 +38,9 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
             .collection('presentations')
             .doc(posts.last.id)
             .get();
+
+        hasReachedMax = posts.length < 10;
+
         emit(PresentationsLoadedState(List.from(cachedPosts),
             hasReachedMax: hasReachedMax));
       } catch (e) {
