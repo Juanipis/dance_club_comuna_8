@@ -10,10 +10,14 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
   List<BlogPost> cachedPosts = [];
   DocumentSnapshot? lastDocument;
   bool hasReachedMax = false;
+  int totalPosts = 0;
 
   PresentationsBloc({required this.firestorePresentationsService})
       : super(PresentationsInitialState()) {
     on<GetPresentationsEvent>((event, emit) async {
+      if (totalPosts == 0) {
+        totalPosts = await firestorePresentationsService.getPostCount();
+      }
       if (hasReachedMax) return;
 
       try {
@@ -26,8 +30,11 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           startAfter: lastDocument,
         );
 
-        if (posts.isEmpty || posts.length < 10) {
+        if (posts.isEmpty) {
           hasReachedMax = true;
+          emit(PresentationsLoadedState(List.from(cachedPosts),
+              hasReachedMax: true));
+          return;
         }
 
         cachedPosts.addAll(posts);
@@ -35,6 +42,12 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
             .collection('presentations')
             .doc(posts.last.id)
             .get();
+
+        hasReachedMax = posts.length < 10;
+        if (!hasReachedMax && cachedPosts.length >= totalPosts) {
+          hasReachedMax = true;
+        }
+
         emit(PresentationsLoadedState(List.from(cachedPosts),
             hasReachedMax: hasReachedMax));
       } catch (e) {
