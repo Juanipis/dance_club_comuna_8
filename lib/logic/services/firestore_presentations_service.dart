@@ -66,4 +66,9 @@ class FirestorePresentationsService {
   Future<void> deleteBlogPost(String id) async {
     await _presentationCollection.doc(id).delete();
   }
+
+  Future<int> getPostCount() async {
+    final querySnapshot = await _presentationCollection.get();
+    return querySnapshot.size;
+  }
 }
