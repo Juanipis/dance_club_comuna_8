@@ -89,6 +89,21 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
       }
     });
 
+    on<DeletePresentationEvent>((event, emit) async {
+      try {
+        emit(PresentationsLoadingState());
+        await firestorePresentationsService.deleteBlogPost(event.id);
+        cachedPosts.removeWhere((post) => post.id == event.id);
+        emit(PresentationDeletedState(id: event.id));
+        await Future.delayed(const Duration(milliseconds: 500));
+        emit(PresentationsLoadedState(List.from(cachedPosts),
+            hasReachedMax: hasReachedMax));
+      } catch (e) {
+        emit(PresentationsErrorState(
+            message: 'Error deleting presentation: $e'));
+      }
+    });
+
     on<RefreshPresentationsEvent>((event, emit) async {
       cachedPosts.clear();
       lastDocument = null;

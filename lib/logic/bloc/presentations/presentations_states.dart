@@ -36,3 +36,12 @@ class PresentationsNoMorePostsState extends PresentationsState {
   @override
   List<Object> get props => [];
 }
+
+class PresentationDeletedState extends PresentationsState {
+  final String id;
+
+  PresentationDeletedState({required this.id});
+
+  @override
+  List<Object?> get props => [id];
+}
