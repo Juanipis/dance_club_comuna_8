@@ -99,25 +99,22 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
     );
   }
 
-  Widget _buildLoaderOrEndMessage(PresentationsState state) {
-    if (state is PresentationsLoadedState) {
-      if (state.hasReachedMax) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('No hay más presentaciones'),
-          ),
-        );
-      } else {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
+  Widget _buildLoaderOrEndMessage(PresentationsLoadedState state) {
+    if (state.hasReachedMax) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text('No hay más presentaciones'),
+        ),
+      );
+    } else {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
-    return const SizedBox.shrink();
   }
 
   Widget _buildPostListItem(BlogPost post) {
