@@ -1,3 +1,4 @@
+import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:dance_club_comuna_8/presentation/widgets/date_display.dart';
 import 'package:flutter/material.dart';
@@ -55,115 +56,142 @@ class _EventFormState extends State<EventForm> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            buildTextField(
-              titleController,
-              'Título del Evento',
-              leadingIcon: Icons.title,
-              helperText: "Obligatorio",
-              maxLength: 50,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El título es obligatorio';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            buildTextField(
-              descriptionController,
-              'Descripción del Evento',
-              leadingIcon: Icons.description,
-              maxLines: 3,
-              maxLength: 200,
-            ),
-            const SizedBox(height: 16),
-            buildTextField(
-              instructionsController,
-              'Instrucciones del Evento',
-              leadingIcon: Icons.info,
-              maxLength: 100,
-            ),
-            const SizedBox(height: 16),
-            buildTextField(
-              addressController,
-              'Dirección del Evento',
-              leadingIcon: Icons.location_on,
-              maxLength: 100,
-            ),
-            const SizedBox(height: 16),
-            buildImagePicker(),
-            const SizedBox(height: 16),
-            buildTextField(
-              maxAttendeesController,
-              'Máximo de asistentes',
-              numeric: true,
-              leadingIcon: Icons.people,
-              helperText: "Obligatorio",
-              maxLength: 4,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El número máximo de asistentes es obligatorio';
-                }
-                final int? maxAttendees = int.tryParse(value);
-                if (maxAttendees == null || maxAttendees <= 0) {
-                  return 'Ingrese un número válido de asistentes';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      buildDateTimePicker('Fecha y Hora de Inicio',
-                          selectStartDate, Icons.event_available),
-                      if (selectedDate != null && selectedTime != null)
-                        DateTimeDisplay(
-                          isStart: true,
-                          selectedDate: selectedDate,
-                          selectedTime: selectedTime,
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    children: [
-                      buildDateTimePicker('Fecha y Hora de Fin', selectEndDate,
-                          Icons.event_busy),
-                      if (selectedEndDate != null && selectedEndTime != null)
-                        DateTimeDisplay(
-                          isStart: false,
-                          selectedDate: selectedEndDate,
-                          selectedTime: selectedEndTime,
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: saveEvent,
-              icon: const Icon(Icons.save),
-              label: const Text('Guardar Evento'),
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+    return BlocListener<EventAdminBloc, EventState>(
+      listener: (context, state) {
+        if (state is EventLoadingState) {
+          // Mostrar spinner de carga
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
+        } else {
+          Navigator.of(context).pop(); // Cerrar el spinner
+          if (state is EventInsertedState) {
+            _showAlertDialog(
+                context, 'Evento añadido', 'El evento se añadió exitosamente.');
+          } else if (state is EventUpdatedState) {
+            _showAlertDialog(context, 'Evento actualizado',
+                'El evento se actualizó exitosamente.');
+          } else if (state is EventErrorState) {
+            _showAlertDialog(context, 'Error', state.message);
+          }
+        }
+      },
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              buildTextField(
+                titleController,
+                'Título del Evento',
+                leadingIcon: Icons.title,
+                helperText: "Obligatorio",
+                maxLength: 50,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'El título es obligatorio';
+                  }
+                  return null;
+                },
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              buildTextField(
+                descriptionController,
+                'Descripción del Evento',
+                leadingIcon: Icons.description,
+                maxLines: 3,
+                maxLength: 200,
+              ),
+              const SizedBox(height: 16),
+              buildTextField(
+                instructionsController,
+                'Instrucciones del Evento',
+                leadingIcon: Icons.info,
+                maxLength: 100,
+              ),
+              const SizedBox(height: 16),
+              buildTextField(
+                addressController,
+                'Dirección del Evento',
+                leadingIcon: Icons.location_on,
+                maxLength: 100,
+              ),
+              const SizedBox(height: 16),
+              buildImagePicker(),
+              const SizedBox(height: 16),
+              buildTextField(
+                maxAttendeesController,
+                'Máximo de asistentes',
+                numeric: true,
+                leadingIcon: Icons.people,
+                helperText: "Obligatorio",
+                maxLength: 4,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'El número máximo de asistentes es obligatorio';
+                  }
+                  final int? maxAttendees = int.tryParse(value);
+                  if (maxAttendees == null || maxAttendees <= 0) {
+                    return 'Ingrese un número válido de asistentes';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        buildDateTimePicker('Fecha y Hora de Inicio',
+                            selectStartDate, Icons.event_available),
+                        if (selectedDate != null && selectedTime != null)
+                          DateTimeDisplay(
+                            isStart: true,
+                            selectedDate: selectedDate,
+                            selectedTime: selectedTime,
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        buildDateTimePicker('Fecha y Hora de Fin',
+                            selectEndDate, Icons.event_busy),
+                        if (selectedEndDate != null && selectedEndTime != null)
+                          DateTimeDisplay(
+                            isStart: false,
+                            selectedDate: selectedEndDate,
+                            selectedTime: selectedEndTime,
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: saveEvent,
+                icon: const Icon(Icons.save),
+                label: const Text('Guardar Evento'),
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -276,6 +304,32 @@ class _EventFormState extends State<EventForm> {
         selectedEndTime = picked;
       });
     }
+  }
+
+  void _showAlertDialog(BuildContext context, String title, String content) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (title == 'Evento añadido' ||
+                    title == 'Evento actualizado') {
+                  Navigator.of(context)
+                      .pop(); // Cerrar el formulario después de guardar
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void saveEvent() {
