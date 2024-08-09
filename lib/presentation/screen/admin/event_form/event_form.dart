@@ -10,20 +10,22 @@ import 'package:dance_club_comuna_8/presentation/widgets/image_selection.dart';
 class EventForm extends StatefulWidget {
   final bool isUpdate;
   final Event? existingEvent;
+  final String? eventId;
 
-  const EventForm({super.key, this.isUpdate = false, this.existingEvent});
+  const EventForm(
+      {super.key, this.isUpdate = false, this.existingEvent, this.eventId});
 
   @override
   State<EventForm> createState() => _EventFormState();
 }
 
 class _EventFormState extends State<EventForm> {
-  late TextEditingController titleController;
-  late TextEditingController descriptionController;
-  late TextEditingController instructionsController;
-  late TextEditingController addressController;
-  late TextEditingController imageUrlController;
-  late TextEditingController maxAttendeesController;
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController instructionsController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController imageUrlController = TextEditingController();
+  TextEditingController maxAttendeesController = TextEditingController();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   DateTime? selectedEndDate;
@@ -34,7 +36,16 @@ class _EventFormState extends State<EventForm> {
   @override
   void initState() {
     super.initState();
-    final event = widget.existingEvent;
+    if (widget.isUpdate && widget.eventId != null) {
+      // Enviar el evento de cargar el evento por ID
+      BlocProvider.of<EventAdminBloc>(context)
+          .add(LoadEventEventById(id: widget.eventId!));
+    } else {
+      _loadEventData(widget.existingEvent);
+    }
+  }
+
+  void _loadEventData(Event? event) {
     titleController = TextEditingController(text: event?.title ?? '');
     descriptionController =
         TextEditingController(text: event?.description ?? '');
@@ -58,28 +69,29 @@ class _EventFormState extends State<EventForm> {
   Widget build(BuildContext context) {
     return BlocListener<EventAdminBloc, EventState>(
       listener: (context, state) {
-        if (state is EventLoadingState) {
-          // Mostrar spinner de carga
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            },
+        if (state is LoadEventByIdState) {
+          // Cargar los datos del evento al formulario
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Evento cargado exitosamente, puede editarlo')),
           );
-        } else {
-          Navigator.of(context).pop(); // Cerrar el spinner
-          if (state is EventInsertedState) {
-            _showAlertDialog(
-                context, 'Evento añadido', 'El evento se añadió exitosamente.');
-          } else if (state is EventUpdatedState) {
-            _showAlertDialog(context, 'Evento actualizado',
-                'El evento se actualizó exitosamente.');
-          } else if (state is EventErrorState) {
-            _showAlertDialog(context, 'Error', state.message);
-          }
+          _loadEventData(state.event);
+          setState(() {});
+        } else if (state is EventInsertedState || state is EventUpdatedState) {
+          // Mostrar mensaje de éxito
+          _showAlertDialog(
+            context,
+            state is EventInsertedState
+                ? 'Evento añadido'
+                : 'Evento actualizado',
+            'El evento se ha guardado exitosamente',
+          );
+        } else if (state is EventErrorState) {
+          // Manejar el error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Error al cargar el evento: ${state.message}')),
+          );
         }
       },
       child: SingleChildScrollView(
@@ -372,8 +384,11 @@ class _EventFormState extends State<EventForm> {
       );
 
       if (widget.isUpdate) {
+        if (widget.eventId == null) {
+          return;
+        }
         eventBloc.add(UpdateEventEvent(
-          id: widget.existingEvent!.id,
+          id: widget.eventId!,
           date: initDate,
           endDate: endDate,
           title: title,
