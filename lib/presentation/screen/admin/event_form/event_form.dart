@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/date_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_admin_bloc.dart';
@@ -27,6 +28,8 @@ class _EventFormState extends State<EventForm> {
   DateTime? selectedEndDate;
   TimeOfDay? selectedEndTime;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -54,47 +57,142 @@ class _EventFormState extends State<EventForm> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          buildTextField(titleController, 'Título del Evento (obligatorio)'),
-          const SizedBox(height: 16),
-          buildTextField(descriptionController, 'Descripción del Evento'),
-          const SizedBox(height: 16),
-          buildTextField(instructionsController, 'Instrucciones del Evento'),
-          const SizedBox(height: 16),
-          buildTextField(addressController, 'Dirección del Evento'),
-          const SizedBox(height: 16),
-          buildImagePicker(),
-          const SizedBox(height: 16),
-          buildTextField(
-              maxAttendeesController, 'Máximo de asistentes (obligatorio)',
-              numeric: true),
-          const SizedBox(height: 16),
-          buildDateTimePicker('Fecha y Hora de Inicio', selectStartDate),
-          const SizedBox(height: 16),
-          buildDateTimePicker('Fecha y Hora de Fin', selectEndDate),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: saveEvent,
-            icon: const Icon(Icons.save),
-            label: const Text('Guardar Evento'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            buildTextField(
+              titleController,
+              'Título del Evento',
+              leadingIcon: Icons.title,
+              helperText: "Obligatorio",
+              maxLength: 50,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El título es obligatorio';
+                }
+                return null;
+              },
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            buildTextField(
+              descriptionController,
+              'Descripción del Evento',
+              leadingIcon: Icons.description,
+              maxLines: 3,
+              maxLength: 200,
+            ),
+            const SizedBox(height: 16),
+            buildTextField(
+              instructionsController,
+              'Instrucciones del Evento',
+              leadingIcon: Icons.info,
+              maxLength: 100,
+            ),
+            const SizedBox(height: 16),
+            buildTextField(
+              addressController,
+              'Dirección del Evento',
+              leadingIcon: Icons.location_on,
+              maxLength: 100,
+            ),
+            const SizedBox(height: 16),
+            buildImagePicker(),
+            const SizedBox(height: 16),
+            buildTextField(
+              maxAttendeesController,
+              'Máximo de asistentes',
+              numeric: true,
+              leadingIcon: Icons.people,
+              helperText: "Obligatorio",
+              maxLength: 4,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El número máximo de asistentes es obligatorio';
+                }
+                final int? maxAttendees = int.tryParse(value);
+                if (maxAttendees == null || maxAttendees <= 0) {
+                  return 'Ingrese un número válido de asistentes';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      buildDateTimePicker('Fecha y Hora de Inicio',
+                          selectStartDate, Icons.event_available),
+                      if (selectedDate != null && selectedTime != null)
+                        DateTimeDisplay(
+                          isStart: true,
+                          selectedDate: selectedDate,
+                          selectedTime: selectedTime,
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    children: [
+                      buildDateTimePicker('Fecha y Hora de Fin', selectEndDate,
+                          Icons.event_busy),
+                      if (selectedEndDate != null && selectedEndTime != null)
+                        DateTimeDisplay(
+                          isStart: false,
+                          selectedDate: selectedEndDate,
+                          selectedTime: selectedEndTime,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: saveEvent,
+              icon: const Icon(Icons.save),
+              label: const Text('Guardar Evento'),
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildTextField(TextEditingController controller, String label,
-      {bool numeric = false}) {
-    return TextField(
+  Widget buildTextField(
+    TextEditingController controller,
+    String label, {
+    bool numeric = false,
+    IconData? leadingIcon,
+    int? maxLines,
+    String helperText = '',
+    int? maxLength,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
       controller: controller,
-      decoration: InputDecoration(labelText: label),
+      decoration: InputDecoration(
+        labelText: label,
+        icon: leadingIcon != null ? Icon(leadingIcon) : null,
+        helperText: helperText,
+      ),
       keyboardType: numeric ? TextInputType.number : TextInputType.text,
+      maxLines: maxLines ?? 1,
+      maxLength: maxLength,
+      buildCounter: (context,
+              {required currentLength, required isFocused, int? maxLength}) =>
+          Text('$currentLength de ${maxLength ?? ''}'),
+      validator: validator,
     );
   }
 
@@ -103,11 +201,13 @@ class _EventFormState extends State<EventForm> {
       children: [
         Expanded(
           flex: 7,
-          child: TextField(
+          child: TextFormField(
             enabled: false,
             controller: imageUrlController,
-            decoration:
-                const InputDecoration(labelText: 'URL de la imagen del Evento'),
+            decoration: const InputDecoration(
+              labelText: 'URL de la imagen del Evento',
+              icon: Icon(Icons.image),
+            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -116,10 +216,11 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  Widget buildDateTimePicker(String label, Function() onTap) {
-    return ElevatedButton(
+  Widget buildDateTimePicker(String label, Function() onTap, IconData avatar) {
+    return ActionChip(
       onPressed: onTap,
-      child: Text(label),
+      avatar: Icon(avatar),
+      label: Text(label),
     );
   }
 
@@ -178,63 +279,68 @@ class _EventFormState extends State<EventForm> {
   }
 
   void saveEvent() {
-    final eventBloc = BlocProvider.of<EventAdminBloc>(context);
-    if (!checkDates()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor revise las fechas del evento')),
+    if (_formKey.currentState?.validate() ?? false) {
+      final eventBloc = BlocProvider.of<EventAdminBloc>(context);
+      if (!checkDates()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Por favor revise las fechas del evento'),
+          ),
+        );
+        return;
+      }
+      final title = titleController.text;
+      final int? maxAttendees = int.tryParse(maxAttendeesController.text);
+
+      if (maxAttendees == null || maxAttendees <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Por favor ingrese un número válido de asistentes'),
+          ),
+        );
+        return;
+      }
+
+      final initDate = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
+        selectedTime!.hour,
+        selectedTime!.minute,
       );
-      return;
-    }
-    final title = titleController.text;
-    final int? maxAttendees = int.tryParse(maxAttendeesController.text);
-    if (title.isEmpty || maxAttendees == null || maxAttendees <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Por favor complete todos los campos obligatorios correctamente')),
+
+      final endDate = DateTime(
+        selectedEndDate!.year,
+        selectedEndDate!.month,
+        selectedEndDate!.day,
+        selectedEndTime!.hour,
+        selectedEndTime!.minute,
       );
-      return;
-    }
 
-    final initDate = DateTime(
-      selectedDate!.year,
-      selectedDate!.month,
-      selectedDate!.day,
-      selectedTime!.hour,
-      selectedTime!.minute,
-    );
-
-    final endDate = DateTime(
-      selectedEndDate!.year,
-      selectedEndDate!.month,
-      selectedEndDate!.day,
-      selectedEndTime!.hour,
-      selectedEndTime!.minute,
-    );
-
-    if (widget.isUpdate) {
-      eventBloc.add(UpdateEventEvent(
-        id: widget.existingEvent!.id,
-        date: initDate,
-        endDate: endDate,
-        title: title,
-        description: descriptionController.text,
-        instructions: instructionsController.text,
-        address: addressController.text,
-        imageUrl: imageUrlController.text,
-        maxAttendees: maxAttendees,
-      ));
-    } else {
-      eventBloc.add(InserEventEvent(
-        date: initDate,
-        endDate: endDate,
-        title: title,
-        description: descriptionController.text,
-        instructions: instructionsController.text,
-        address: addressController.text,
-        imageUrl: imageUrlController.text,
-        maxAttendees: maxAttendees,
-      ));
+      if (widget.isUpdate) {
+        eventBloc.add(UpdateEventEvent(
+          id: widget.existingEvent!.id,
+          date: initDate,
+          endDate: endDate,
+          title: title,
+          description: descriptionController.text,
+          instructions: instructionsController.text,
+          address: addressController.text,
+          imageUrl: imageUrlController.text,
+          maxAttendees: maxAttendees,
+        ));
+      } else {
+        eventBloc.add(InserEventEvent(
+          date: initDate,
+          endDate: endDate,
+          title: title,
+          description: descriptionController.text,
+          instructions: instructionsController.text,
+          address: addressController.text,
+          imageUrl: imageUrlController.text,
+          maxAttendees: maxAttendees,
+        ));
+      }
     }
   }
 
