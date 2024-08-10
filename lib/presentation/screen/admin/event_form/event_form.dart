@@ -9,11 +9,10 @@ import 'package:dance_club_comuna_8/presentation/widgets/image_selection.dart';
 
 class EventForm extends StatefulWidget {
   final bool isUpdate;
-  final Event? existingEvent;
+
   final String? eventId;
 
-  const EventForm(
-      {super.key, this.isUpdate = false, this.existingEvent, this.eventId});
+  const EventForm({super.key, this.isUpdate = false, this.eventId});
 
   @override
   State<EventForm> createState() => _EventFormState();
@@ -30,6 +29,7 @@ class _EventFormState extends State<EventForm> {
   TimeOfDay? selectedTime;
   DateTime? selectedEndDate;
   TimeOfDay? selectedEndTime;
+  Event? existingEvent;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -41,7 +41,7 @@ class _EventFormState extends State<EventForm> {
       BlocProvider.of<EventAdminBloc>(context)
           .add(LoadEventEventById(id: widget.eventId!));
     } else {
-      _loadEventData(widget.existingEvent);
+      _loadEventData(null);
     }
   }
 
@@ -63,37 +63,52 @@ class _EventFormState extends State<EventForm> {
     selectedEndTime = event != null
         ? TimeOfDay(hour: event.endDate.hour, minute: event.endDate.minute)
         : null;
+    if (widget.isUpdate) {
+      existingEvent = event;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<EventAdminBloc, EventState>(
-      builder: (context, state) {
-        if (state is LoadEventByIdState) {
-          // Cargar los datos del evento al formulario
-
-          _loadEventData(state.event);
-
-          return _buildForm();
-        } else if (state is EventInsertedState || state is EventUpdatedState) {
-          // Mostrar mensaje de éxito
+    return BlocListener<EventAdminBloc, EventState>(
+      listener: (context, state) {
+        if (state is EventInsertedState || state is EventUpdatedState) {
           _showAlertDialog(
             context,
-            state is EventInsertedState
-                ? 'Evento añadido'
-                : 'Evento actualizado',
+            widget.isUpdate ? 'Evento actualizado' : 'Evento añadido',
             'El evento se ha guardado exitosamente',
           );
         } else if (state is EventErrorState) {
-          // Manejar el error
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Error al cargar el evento: ${state.message}')),
-          );
+          _showErrorSnackBar(context, 'Error: ${state.message}');
+        } else if (state is EventDosentExistState) {
+          _showErrorSnackBar(context, 'Error: El evento no existe');
+        } else if (state is EventCannotUpdateMaxAttendeesState) {
+          _showErrorSnackBar(context,
+              'Error: No se puede actualizar el número máximo de asistentes, ya que hay asistentes registrados');
         }
-
-        return const Center(child: CircularProgressIndicator());
       },
+      child: BlocBuilder<EventAdminBloc, EventState>(
+        builder: (context, state) {
+          if (state is LoadEventByIdState) {
+            _loadEventData(state.event);
+            return _buildForm();
+          } else if (state is EventLoadingState) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (!widget.isUpdate) {
+            return _buildForm();
+          }
+          return _buildForm(); // Cambiado para mostrar el formulario en lugar del spinner
+        },
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 
@@ -207,51 +222,50 @@ class _EventFormState extends State<EventForm> {
   }
 
   void _showAlertDialog(BuildContext context, String title, String content) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                if (title == 'Evento añadido' ||
-                    title == 'Evento actualizado') {
-                  Navigator.of(context)
-                      .pop(); // Cerrar el formulario después de guardar
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                  Navigator.of(context).pop(); // Go back to previous screen
+                },
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 
   void saveEvent() {
     if (_formKey.currentState?.validate() ?? false) {
       final eventBloc = BlocProvider.of<EventAdminBloc>(context);
       if (!checkDates()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Por favor revise las fechas del evento'),
-          ),
-        );
+        _showErrorSnackBar(
+            context, 'La fecha de inicio debe ser antes que la fecha de fin');
         return;
       }
       final title = titleController.text;
       final int? maxAttendees = int.tryParse(maxAttendeesController.text);
 
       if (maxAttendees == null || maxAttendees <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Por favor ingrese un número válido de asistentes'),
-          ),
-        );
+        _showErrorSnackBar(context, 'Ingrese un número válido de asistentes');
+        return;
+      }
+
+      if (widget.isUpdate &&
+          existingEvent != null &&
+          existingEvent!.attendes > maxAttendees) {
+        _showErrorSnackBar(context,
+            'No se puede reducir el número máximo de asistentes, ya que hay asistentes registrados');
         return;
       }
 
@@ -388,6 +402,14 @@ class _EventFormState extends State<EventForm> {
                 return null;
               },
             ),
+            if (widget.isUpdate && existingEvent != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  'Asistentes actuales: ${existingEvent!.attendes}',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
             const SizedBox(height: 16),
             Row(
               children: [
