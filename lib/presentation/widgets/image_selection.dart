@@ -5,6 +5,28 @@ import 'package:flutter/material.dart';
 import 'package:dance_club_comuna_8/logic/models/image_bucket.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+Widget imageSelectionButton(
+    BuildContext context, TextEditingController imageUrlController) {
+  return IconButton(
+    icon: const Icon(Icons.image_search),
+    onPressed: () => _showImageSelectionDialog(context, imageUrlController),
+    tooltip: 'Seleccionar imagen',
+  );
+}
+
+Future<void> _showImageSelectionDialog(
+    BuildContext context, TextEditingController imageUrlController) async {
+  final imageUrl = await showDialog<String>(
+    context: context,
+    builder: (BuildContext context) {
+      return const ImageSelectionDialog();
+    },
+  );
+  if (imageUrl != null) {
+    imageUrlController.text = imageUrl;
+  }
+}
+
 class ImageSelectionDialog extends StatefulWidget {
   const ImageSelectionDialog({super.key});
 
