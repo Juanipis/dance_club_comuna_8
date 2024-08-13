@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     var screens = [
       (
-        buildHomeScreen(context),
+        const BuildHomeScreen(),
         'Página principal',
       ),
       (buildAboutScreen(), '¿Quiénes somos?'),

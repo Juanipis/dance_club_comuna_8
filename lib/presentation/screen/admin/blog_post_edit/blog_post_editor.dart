@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/presentation/widgets/image_selection.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/tag_input.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -8,6 +9,8 @@ class BlogPostEditor extends StatelessWidget {
   final TextEditingController contentController;
   final DateTime selectedDate;
   final ValueChanged<DateTime> onDateChanged;
+  final ValueChanged<List<String>> onVideoUrlsChanged;
+  final List<String> videoUrlsInitial;
 
   const BlogPostEditor({
     super.key,
@@ -16,6 +19,8 @@ class BlogPostEditor extends StatelessWidget {
     required this.contentController,
     required this.selectedDate,
     required this.onDateChanged,
+    required this.onVideoUrlsChanged,
+    required this.videoUrlsInitial,
   });
 
   @override
@@ -35,6 +40,11 @@ class BlogPostEditor extends StatelessWidget {
           _buildImageUrlField(context),
           const SizedBox(height: 16),
           _buildTextField(contentController, 'Contenido', maxLines: maxLines),
+          const SizedBox(height: 16),
+          TagInputWidget(
+            onTagsChanged: onVideoUrlsChanged,
+            initialTags: videoUrlsInitial,
+          ),
           const SizedBox(height: 16),
           _buildDatePicker(context),
         ],

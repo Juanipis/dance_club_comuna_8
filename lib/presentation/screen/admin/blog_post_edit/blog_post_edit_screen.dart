@@ -23,6 +23,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
   late final TextEditingController _contentController;
   late DateTime _selectedDate;
   bool _isPreviewMode = false;
+  List<String> videoUrls = [];
 
   @override
   void initState() {
@@ -73,8 +74,11 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
                     imageUrlController: _imageUrlController,
                     contentController: _contentController,
                     selectedDate: _selectedDate,
+                    onVideoUrlsChanged: (tags) =>
+                        setState(() => videoUrls = tags),
                     onDateChanged: (date) =>
                         setState(() => _selectedDate = date),
+                    videoUrlsInitial: widget.post?.videoUrls ?? [],
                   ),
           ),
         ],
@@ -98,19 +102,19 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
       final bloc = context.read<PresentationsBloc>();
       if (widget.post == null) {
         bloc.add(AddPresentationEvent(
-          title: title,
-          content: content,
-          date: _selectedDate,
-          imageUrl: imageUrl,
-        ));
+            title: title,
+            content: content,
+            date: _selectedDate,
+            imageUrl: imageUrl,
+            videoUrls: videoUrls));
       } else {
         bloc.add(UpdatePresentationEvent(
-          id: widget.post!.id,
-          title: title,
-          content: content,
-          date: _selectedDate,
-          imageUrl: imageUrl,
-        ));
+            id: widget.post!.id,
+            title: title,
+            content: content,
+            date: _selectedDate,
+            imageUrl: imageUrl,
+            videoUrls: videoUrls));
       }
       _showSnackBar("Post guardado con éxito");
       Navigator.of(context).pop();
