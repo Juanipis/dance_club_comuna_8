@@ -1,3 +1,5 @@
+import 'package:dance_club_comuna_8/presentation/widgets/carousel_videos_youtube.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/video_player_youtube.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
@@ -7,12 +9,14 @@ class BlogPostPreview extends StatelessWidget {
   final String title;
   final String content;
   final DateTime date;
+  final List<String> videoUrls;
 
   const BlogPostPreview({
     super.key,
     required this.title,
     required this.content,
     required this.date,
+    required this.videoUrls,
   });
 
   @override
@@ -47,6 +51,20 @@ class BlogPostPreview extends StatelessWidget {
                 launchUrl(Uri.parse(href));
               }
             },
+          ),
+          const SizedBox(height: 16),
+          // centred titile for the carousel
+          Center(
+            child: Text(
+              'Videos',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+          const SizedBox(height: 16),
+          YouTubeCarousel(
+            videoUrls: videoUrls,
+            width: MediaQuery.of(context).size.width,
+            height: 300, // Ajusta esta altura según tus necesidades
           ),
         ],
       ),

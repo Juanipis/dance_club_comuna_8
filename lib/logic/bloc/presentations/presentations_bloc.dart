@@ -64,6 +64,7 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           event.content,
           event.date,
           event.imageUrl,
+          event.videoUrls,
         );
 
         final index =
@@ -89,6 +90,7 @@ class PresentationsBloc extends Bloc<PresentationsEvent, PresentationsState> {
           event.content,
           event.date,
           event.imageUrl,
+          event.videoUrls,
         );
         final index = cachedPosts.indexWhere((post) => post.id == event.id);
         if (index != -1) {

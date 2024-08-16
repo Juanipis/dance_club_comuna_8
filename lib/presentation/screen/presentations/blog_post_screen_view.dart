@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/models/blog_post.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/carousel_videos_youtube.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,6 +54,20 @@ class BlogPostScreenView extends StatelessWidget {
                 }
               },
               selectable: true,
+            ),
+            const SizedBox(height: 16.0),
+            // centred titile for the carousel
+            Center(
+              child: Text(
+                'Videos',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            YouTubeCarousel(
+              videoUrls: post.videoUrls!,
+              width: MediaQuery.of(context).size.width,
+              height: 300, // Ajusta esta altura según tus necesidades
             ),
           ],
         ),

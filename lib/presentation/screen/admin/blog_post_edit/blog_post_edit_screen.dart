@@ -23,6 +23,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
   late final TextEditingController _contentController;
   late DateTime _selectedDate;
   bool _isPreviewMode = false;
+  List<String> videoUrls = [];
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
         TextEditingController(text: widget.post?.imageUrl ?? '');
     _selectedDate = widget.post?.date ?? DateTime.now();
     _contentController.addListener(() => setState(() {}));
+    videoUrls = widget.post?.videoUrls ?? [];
   }
 
   @override
@@ -67,14 +69,18 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
                     title: _titleController.text,
                     content: _contentController.text,
                     date: _selectedDate,
+                    videoUrls: videoUrls,
                   )
                 : BlogPostEditor(
                     titleController: _titleController,
                     imageUrlController: _imageUrlController,
                     contentController: _contentController,
                     selectedDate: _selectedDate,
+                    onVideoUrlsChanged: (tags) =>
+                        setState(() => videoUrls = tags),
                     onDateChanged: (date) =>
                         setState(() => _selectedDate = date),
+                    videoUrlsInitial: videoUrls,
                   ),
           ),
         ],
@@ -98,19 +104,19 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
       final bloc = context.read<PresentationsBloc>();
       if (widget.post == null) {
         bloc.add(AddPresentationEvent(
-          title: title,
-          content: content,
-          date: _selectedDate,
-          imageUrl: imageUrl,
-        ));
+            title: title,
+            content: content,
+            date: _selectedDate,
+            imageUrl: imageUrl,
+            videoUrls: videoUrls));
       } else {
         bloc.add(UpdatePresentationEvent(
-          id: widget.post!.id,
-          title: title,
-          content: content,
-          date: _selectedDate,
-          imageUrl: imageUrl,
-        ));
+            id: widget.post!.id,
+            title: title,
+            content: content,
+            date: _selectedDate,
+            imageUrl: imageUrl,
+            videoUrls: videoUrls));
       }
       _showSnackBar("Post guardado con éxito");
       Navigator.of(context).pop();

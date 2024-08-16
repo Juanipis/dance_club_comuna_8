@@ -14,12 +14,14 @@ class AddPresentationEvent extends PresentationsEvent {
   final String content;
   final DateTime date;
   final String imageUrl;
+  final List<String> videoUrls;
 
   const AddPresentationEvent(
       {required this.title,
       required this.content,
       required this.date,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.videoUrls});
 
   @override
   List<Object?> get props => [title, content, date];
@@ -36,13 +38,15 @@ class UpdatePresentationEvent extends PresentationsEvent {
   final String content;
   final DateTime date;
   final String imageUrl;
+  final List<String> videoUrls;
 
   const UpdatePresentationEvent(
       {required this.id,
       required this.title,
       required this.content,
       required this.date,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.videoUrls});
 
   @override
   List<Object?> get props => [id, title, content, date];
