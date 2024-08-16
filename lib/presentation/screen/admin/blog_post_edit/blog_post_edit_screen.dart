@@ -35,6 +35,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
         TextEditingController(text: widget.post?.imageUrl ?? '');
     _selectedDate = widget.post?.date ?? DateTime.now();
     _contentController.addListener(() => setState(() {}));
+    videoUrls = widget.post?.videoUrls ?? [];
   }
 
   @override
@@ -79,7 +80,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
                         setState(() => videoUrls = tags),
                     onDateChanged: (date) =>
                         setState(() => _selectedDate = date),
-                    videoUrlsInitial: widget.post?.videoUrls ?? [],
+                    videoUrlsInitial: videoUrls,
                   ),
           ),
         ],

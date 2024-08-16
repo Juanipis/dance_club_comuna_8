@@ -1,3 +1,4 @@
+import 'package:dance_club_comuna_8/presentation/widgets/carousel_videos_youtube.dart';
 import 'package:dance_club_comuna_8/presentation/widgets/video_player_youtube.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -51,12 +52,20 @@ class BlogPostPreview extends StatelessWidget {
               }
             },
           ),
-          Row(
-            children: [
-              for (var videoUrl in videoUrls)
-                Expanded(child: PlayerWidget(videoUrl: videoUrl)),
-            ],
-          )
+          const SizedBox(height: 16),
+          // centred titile for the carousel
+          Center(
+            child: Text(
+              'Videos',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+          const SizedBox(height: 16),
+          YouTubeCarousel(
+            videoUrls: videoUrls,
+            width: MediaQuery.of(context).size.width,
+            height: 300, // Ajusta esta altura según tus necesidades
+          ),
         ],
       ),
     );
