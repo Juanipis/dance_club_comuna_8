@@ -60,3 +60,57 @@ class InfoCard extends StatelessWidget {
     );
   }
 }
+
+class InfoCardExtended extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String content;
+
+  const InfoCardExtended({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.content,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(50),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 40,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              content,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

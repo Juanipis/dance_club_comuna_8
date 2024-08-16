@@ -139,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
       (const BuildAboutScreen(), '¿Quiénes somos?'),
       (const BuildPresentationsScreen(), 'Presentaciones'),
       (const BuildEventsScreen(), 'Eventos'),
-      (buildContactScreen(), 'Contacto'),
+      (const BuildContactScreen(), 'Contacto'),
     ];
     var actionsBiggerScreen = [
       for (var i = 0; i < screens.length; i++)
