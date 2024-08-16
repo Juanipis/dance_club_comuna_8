@@ -68,6 +68,7 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
                     title: _titleController.text,
                     content: _contentController.text,
                     date: _selectedDate,
+                    videoUrls: videoUrls,
                   )
                 : BlogPostEditor(
                     titleController: _titleController,

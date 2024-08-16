@@ -1,3 +1,4 @@
+import 'package:dance_club_comuna_8/presentation/widgets/video_player_youtube.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
@@ -7,12 +8,14 @@ class BlogPostPreview extends StatelessWidget {
   final String title;
   final String content;
   final DateTime date;
+  final List<String> videoUrls;
 
   const BlogPostPreview({
     super.key,
     required this.title,
     required this.content,
     required this.date,
+    required this.videoUrls,
   });
 
   @override
@@ -48,6 +51,12 @@ class BlogPostPreview extends StatelessWidget {
               }
             },
           ),
+          Row(
+            children: [
+              for (var videoUrl in videoUrls)
+                Expanded(child: PlayerWidget(videoUrl: videoUrl)),
+            ],
+          )
         ],
       ),
     );

@@ -44,6 +44,7 @@ class BlogPostEditor extends StatelessWidget {
           TagInputWidget(
             onTagsChanged: onVideoUrlsChanged,
             initialTags: videoUrlsInitial,
+            hintText: 'URLs de videos de youtube (opcional)',
           ),
           const SizedBox(height: 16),
           _buildDatePicker(context),
