@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
         const BuildHomeScreen(),
         'Página principal',
       ),
-      (buildAboutScreen(), '¿Quiénes somos?'),
+      (const BuildAboutScreen(), '¿Quiénes somos?'),
       (const BuildPresentationsScreen(), 'Presentaciones'),
       (const BuildEventsScreen(), 'Eventos'),
       (buildContactScreen(), 'Contacto'),
@@ -151,20 +151,28 @@ class _MyHomePageState extends State<MyHomePage> {
             });
           },
           child: Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 8.0, vertical: 4.0), // Añadimos padding
             decoration: BoxDecoration(
+              color: selectedScreenIndex == i
+                  ? Theme.of(context).primaryColor.withOpacity(
+                      0.7) // Fondo semitransparente basado en el tema cuando está seleccionado
+                  : Theme.of(context).primaryColorDark.withOpacity(
+                      0.8), // Fondo semitransparente cuando no está seleccionado
               border: Border(
                 bottom: BorderSide(
                   color: selectedScreenIndex == i
-                      ? Colors.orange
+                      ? Theme.of(context).primaryColor
                       : Colors.transparent,
                   width: 2,
                 ),
               ),
+              borderRadius: BorderRadius.circular(4.0), // Bordes redondeados
             ),
             child: Text(
               screens[i].$2,
-              style: TextStyle(
-                color: selectedScreenIndex == i ? Colors.orange : Colors.white,
+              style: const TextStyle(
+                color: Colors.white, // Color de texto siempre blanco
               ),
             ),
           ),
@@ -198,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
 
     return Scaffold(
-      drawer: screenWidth < 650
+      drawer: screenWidth < 680
           ? Drawer(
               shape: const BeveledRectangleBorder(),
               child: ListView(
@@ -215,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
             expandedHeight: 300.0,
             floating: false,
             pinned: true,
-            leading: screenWidth < 650
+            leading: screenWidth < 680
                 ? Builder(
                     builder: (context) => Container(
                       // color: Colors.red, // Si se quiere cambiar el fondo del color
@@ -238,19 +246,26 @@ class _MyHomePageState extends State<MyHomePage> {
                     fit: BoxFit.cover,
                     alignment: const Alignment(1.0, -0.3),
                   ),
-                  Text(
-                    resources['title'] as String,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 60,
-                      fontWeight: FontWeight.w100,
+                  Container(
+                    color: Theme.of(context).primaryColor.withOpacity(
+                        0.7), // Fondo semitransparente usando el del tema
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
+                    child: Text(
+                      resources['title'] as String,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 60,
+                        fontWeight: FontWeight.w100,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            actions: screenWidth > 550 ? actionsBiggerScreen : [],
+
+            actions: screenWidth > 680 ? actionsBiggerScreen : [],
           ),
           SliverToBoxAdapter(
             child: screens[selectedScreenIndex].$1,
