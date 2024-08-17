@@ -87,7 +87,7 @@ class AdminPanelContent extends StatelessWidget {
               Text(
                 "¿Qué desea hacer hoy?",
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
               ),
               const SizedBox(height: 32),
@@ -183,7 +183,7 @@ class AdminOptionCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                     ),
                   ],

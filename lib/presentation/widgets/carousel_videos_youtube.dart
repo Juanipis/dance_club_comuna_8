@@ -96,7 +96,7 @@ class _YouTubeCarouselState extends State<YouTubeCarousel> {
               dotsCount: widget.videoUrls.length,
               position: _currentIndex,
               decorator: DotsDecorator(
-                activeColor: Colors.orange,
+                activeColor: Theme.of(context).colorScheme.secondary,
                 size: const Size.square(9.0),
                 activeSize: const Size(18.0, 9.0),
                 activeShape: RoundedRectangleBorder(
