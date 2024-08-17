@@ -5,6 +5,7 @@ import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.
 import 'package:dance_club_comuna_8/logic/services/firestore_presentations_service.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_storage_service.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/admin_screen.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/theme.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -94,10 +95,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Danzas la ladera alma y tradición',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange.shade200),
-          useMaterial3: true,
-        ),
+        theme: customTheme,
         home: const MyHomePage(title: 'Danzas la ladera alma y tradición'),
       ),
     );
