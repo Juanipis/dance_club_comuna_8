@@ -30,6 +30,7 @@ class _EventFormState extends State<EventForm> {
   DateTime? selectedEndDate;
   TimeOfDay? selectedEndTime;
   Event? existingEvent;
+  bool dataLoaded = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -46,26 +47,30 @@ class _EventFormState extends State<EventForm> {
   }
 
   void _loadEventData(Event? event) {
-    titleController = TextEditingController(text: event?.title ?? '');
-    descriptionController =
-        TextEditingController(text: event?.description ?? '');
-    instructionsController =
-        TextEditingController(text: event?.instructions ?? '');
-    addressController = TextEditingController(text: event?.address ?? '');
-    imageUrlController = TextEditingController(text: event?.imageUrl ?? '');
-    maxAttendeesController =
-        TextEditingController(text: event?.maxAttendees.toString() ?? '');
-    selectedDate = event?.date;
+    if (dataLoaded) {
+      return;
+    }
+    titleController.text = event?.title ?? '';
+    descriptionController.text = event?.description ?? '';
+    instructionsController.text = event?.instructions ?? '';
+    addressController.text = event?.address ?? '';
+    imageUrlController.text = event?.imageUrl ?? '';
+    maxAttendeesController.text = event?.maxAttendees.toString() ?? '';
+
+    selectedDate = event?.date ?? DateTime.now();
     selectedTime = event != null
         ? TimeOfDay(hour: event.date.hour, minute: event.date.minute)
-        : null;
-    selectedEndDate = event?.endDate;
+        : TimeOfDay.now();
+    selectedEndDate =
+        event?.endDate ?? DateTime.now().add(const Duration(hours: 1));
     selectedEndTime = event != null
         ? TimeOfDay(hour: event.endDate.hour, minute: event.endDate.minute)
-        : null;
+        : TimeOfDay.now();
+
     if (widget.isUpdate) {
       existingEvent = event;
     }
+    dataLoaded = true;
   }
 
   @override
@@ -91,14 +96,134 @@ class _EventFormState extends State<EventForm> {
         builder: (context, state) {
           if (state is LoadEventByIdState) {
             _loadEventData(state.event);
-            return _buildForm();
           } else if (state is EventLoadingState) {
             return const Center(child: CircularProgressIndicator());
-          } else if (!widget.isUpdate) {
-            return _buildForm();
           }
-          return _buildForm(); // Cambiado para mostrar el formulario en lugar del spinner
+          return buildForm(context);
         },
+      ),
+    );
+  }
+
+  SingleChildScrollView buildForm(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            buildTextField(
+              titleController,
+              'Título del Evento',
+              leadingIcon: Icons.title,
+              helperText: "Obligatorio",
+              maxLength: 50,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El título es obligatorio';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            buildTextField(
+              descriptionController,
+              'Descripción del Evento',
+              leadingIcon: Icons.description,
+              maxLines: 3,
+              maxLength: 200,
+            ),
+            const SizedBox(height: 16),
+            buildTextField(
+              instructionsController,
+              'Instrucciones del Evento',
+              leadingIcon: Icons.info,
+              maxLength: 100,
+            ),
+            const SizedBox(height: 16),
+            buildTextField(
+              addressController,
+              'Dirección del Evento',
+              leadingIcon: Icons.location_on,
+              maxLength: 100,
+            ),
+            const SizedBox(height: 16),
+            buildImagePicker(),
+            const SizedBox(height: 16),
+            buildTextField(
+              maxAttendeesController,
+              'Máximo de asistentes',
+              numeric: true,
+              leadingIcon: Icons.people,
+              helperText: "Obligatorio",
+              maxLength: 4,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El número máximo de asistentes es obligatorio';
+                }
+                final int? maxAttendees = int.tryParse(value);
+                if (maxAttendees == null || maxAttendees <= 0) {
+                  return 'Ingrese un número válido de asistentes';
+                }
+                return null;
+              },
+            ),
+            if (widget.isUpdate && existingEvent != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  'Asistentes actuales: ${existingEvent!.attendes}',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+              ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      buildDateTimePicker('Fecha y Hora de Inicio',
+                          selectStartDate, Icons.event_available),
+                      if (selectedDate != null && selectedTime != null)
+                        DateTimeDisplay(
+                          isStart: true,
+                          selectedDate: selectedDate,
+                          selectedTime: selectedTime,
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    children: [
+                      buildDateTimePicker('Fecha y Hora de Fin', selectEndDate,
+                          Icons.event_busy),
+                      if (selectedEndDate != null && selectedEndTime != null)
+                        DateTimeDisplay(
+                          isStart: false,
+                          selectedDate: selectedEndDate,
+                          selectedTime: selectedEndTime,
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: saveEvent,
+              icon: const Icon(Icons.save),
+              label: const Text('Guardar Evento'),
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -168,12 +293,27 @@ class _EventFormState extends State<EventForm> {
   }
 
   Future<void> selectStartDate() async {
+    // Si existe un select end date, first date debe estar antes que initial date
+    // initial date debe ser la fecha seleccionada en el select end date, si no existe es la fecha actual
+    // first date siempre debe ser 10 dias antes de la fecha que esté en intial date sea la actual o la seleccionada
+    DateTime firstDate = DateTime.now();
+    if (selectedEndDate != null) {
+      firstDate = selectedDate!.subtract(const Duration(days: 10));
+    } else {
+      firstDate = firstDate.subtract(const Duration(days: 10));
+    }
+    // last date debe ser 5 años despues de la selected date en caso de que exista, si no es la fecha actual
+    DateTime lastDate = DateTime.now();
+    if (selectedDate != null) {
+      lastDate = selectedDate!.add(const Duration(days: 365 * 5));
+    } else {
+      lastDate = DateTime.now().add(const Duration(days: 365 * 5));
+    }
     final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 1)),
-      lastDate: DateTime(2025),
-    );
+        context: context,
+        initialDate: selectedDate ?? DateTime.now(),
+        firstDate: firstDate,
+        lastDate: lastDate);
     if (picked != null) {
       setState(() {
         selectedDate = picked;
@@ -195,12 +335,29 @@ class _EventFormState extends State<EventForm> {
   }
 
   Future<void> selectEndDate() async {
+    // El initial date debe ser selected date si existe, si no es la fecha actual
+    // el first date debe ser 10 dias antes de la fecha seleccionada en initial date
+    // el last date debe ser 5 años despues de la fecha seleccionada en initial date
+
+    DateTime firstDate = DateTime.now();
+    if (selectedDate != null) {
+      firstDate = selectedEndDate!.subtract(const Duration(days: 10));
+    } else {
+      firstDate = firstDate.subtract(const Duration(days: 10));
+    }
+    DateTime lastDate = DateTime.now();
+    if (selectedDate != null) {
+      lastDate = selectedEndDate!.add(const Duration(days: 365 * 5));
+    } else {
+      lastDate = DateTime.now().add(const Duration(days: 365 * 5));
+    }
+
     final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedEndDate ?? DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 1)),
-      lastDate: DateTime(2025),
-    );
+        context: context,
+        initialDate:
+            selectedEndDate ?? DateTime.now().add(const Duration(hours: 1)),
+        firstDate: firstDate,
+        lastDate: lastDate);
     if (picked != null) {
       setState(() {
         selectedEndDate = picked;
@@ -337,128 +494,5 @@ class _EventFormState extends State<EventForm> {
       selectedEndTime!.minute,
     );
     return startDateTime.isBefore(endDateTime);
-  }
-
-  Widget _buildForm() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            buildTextField(
-              titleController,
-              'Título del Evento',
-              leadingIcon: Icons.title,
-              helperText: "Obligatorio",
-              maxLength: 50,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El título es obligatorio';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            buildTextField(
-              descriptionController,
-              'Descripción del Evento',
-              leadingIcon: Icons.description,
-              maxLines: 3,
-              maxLength: 200,
-            ),
-            const SizedBox(height: 16),
-            buildTextField(
-              instructionsController,
-              'Instrucciones del Evento',
-              leadingIcon: Icons.info,
-              maxLength: 100,
-            ),
-            const SizedBox(height: 16),
-            buildTextField(
-              addressController,
-              'Dirección del Evento',
-              leadingIcon: Icons.location_on,
-              maxLength: 100,
-            ),
-            const SizedBox(height: 16),
-            buildImagePicker(),
-            const SizedBox(height: 16),
-            buildTextField(
-              maxAttendeesController,
-              'Máximo de asistentes',
-              numeric: true,
-              leadingIcon: Icons.people,
-              helperText: "Obligatorio",
-              maxLength: 4,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El número máximo de asistentes es obligatorio';
-                }
-                final int? maxAttendees = int.tryParse(value);
-                if (maxAttendees == null || maxAttendees <= 0) {
-                  return 'Ingrese un número válido de asistentes';
-                }
-                return null;
-              },
-            ),
-            if (widget.isUpdate && existingEvent != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text(
-                  'Asistentes actuales: ${existingEvent!.attendes}',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-              ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      buildDateTimePicker('Fecha y Hora de Inicio',
-                          selectStartDate, Icons.event_available),
-                      if (selectedDate != null && selectedTime != null)
-                        DateTimeDisplay(
-                          isStart: true,
-                          selectedDate: selectedDate,
-                          selectedTime: selectedTime,
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    children: [
-                      buildDateTimePicker('Fecha y Hora de Fin', selectEndDate,
-                          Icons.event_busy),
-                      if (selectedEndDate != null && selectedEndTime != null)
-                        DateTimeDisplay(
-                          isStart: false,
-                          selectedDate: selectedEndDate,
-                          selectedTime: selectedEndTime,
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: saveEvent,
-              icon: const Icon(Icons.save),
-              label: const Text('Guardar Evento'),
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
