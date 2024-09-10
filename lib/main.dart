@@ -133,11 +133,12 @@ class _MyHomePageState extends State<MyHomePage> {
       (
         const BuildHomeScreen(),
         'Página principal',
+        Icons.home,
       ),
-      (const BuildAboutScreen(), '¿Quiénes somos?'),
-      (const BuildPresentationsScreen(), 'Presentaciones'),
-      (const BuildEventsScreen(), 'Eventos'),
-      (const BuildContactScreen(), 'Contacto'),
+      (const BuildAboutScreen(), '¿Quiénes somos?', Icons.people),
+      (const BuildPresentationsScreen(), 'Presentaciones', Icons.event_seat),
+      (const BuildEventsScreen(), 'Eventos', Icons.event),
+      (const BuildContactScreen(), 'Contacto', Icons.contact_support_outlined),
     ];
     var actionsBiggerScreen = [
       for (var i = 0; i < screens.length; i++)
@@ -185,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var actionsDrawerSmallScreen = [
       for (var i = 0; i < screens.length; i++)
         ListTile(
+          leading: Icon(screens[i].$3),
           title: Text(screens[i].$2),
           onTap: () {
             setState(() {

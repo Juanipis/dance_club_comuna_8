@@ -15,6 +15,18 @@ class _BuildHomeScreenState extends State<BuildHomeScreen> {
     'assets/images/0002.webp',
     'assets/images/0003.webp',
     'assets/images/0004.webp',
+    'assets/images/0005.webp',
+    'assets/images/0006.webp',
+    'assets/images/0007.webp',
+    'assets/images/0008.webp',
+    'assets/images/0009.webp',
+    'assets/images/0010.webp',
+    'assets/images/0011.webp',
+    'assets/images/0012.webp',
+    'assets/images/0013.webp',
+    'assets/images/0014.webp',
+    'assets/images/0015.webp',
+    'assets/images/0016.webp',
   ];
 
   @override
@@ -32,18 +44,21 @@ class _BuildHomeScreenState extends State<BuildHomeScreen> {
               alignment: WrapAlignment.center,
               children: [
                 InfoCard(
+                  isPrimary: true,
                   icon: Icons.emoji_people_outlined,
                   title: 'Objetivo',
                   content:
                       'Proporcionar un espacio inclusivo para que los adultos mayores de la comuna 8 se expresen a través de la danza, celebrando la diversidad cultural, fomentando la creatividad y promoviendo una vejez digna y activa.',
                 ),
                 InfoCard(
+                  isPrimary: false,
                   icon: Icons.emoji_events_outlined,
                   title: 'Logros del club',
                   content:
                       '¿Qué logros del club te enorgullecen? Comparte algunos aspectos destacados a continuación. Puedes incluir un video, un documento o una presentación que resuma el trabajo realizado.',
                 ),
                 InfoCard(
+                  isPrimary: true,
                   icon: Icons.interests_outlined,
                   title: 'Intereses',
                   content:
