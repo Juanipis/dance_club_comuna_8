@@ -26,7 +26,7 @@ jobs:
         run: |
           flutter pub get
       - name: 🛠️ Build the application
-        run: flutter build web --dart-define=RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }}
+        run: flutter build web --dart-define=RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }} --wasm
       - name: ⬇️ Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
