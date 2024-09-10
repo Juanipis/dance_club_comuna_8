@@ -3,6 +3,7 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_register_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/placeholder/image_place_holder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -46,7 +47,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is LoadEventByIdState) {
             Event event = state.event;
-            var placeHolderImage = 'assets/images/placeholder.webp';
+
             var isNetworkImage = event.imageUrl.startsWith('http') ||
                 event.imageUrl.startsWith('https');
 
@@ -56,13 +57,11 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: 200,
+                    errorBuilder: (context, error, stackTrace) {
+                      return expandedEventPlaceHolderImage();
+                    },
                   )
-                : Image.asset(
-                    placeHolderImage,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: 200,
-                  );
+                : expandedEventPlaceHolderImage();
 
             var formattedDate =
                 DateFormat('EEEE, d MMMM, HH:mm', 'es_ES').format(event.date);

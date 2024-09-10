@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/models/event.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/placeholder/image_place_holder.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +13,6 @@ Widget eventCard({
 }) {
   initializeDateFormatting();
 
-  var placeHolderImage = 'assets/images/placeholder.webp';
   var isNetworkImage =
       event.imageUrl.startsWith('http') || event.imageUrl.startsWith('https');
 
@@ -38,20 +38,10 @@ Widget eventCard({
             }
           },
           errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              placeHolderImage,
-              fit: BoxFit.cover,
-              width: 300,
-              height: 200,
-            );
+            return eventCardPlaceHolderImage();
           },
         )
-      : Image.asset(
-          placeHolderImage,
-          fit: BoxFit.cover,
-          width: 300,
-          height: 200,
-        );
+      : eventCardPlaceHolderImage();
 
   //Show the date of the event in style of dayofweek, day of month, hh:mm
   // e.g. "sabado, 12 de diciembre, 18:00"

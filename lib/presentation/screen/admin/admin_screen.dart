@@ -2,7 +2,7 @@ import 'package:dance_club_comuna_8/logic/bloc/auth/auth_bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/auth/auth_states.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_screen.dart';
-import 'package:dance_club_comuna_8/presentation/screen/admin/add_event.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/event_form/add_event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/events_viewer.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/login_form.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/upload_images_screen.dart';
@@ -87,7 +87,7 @@ class AdminPanelContent extends StatelessWidget {
               Text(
                 "¿Qué desea hacer hoy?",
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
               ),
               const SizedBox(height: 32),
@@ -183,7 +183,7 @@ class AdminOptionCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                     ),
                   ],

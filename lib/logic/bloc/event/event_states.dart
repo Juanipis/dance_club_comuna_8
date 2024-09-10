@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
 import 'package:equatable/equatable.dart';
@@ -30,11 +31,13 @@ class AttendanceUpdatedState extends EventState {
 
 class EventsLoadedState extends EventState {
   final List<Event> events;
+  final bool hasMore;
+  final DocumentSnapshot? lastDocument;
 
-  EventsLoadedState(this.events);
+  EventsLoadedState(this.events, {this.hasMore = true, this.lastDocument});
 
   @override
-  List<Object?> get props => [events];
+  List<Object?> get props => [events, hasMore, lastDocument];
 }
 
 class EventErrorState extends EventState {

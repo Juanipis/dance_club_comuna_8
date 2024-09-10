@@ -1,5 +1,6 @@
-import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_edit_screen.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_edit/blog_post_edit_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:dance_club_comuna_8/logic/bloc/presentations/presentations_bloc.dart';
@@ -76,6 +77,16 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
             return Center(child: Text('Error: ${state.message}'));
           } else if (state is PresentationsLoadingState) {
             return const Center(child: CircularProgressIndicator());
+          } else if (state is PresentationDeletedState) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Post con ID ${state.id} eliminado'),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            });
+            return const SizedBox.shrink();
           } else {
             return const Center(child: Text('No hay posts disponibles'));
           }
@@ -88,13 +99,22 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
     );
   }
 
-  Widget _buildLoaderOrEndMessage(PresentationsState state) {
-    if (state is PresentationsLoadingState) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (state is PresentationsNoMorePostsState) {
-      return const Center(child: Text('No hay más posts'));
+  Widget _buildLoaderOrEndMessage(PresentationsLoadedState state) {
+    if (state.hasReachedMax) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text('No hay más presentaciones'),
+        ),
+      );
+    } else {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
-    return const SizedBox.shrink();
   }
 
   Widget _buildPostListItem(BlogPost post) {
@@ -104,11 +124,52 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
         title: Text(post.title),
         subtitle: Text(
             'ID: ${post.id}\nFecha: ${DateFormat('dd/MM/yyyy').format(post.date)}'),
-        trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () => _navigateToEditScreen(context, post: post),
+        trailing: SizedBox(
+          width: 80,
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => _navigateToEditScreen(context, post: post),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  // launch a delete confirmation dialog
+                  _deleteDialog(post);
+                },
+              ),
+            ],
+          ),
         ),
         onTap: () => _navigateToEditScreen(context, post: post),
+      ),
+    );
+  }
+
+  Future<dynamic> _deleteDialog(BlogPost post) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar post'),
+        content: const Text('¿Estás seguro de que deseas eliminar este post?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              context
+                  .read<PresentationsBloc>()
+                  .add(DeletePresentationEvent(id: post.id));
+              Navigator.pop(context);
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
       ),
     );
   }

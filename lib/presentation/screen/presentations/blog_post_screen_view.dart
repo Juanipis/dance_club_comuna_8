@@ -1,4 +1,5 @@
 import 'package:dance_club_comuna_8/logic/models/blog_post.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/carousel_videos_youtube.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -15,10 +16,16 @@ class BlogPostScreenView extends StatelessWidget {
         title: Text(post.title),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        // pading left and right 50
+        // padding top and bottom 40
+        padding: const EdgeInsets.fromLTRB(50.0, 40.0, 50.0, 40.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              post.title,
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
             Text(
               'Fecha: ${post.date.toString()}',
               style: Theme.of(context).textTheme.labelMedium,
@@ -47,6 +54,20 @@ class BlogPostScreenView extends StatelessWidget {
                 }
               },
               selectable: true,
+            ),
+            const SizedBox(height: 16.0),
+            // centred titile for the carousel
+            Center(
+              child: Text(
+                'Videos',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            YouTubeCarousel(
+              videoUrls: post.videoUrls!,
+              width: MediaQuery.of(context).size.width,
+              height: 300, // Ajusta esta altura según tus necesidades
             ),
           ],
         ),

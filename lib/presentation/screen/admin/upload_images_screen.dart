@@ -119,7 +119,7 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
 
                       BlocProvider.of<ImageBloc>(context)
                           .add(UploadImageUnit8ListEvent(
-                        path: 'images',
+                        path: '',
                         imageName: '$imageName.jpg',
                         fileBytes: fileBytes!,
                       ));
@@ -151,7 +151,7 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
   void initState() {
     super.initState();
     BlocProvider.of<ImageBloc>(context)
-        .add(const GetImagesPathsEvent(path: 'images'));
+        .add(const GetImagesPathsEvent(path: ''));
   }
 
   @override
@@ -219,7 +219,7 @@ class _UploadImagesScreenState extends State<UploadImagesScreen> {
           } else if (state is ImageUploadedState ||
               state is ImageDeletedState) {
             BlocProvider.of<ImageBloc>(context)
-                .add(const GetImagesPathsEvent(path: 'images'));
+                .add(const GetImagesPathsEvent(path: ''));
           } else if (state is UploadingImageState) {
             return const Center(
               child: Column(

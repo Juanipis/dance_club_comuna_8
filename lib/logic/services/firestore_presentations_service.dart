@@ -18,23 +18,18 @@ class FirestorePresentationsService {
 
     return querySnapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
-      return BlogPost(
-        id: doc.id,
-        title: data['title'],
-        content: data['content'],
-        date: (data['date'] as Timestamp).toDate(),
-        imageUrl: data['imageUrl'],
-      );
+      return BlogPost.fromJson(data, doc.id);
     }).toList();
   }
 
-  Future<BlogPost> addBlogPost(
-      String title, String content, DateTime date, String imageUrl) async {
+  Future<BlogPost> addBlogPost(String title, String content, DateTime date,
+      String imageUrl, List<String> videoUrls) async {
     final docRef = await _presentationCollection.add({
       'title': title,
       'content': content,
       'date': Timestamp.fromDate(date),
       'imageUrl': imageUrl,
+      'videoUrls': videoUrls,
     });
 
     return BlogPost(
@@ -42,16 +37,19 @@ class FirestorePresentationsService {
       title: title,
       content: content,
       date: date,
+      imageUrl: imageUrl,
+      videoUrls: videoUrls,
     );
   }
 
   Future<BlogPost> updateBlogPost(String id, String title, String content,
-      DateTime date, String imageUrl) async {
+      DateTime date, String imageUrl, List<String> videoUrls) async {
     await _presentationCollection.doc(id).update({
       'title': title,
       'content': content,
       'date': Timestamp.fromDate(date),
       'imageUrl': imageUrl,
+      'videoUrls': videoUrls,
     });
 
     return BlogPost(
@@ -60,6 +58,16 @@ class FirestorePresentationsService {
       content: content,
       date: date,
       imageUrl: imageUrl,
+      videoUrls: videoUrls,
     );
+  }
+
+  Future<void> deleteBlogPost(String id) async {
+    await _presentationCollection.doc(id).delete();
+  }
+
+  Future<int> getPostCount() async {
+    final querySnapshot = await _presentationCollection.get();
+    return querySnapshot.size;
   }
 }

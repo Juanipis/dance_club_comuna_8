@@ -1,49 +1,68 @@
+import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:flutter/material.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-class CarouselWithControls extends StatefulWidget {
+class YouTubeCarousel extends StatefulWidget {
+  final List<String> videoUrls;
   final double width;
   final double height;
-  final List<String> images;
 
-  const CarouselWithControls({
+  const YouTubeCarousel({
     super.key,
+    required this.videoUrls,
     required this.width,
     required this.height,
-    required this.images,
   });
 
   @override
-  State<CarouselWithControls> createState() => _CarouselWithControlsState();
+  State<YouTubeCarousel> createState() => _YouTubeCarouselState();
 }
 
-class _CarouselWithControlsState extends State<CarouselWithControls> {
+class _YouTubeCarouselState extends State<YouTubeCarousel> {
   final CarouselController _controller = CarouselController();
   int _currentIndex = 0;
+  YoutubePlayerController? _videoController;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVideo(_currentIndex);
+  }
+
+  void _loadVideo(int index) {
+    if (_videoController != null) {
+      _videoController!.close();
+    }
+
+    String? videoId =
+        YoutubePlayerController.convertUrlToId(widget.videoUrls[index]);
+    _videoController = YoutubePlayerController.fromVideoId(
+      videoId: videoId ?? 'aqz-KE-bpKQ',
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         CarouselSlider(
-          items: widget.images.map((e) {
-            return Center(
-              child: e.startsWith('http') || e.startsWith('https')
-                  ? Image.network(
-                      e,
-                      fit: BoxFit.cover,
-                      width: widget.width,
-                      height: widget.height,
-                    )
-                  : Image.asset(
-                      e,
-                      fit: BoxFit.cover,
-                      width: widget.width,
-                      height: widget.height,
-                    ),
-            );
-          }).toList(),
+          items: List.generate(widget.videoUrls.length, (index) {
+            if (index == _currentIndex) {
+              return YoutubePlayer(
+                controller: _videoController!,
+                aspectRatio: 16 / 9,
+              );
+            } else {
+              return Center(
+                child: Text('Video ${index + 1}'),
+              );
+            }
+          }),
           carouselController: _controller,
           options: CarouselOptions(
             height: widget.height,
@@ -52,14 +71,12 @@ class _CarouselWithControlsState extends State<CarouselWithControls> {
             initialPage: 0,
             enableInfiniteScroll: true,
             reverse: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 3),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            autoPlayCurve: Curves.fastOutSlowIn,
+            autoPlay: false,
             enlargeCenterPage: true,
             onPageChanged: (index, reason) {
               setState(() {
                 _currentIndex = index;
+                _loadVideo(index);
               });
             },
             scrollDirection: Axis.horizontal,
@@ -76,7 +93,7 @@ class _CarouselWithControlsState extends State<CarouselWithControls> {
               ),
             ),
             DotsIndicator(
-              dotsCount: widget.images.length,
+              dotsCount: widget.videoUrls.length,
               position: _currentIndex,
               decorator: DotsDecorator(
                 activeColor: Theme.of(context).colorScheme.secondary,
@@ -98,5 +115,11 @@ class _CarouselWithControlsState extends State<CarouselWithControls> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _videoController?.close();
+    super.dispose();
   }
 }

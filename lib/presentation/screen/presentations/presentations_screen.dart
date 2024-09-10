@@ -62,9 +62,9 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
                   children: [
                     if (state is PresentationsLoadedState)
                       ...state.posts.map(_buildPostCard),
-                    _buildLoaderOrEndMessage(state),
                   ],
-                )
+                ),
+                _buildLoaderOrEndMessage(state),
               ],
             ),
           ),
@@ -75,28 +75,26 @@ class _BuildPresentationsScreenState extends State<BuildPresentationsScreen> {
 
   Widget _buildLoaderOrEndMessage(PresentationsState state) {
     if (state is PresentationsLoadedState) {
+      if (state.hasReachedMax) {
+        return const Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text('No hay más presentaciones'),
+          ),
+        );
+      }
       return ElevatedButton(
           onPressed: () {
             context.read<PresentationsBloc>().add(GetPresentationsEvent());
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Cargando más presentaciones...'),
+              ),
+            );
           },
           child: const Text('Cargar más'));
-    }
-    if (state is PresentationsLoadingState) {
+    } else if (state is PresentationsLoadingState) {
       return const Center(child: CircularProgressIndicator());
-    } else if (state is PresentationsNoMorePostsState) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('No hay más presentaciones'),
-        ),
-      );
-    } else if (state is PresentationsErrorState) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(state.message),
-        ),
-      );
     }
 
     return const Center(child: Text('No hay más presentaciones'));
