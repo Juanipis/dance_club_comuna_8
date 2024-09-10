@@ -26,8 +26,9 @@ class EventBloc extends Bloc<EventEvent, EventState> {
       try {
         DateTime now = eventInfo.startTime;
         DateTime end = eventInfo.endTime;
-        List<Event> events =
-            await _firestoreService.getUpcomingEventsWithAttendees(now, end);
+        const int limit = 100;
+        final (events, _, _) = await _firestoreService
+            .getUpcomingEventsWithAttendees(now, end, limit, null);
         emit(EventsLoadedState(events));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));

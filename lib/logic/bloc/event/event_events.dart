@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dance_club_comuna_8/logic/models/event_attend.dart';
 import 'package:equatable/equatable.dart';
 
@@ -89,12 +90,18 @@ class DeleteEventEvent extends EventEvent {
 class LoadUpcomingEventsEvent extends EventEvent {
   final DateTime startTime;
   final DateTime endTime;
+  final int limit;
+  final DocumentSnapshot? lastDocument;
 
-  const LoadUpcomingEventsEvent(
-      {required this.startTime, required this.endTime});
+  const LoadUpcomingEventsEvent({
+    required this.startTime,
+    required this.endTime,
+    this.limit = 10,
+    this.lastDocument,
+  });
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [startTime, endTime, limit, lastDocument];
 }
 
 class RegisterUserEvent extends EventEvent {

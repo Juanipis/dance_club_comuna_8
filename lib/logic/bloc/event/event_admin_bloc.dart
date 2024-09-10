@@ -74,15 +74,26 @@ class EventAdminBloc extends Bloc<EventEvent, EventState> {
       }
     });
 
-    on<LoadUpcomingEventsEvent>((eventInfo, emit) async {
+    on<LoadUpcomingEventsEvent>((event, emit) async {
       logger.d('Loading upcoming events');
       emit(EventLoadingState());
       try {
-        DateTime now = eventInfo.startTime;
-        DateTime end = eventInfo.endTime;
-        allEvents =
-            await _firestoreService.getUpcomingEventsWithAttendees(now, end);
-        emit(EventsLoadedState(allEvents));
+        final (events, lastDocument, hasMore) =
+            await _firestoreService.getUpcomingEventsWithAttendees(
+          event.startTime,
+          event.endTime,
+          event.limit,
+          event.lastDocument,
+        );
+
+        if (event.lastDocument == null) {
+          allEvents = events;
+        } else {
+          allEvents.addAll(events);
+        }
+
+        emit(EventsLoadedState(allEvents,
+            hasMore: hasMore, lastDocument: lastDocument));
       } catch (e) {
         emit(EventErrorState(message: e.toString()));
       }
