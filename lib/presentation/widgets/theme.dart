@@ -6,7 +6,7 @@ final ThemeData customTheme = ThemeData(
     seedColor: const Color(0xFFFF4081), // Rosa como color semilla
     brightness: Brightness.light,
   ).copyWith(
-    secondary: const Color(0xFFFFD54F), // Amarillo
+    secondary: const Color.fromARGB(255, 211, 148, 12), // Amarillo
     tertiary: const Color(0xFFFFAB40), // Naranja
     error: const Color(0xFFE57373), // Rojo suave
     onPrimary: Colors.white,
@@ -35,8 +35,11 @@ final ThemeData customTheme = ThemeData(
     bodyMedium: TextStyle(fontSize: 14, color: Colors.black87),
     bodySmall: TextStyle(fontSize: 12, color: Colors.black54),
   ),
-  appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xFFFF4081), // Rosa
+  appBarTheme: AppBarTheme(
+    backgroundColor: ColorScheme.fromSeed(
+      seedColor: const Color(0xFFFF4081),
+      brightness: Brightness.light,
+    ).primary,
     foregroundColor: Colors.white,
     elevation: 0,
   ),

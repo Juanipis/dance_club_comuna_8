@@ -106,39 +106,31 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
       ),
       body: Column(
         children: [
-          SegmentedButton(
-              segments: const <ButtonSegment<EventFilter>>[
-                ButtonSegment<EventFilter>(
-                    label: Text('Hoy'),
-                    icon: Icon(Icons.calendar_view_day),
-                    value: EventFilter.today),
-                ButtonSegment<EventFilter>(
-                    label: Text('Mañana'),
-                    icon: Icon(Icons.keyboard_tab),
-                    value: EventFilter.tomorrow),
-                ButtonSegment<EventFilter>(
-                    label: Text('Esta semana'),
-                    icon: Icon(Icons.calendar_view_week),
-                    value: EventFilter.thisWeek),
-                ButtonSegment<EventFilter>(
-                    label: Text('Este mes'),
-                    icon: Icon(Icons.calendar_view_month),
-                    value: EventFilter.thisMonth),
-                ButtonSegment<EventFilter>(
-                    label: Text('Todos'),
-                    icon: Icon(Icons.calendar_today),
-                    value: EventFilter.all),
-                ButtonSegment<EventFilter>(
-                    label: Text('Pasados'),
-                    icon: Icon(Icons.history),
-                    value: EventFilter.past),
-              ],
-              selected: <EventFilter>{
-                filter
-              },
-              onSelectionChanged: (Set<EventFilter> selected) {
-                segmentedFiltrerActions(selected, context);
-              }),
+          const SizedBox(
+            height: 10,
+          ),
+          Wrap(
+            spacing: 10.0,
+            runSpacing: 10.0,
+            children: EventFilter.values.map((eventFilter) {
+              return ElevatedButton.icon(
+                onPressed: filter == eventFilter
+                    ? null
+                    : () {
+                        segmentedFilterActions({eventFilter}, context);
+                      },
+                icon: Icon(_getIconForFilter(eventFilter)),
+                label: Text(_getLabelForFilter(eventFilter)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: filter == eventFilter ? Colors.grey : null,
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           Expanded(
             child: BlocBuilder<EventAdminBloc, EventState>(
               builder: (context, state) {
@@ -268,9 +260,11 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
     await Future.delayed(const Duration(seconds: 3));
   }
 
-  void segmentedFiltrerActions(
-      Set<EventFilter> selected, BuildContext context) {
-    return setState(() {
+  void segmentedFilterActions(
+    Set<EventFilter> selected,
+    BuildContext context,
+  ) {
+    setState(() {
       filter = selected.first;
       switch (filter) {
         case EventFilter.today:
@@ -296,8 +290,47 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
         case EventFilter.past:
           startDate = DateHelper.past();
           endDate = DateHelper.startOfToday();
+          break;
       }
       _loadEvents();
     });
+  }
+
+  IconData _getIconForFilter(EventFilter filter) {
+    switch (filter) {
+      case EventFilter.today:
+        return Icons.calendar_view_day;
+      case EventFilter.tomorrow:
+        return Icons.keyboard_tab;
+      case EventFilter.thisWeek:
+        return Icons.calendar_view_week;
+      case EventFilter.thisMonth:
+        return Icons.calendar_view_month;
+      case EventFilter.all:
+        return Icons.calendar_today;
+      case EventFilter.past:
+        return Icons.history;
+      default:
+        return Icons.calendar_today; // Valor predeterminado
+    }
+  }
+
+  String _getLabelForFilter(EventFilter filter) {
+    switch (filter) {
+      case EventFilter.today:
+        return 'Hoy';
+      case EventFilter.tomorrow:
+        return 'Mañana';
+      case EventFilter.thisWeek:
+        return 'Esta semana';
+      case EventFilter.thisMonth:
+        return 'Este mes';
+      case EventFilter.all:
+        return 'Todos';
+      case EventFilter.past:
+        return 'Pasados';
+      default:
+        return ''; // Valor predeterminado
+    }
   }
 }

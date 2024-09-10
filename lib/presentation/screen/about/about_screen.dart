@@ -18,6 +18,7 @@ class _BuildAboutScreenState extends State<BuildAboutScreen> {
         children: [
           InfoCardExtended(
             icon: Icons.flag_outlined,
+            isPrimary: true,
             title: 'Misión',
             content:
                 'En un mundo donde las expresiones artísticas trascienden fronteras y conectan corazones, el Grupo de Danza "danzas la ladera 8" emerge como un faro de diversidad, creatividad y pasión. Fundado con el propósito de celebrar la riqueza cultural a través del movimiento, este conjunto de artistas fusiona elementos tradicionales y contemporáneos para tejer un tapiz vibrante de experiencias sensoriales.',
@@ -25,6 +26,7 @@ class _BuildAboutScreenState extends State<BuildAboutScreen> {
           SizedBox(height: 16),
           InfoCardExtended(
             icon: Icons.visibility_outlined,
+            isPrimary: false,
             title: 'Visión',
             content:
                 'Guiados por la visión de la unidad a través del arte, los bailarines de "danzas la ladera 8" personifican la belleza de la colaboración y la cooperación. Cada miembro aporta su propio bagaje cultural y experiencia única, creando un mosaico de estilos y perspectivas que enriquecen cada presentación.',

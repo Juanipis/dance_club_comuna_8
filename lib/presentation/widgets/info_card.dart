@@ -6,12 +6,14 @@ class InfoCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String content;
+  final bool isPrimary;
 
   const InfoCard({
     super.key,
     required this.icon,
     required this.title,
     required this.content,
+    required this.isPrimary,
   });
 
   @override
@@ -22,7 +24,9 @@ class InfoCard extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.0),
-        color: Theme.of(context).primaryColor,
+        color: isPrimary
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.secondary,
         boxShadow: const [
           BoxShadow(
             color: Colors.black26,
@@ -67,12 +71,14 @@ class InfoCardExtended extends StatelessWidget {
   final IconData icon;
   final String title;
   final String content;
+  final bool isPrimary;
 
   const InfoCardExtended({
     super.key,
     required this.icon,
     required this.title,
     required this.content,
+    required this.isPrimary,
   });
 
   @override
@@ -89,7 +95,9 @@ class InfoCardExtended extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              color: Theme.of(context).primaryColor, // Color de fondo ajustado
+              color: isPrimary
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.secondary,
               child: Padding(
                 padding: const EdgeInsets.all(50),
                 child: Column(
