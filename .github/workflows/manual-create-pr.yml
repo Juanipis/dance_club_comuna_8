@@ -1,0 +1,42 @@
+name: Manual Pull Request from Test to Main
+
+on:
+  workflow_dispatch:  # Solo se ejecuta manualmente desde la interfaz de GitHub
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Test Branch
+        uses: actions/checkout@v3
+        with:
+          ref: test  # Checkout de la rama `test`
+
+      - name: Generate PR Title and Body
+        id: generate_pr
+        run: |
+          # Genera un título basado en el último commit
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          PR_TITLE="PR from Test to Main: $LAST_COMMIT_MSG"
+          
+          # Genera un cuerpo basado en los últimos 5 commits
+          PR_BODY=$(git log -5 --pretty=format:"- %s by %an" | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          # Guarda los resultados como salidas para usarlos más adelante
+          echo "title=$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "body=$PR_BODY" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request to Main
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: test  # Rama de origen
+          base: main  # Rama destino
+          title: ${{ steps.generate_pr.outputs.title }}
+          body: ${{ steps.generate_pr.outputs.body }}
+          labels: |
+            enhancement
+          assignees: |
+            juanipis
+          reviewers: |
+            juanipis
