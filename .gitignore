@@ -52,3 +52,6 @@ app.*.map.json
 
 key.properties
 my-release-key.keystore
+
+#npm
+node_modules/
