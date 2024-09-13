@@ -32,14 +32,6 @@ class _ExpandedEventState extends State<ExpandedEvent> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-        ],
       ),
       body: BlocBuilder<EventBloc, EventState>(
         builder: (context, state) {
@@ -56,6 +48,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                     event.imageUrl,
                     fit: BoxFit.cover,
                     width: double.infinity,
+                    alignment: const Alignment(1.0, -0.3),
                     height: 200,
                     errorBuilder: (context, error, stackTrace) {
                       return expandedEventPlaceHolderImage();
