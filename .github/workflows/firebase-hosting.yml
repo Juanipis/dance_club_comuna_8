@@ -1,4 +1,4 @@
-name: Producton- Analyze, Build, Deploy, and Release 
+name: Producton- Analyze, Build, Deploy, and Release
 
 on:
   push:
@@ -23,8 +23,7 @@ jobs:
           channel: "stable"
           flutter-version: 3.22.2
       - name: 📦 Install Dependencies
-        run: |
-          flutter pub get
+        run: flutter pub get
       - name: 🛠️ Build the application
         run: flutter build web --dart-define=RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }}
       - name: ⬇️ Archive Production Artifact
@@ -66,15 +65,23 @@ jobs:
         uses: release-drafter/release-drafter@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create and Push Tag
+
+  semantic-release:
+    name: "Semantic Release"
+    runs-on: ubuntu-latest
+    needs: [build, deploy]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Get the latest release version from the draft
-          latest_version=$(curl -sH "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name)
-          # Create a new git tag for the version
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git tag $latest_version
-          # Push the new tag to the repository
-          git push origin $latest_version
+        run: npx semantic-release
