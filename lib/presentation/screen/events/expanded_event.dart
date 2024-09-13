@@ -32,14 +32,6 @@ class _ExpandedEventState extends State<ExpandedEvent> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-        ],
       ),
       body: BlocBuilder<EventBloc, EventState>(
         builder: (context, state) {
@@ -56,6 +48,7 @@ class _ExpandedEventState extends State<ExpandedEvent> {
                     event.imageUrl,
                     fit: BoxFit.cover,
                     width: double.infinity,
+                    alignment: const Alignment(1.0, -0.3),
                     height: 200,
                     errorBuilder: (context, error, stackTrace) {
                       return expandedEventPlaceHolderImage();
@@ -225,7 +218,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
               '- Acceder en forma gratuita a sus datos personales que hayan sido objeto del tratamiento.\n\n'
               '#### 5. Vigencia\n\n'
               'La presente política de tratamiento de datos personales está vigente desde 8/4/204 y permanecerá efectiva hasta que se realice una actualización que será comunicada a los usuarios.\n\n'
-              'Para más información, preguntas o preocupaciones acerca de nuestras políticas de privacidad, por favor, póngase en contacto con nosotros a través de [Correo electrónico de contacto] o [Número de teléfono de contacto].'),
+              'Para más información, preguntas o preocupaciones acerca de nuestras políticas de privacidad, por favor, póngase en contacto con nosotros a través de danzasladera.8@gmail.com.'),
         ),
         actions: <Widget>[
           TextButton(
