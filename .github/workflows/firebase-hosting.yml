@@ -78,7 +78,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '18'  # Versión actualizada a Node.js 18
+          node-version: '21'  # Versión actualizada a Node.js 21
       - name: Cache Node.js modules
         uses: actions/cache@v2
         with:
