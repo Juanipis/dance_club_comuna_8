@@ -218,7 +218,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
               '- Acceder en forma gratuita a sus datos personales que hayan sido objeto del tratamiento.\n\n'
               '#### 5. Vigencia\n\n'
               'La presente política de tratamiento de datos personales está vigente desde 8/4/204 y permanecerá efectiva hasta que se realice una actualización que será comunicada a los usuarios.\n\n'
-              'Para más información, preguntas o preocupaciones acerca de nuestras políticas de privacidad, por favor, póngase en contacto con nosotros a través de [Correo electrónico de contacto] o [Número de teléfono de contacto].'),
+              'Para más información, preguntas o preocupaciones acerca de nuestras políticas de privacidad, por favor, póngase en contacto con nosotros a través de danzasladera.8@gmail.com.'),
         ),
         actions: <Widget>[
           TextButton(

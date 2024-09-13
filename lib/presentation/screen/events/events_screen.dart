@@ -64,6 +64,7 @@ class BuildEventsScreenState extends State<BuildEventsScreen> {
               icon: Icon(_getIconForFilter(eventFilter)),
               label: Text(_getLabelForFilter(eventFilter)),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: filter == eventFilter ? Colors.grey : null,
               ),
             );

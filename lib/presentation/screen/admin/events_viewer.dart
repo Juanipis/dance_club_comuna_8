@@ -258,31 +258,67 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
   void _showDeleteConfirmationDialog(BuildContext context, Event event) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Eliminar evento"),
-        content: const Text("¿Está seguro que desea eliminar este evento?"),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              await removeEvent(context, event);
-              Navigator.pop(context);
-            },
-            child: const Text("Sí"),
+      builder: (context) {
+        bool isLoading = false; // To manage loading state
+
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text("Eliminar evento"),
+            content: isLoading
+                ? const CircularProgressIndicator()
+                : const Text("¿Está seguro que desea eliminar este evento?"),
+            actions: isLoading
+                ? []
+                : [
+                    TextButton(
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true; // Show loading spinner
+                        });
+
+                        final success = await removeEvent(context, event);
+
+                        setState(() {
+                          isLoading = false; // Hide loading spinner
+                        });
+
+                        Navigator.pop(context); // Close the dialog
+
+                        // Show snackbar with result
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(success
+                                ? 'Evento "${event.title}" (ID: ${event.id}) eliminado exitosamente.'
+                                : 'Error al eliminar el evento "${event.title}" (ID: ${event.id}).'),
+                            backgroundColor:
+                                success ? Colors.green : Colors.red,
+                          ),
+                        );
+                      },
+                      child: const Text("Sí"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("No"),
+                    ),
+                  ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("No"),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Future<void> removeEvent(BuildContext context, Event event) async {
-    BlocProvider.of<EventAdminBloc>(context)
-        .add(DeleteEventEvent(id: event.id));
-    await Future.delayed(const Duration(seconds: 3));
-    _loadEvents();
+  Future<bool> removeEvent(BuildContext context, Event event) async {
+    try {
+      BlocProvider.of<EventAdminBloc>(context)
+          .add(DeleteEventEvent(id: event.id));
+      await Future.delayed(const Duration(seconds: 3)); // Simulate a delay
+      _loadEvents(); // Reload events after deletion
+
+      return true; // Return success
+    } catch (e) {
+      return false; // Return failure if an error occurs
+    }
   }
 
   IconData _getIconForFilter(EventFilter filter) {
