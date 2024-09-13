@@ -75,6 +75,9 @@ Widget eventCard({
             onPressed: () {
               refreshEvents(context, event.id, event.title);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
             child: const Text('Inscribirse')),
         const SizedBox(height: 10),
       ],

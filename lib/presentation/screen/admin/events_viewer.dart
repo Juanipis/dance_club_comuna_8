@@ -4,7 +4,6 @@ import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
 import 'package:dance_club_comuna_8/logic/models/date_helper.dart';
 import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/attendes_screen.dart';
-
 import 'package:dance_club_comuna_8/presentation/screen/admin/event_form/update_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +21,8 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
   EventFilter filter = EventFilter.today;
   DateTime startDate = DateHelper.startOfToday();
   DateTime endDate = DateHelper.endOfToday();
-  bool _isLoading = false;
+  bool _isLoadingMore = false;
+  bool _isFilterChanging = false; // New state to handle filter changes
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -40,7 +40,8 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
 
   void _onScroll() {
     if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+            _scrollController.position.maxScrollExtent &&
+        !_isLoadingMore) {
       _loadMoreEvents();
     }
   }
@@ -53,8 +54,8 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
 
   void _loadMoreEvents() {
     final state = BlocProvider.of<EventAdminBloc>(context).state;
-    if (state is EventsLoadedState && !_isLoading && state.hasMore) {
-      setState(() => _isLoading = true);
+    if (state is EventsLoadedState && state.hasMore) {
+      setState(() => _isLoadingMore = true);
       BlocProvider.of<EventAdminBloc>(context).add(
         LoadUpcomingEventsEvent(
           startTime: startDate,
@@ -65,31 +66,12 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
     }
   }
 
-  Future<void> _refreshEventsFromAttendesScreen(
-      BuildContext context, eventId, String title) async {
+  Future<void> _navigateAndRefresh(BuildContext context, Widget screen) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AttendeesScreen(eventId: eventId),
-      ),
-    ).then((_) {
-      // Ejecuta la función _loadEvents() cuando regrese de la pantalla AttendeesScreen
-      _loadEvents();
-    });
-  }
-
-  Future<void> _refreshEventsFromUpdateEventScreen(
-      BuildContext context, eventId, String title) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => UpdateEventScreen(
-          eventId: eventId,
-        ),
-      ),
-    ).then((_) {
-      _loadEvents();
-    });
+      MaterialPageRoute(builder: (context) => screen),
+    );
+    _loadEvents(); // Refresh events when coming back from the navigation
   }
 
   @override
@@ -99,60 +81,48 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
         title: const Text("Eventos actuales"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Column(
         children: [
-          const SizedBox(
-            height: 10,
-          ),
-          Wrap(
-            spacing: 10.0,
-            runSpacing: 10.0,
-            children: EventFilter.values.map((eventFilter) {
-              return ElevatedButton.icon(
-                onPressed: filter == eventFilter
-                    ? null
-                    : () {
-                        segmentedFilterActions({eventFilter}, context);
-                      },
-                icon: Icon(_getIconForFilter(eventFilter)),
-                label: Text(_getLabelForFilter(eventFilter)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: filter == eventFilter ? Colors.grey : null,
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
+          _buildFilterButtons(context),
+          const SizedBox(height: 10),
           Expanded(
-            child: BlocBuilder<EventAdminBloc, EventState>(
+            child: BlocConsumer<EventAdminBloc, EventState>(
+              listener: (context, state) {
+                if (state is EventsLoadedState) {
+                  setState(() {
+                    _isLoadingMore = false;
+                    _isFilterChanging = false; // Reset after loading completes
+                  });
+                }
+              },
               builder: (context, state) {
-                if (state is EventLoadingState &&
-                    BlocProvider.of<EventAdminBloc>(context)
-                        .allEvents
-                        .isEmpty) {
+                final eventBloc = BlocProvider.of<EventAdminBloc>(context);
+
+                if (_isFilterChanging) {
+                  // Show loading spinner when filter is changing
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is EventLoadingState &&
+                    eventBloc.allEvents.isEmpty) {
+                  // Show a full-screen loader only if no events are loaded yet
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is EventsLoadedState) {
-                  _isLoading = false;
-                  return tileBuilder(state);
+                  // Build the list and handle loading at the end of the list
+                  return _buildEventList(state);
                 } else if (state is EventErrorState) {
                   return Center(child: Text(state.message));
-                } else if (_isLoading || state is EventLoadingState) {
-                  return const Column(
-                    children: [
-                      Text("Cargando más eventos..."),
-                      Center(child: CircularProgressIndicator()),
-                    ],
-                  );
                 } else {
-                  return const Center(child: Text("No hay eventos"));
+                  // If events are already loaded and we're loading more, use the allEvents list
+                  return _buildEventList(EventsLoadedState(
+                    eventBloc.allEvents,
+                    hasMore:
+                        true, // Assume true to allow for infinite scrolling
+                    lastDocument:
+                        null, // Pass null or the correct value based on your logic
+                  ));
                 }
               },
             ),
@@ -162,110 +132,30 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
     );
   }
 
-  Widget tileBuilder(EventsLoadedState state) {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: state.events.length,
-      itemBuilder: (context, index) {
-        final event = state.events[index];
-        return ListTile(
-          title: Text(event.title),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Text(
-                      "${event.date.day}/${event.date.month}/${event.date.year} - "),
-                  Text(
-                      "${event.date.hour.toString().padLeft(2, '0')}:${event.date.minute.toString().padLeft(2, '0')}"),
-                ],
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.people),
-                  Text("${event.attendes}/${event.maxAttendees}"),
-                ],
-              ),
-            ],
-          ),
-          trailing: SizedBox(
-            width: 120, // Ajusta este valor según necesites
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                    child: Text(event.id, overflow: TextOverflow.ellipsis)),
-                IconButton(
-                  onPressed: () async {
-                    _refreshEventsFromUpdateEventScreen(
-                        context, event.id, event.title);
-                  },
-                  icon: const Icon(Icons.edit),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _refreshEventsFromAttendesScreen(
-                        context, event.id, event.title);
-                  },
-                  icon: const Icon(Icons.people),
-                ),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Eliminar evento"),
-                        content: const Text(
-                            "¿Está seguro que desea eliminar este evento?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () async {
-                              final eventAdminBloc =
-                                  BlocProvider.of<EventAdminBloc>(context);
-                              await removeEvent(context, event);
-                              eventAdminBloc.add(LoadUpcomingEventsEvent(
-                                startTime: startDate,
-                                endTime: endDate,
-                              ));
-                              Navigator.pop(context); // Cerrar el diálogo
-                            },
-                            child: const Text("Sí"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text("No"),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.delete),
-                ),
-              ],
-            ),
+  Widget _buildFilterButtons(BuildContext context) {
+    return Wrap(
+      spacing: 10.0,
+      runSpacing: 10.0,
+      children: EventFilter.values.map((eventFilter) {
+        return ElevatedButton.icon(
+          onPressed: filter == eventFilter
+              ? null
+              : () => _onFilterSelected(eventFilter),
+          icon: Icon(_getIconForFilter(eventFilter)),
+          label: Text(_getLabelForFilter(eventFilter)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: filter == eventFilter ? Colors.grey : null,
           ),
         );
-      },
+      }).toList(),
     );
   }
 
-  Future<void> removeEvent(BuildContext context, Event event) async {
-    BlocProvider.of<EventAdminBloc>(context)
-        .add(DeleteEventEvent(id: event.id));
-    Navigator.pop(context);
-    await Future.delayed(const Duration(seconds: 3));
-  }
-
-  void segmentedFilterActions(
-    Set<EventFilter> selected,
-    BuildContext context,
-  ) {
+  void _onFilterSelected(EventFilter eventFilter) {
     setState(() {
-      filter = selected.first;
+      _isFilterChanging = true; // Set filter changing state
+      filter = eventFilter;
       switch (filter) {
         case EventFilter.today:
           startDate = DateHelper.startOfToday();
@@ -296,6 +186,141 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
     });
   }
 
+  Widget _buildEventList(EventsLoadedState state) {
+    return ListView.separated(
+      controller: _scrollController,
+      itemCount: state.events.length +
+          (_isLoadingMore ? 1 : 0), // Add extra item if loading more
+      separatorBuilder: (context, index) => const Divider(),
+      itemBuilder: (context, index) {
+        if (index < state.events.length) {
+          final event = state.events[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: ListTile(
+              title: Text(event.title),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                      "${event.date.day}/${event.date.month}/${event.date.year} - ${event.date.hour.toString().padLeft(2, '0')}:${event.date.minute.toString().padLeft(2, '0')}"),
+                  Row(
+                    children: [
+                      const Icon(Icons.people, size: 16),
+                      const SizedBox(width: 4),
+                      Text("${event.attendes}/${event.maxAttendees}"),
+                    ],
+                  ),
+                ],
+              ),
+              trailing: _buildTrailingIcons(context, event),
+            ),
+          );
+        } else {
+          // Show a loading indicator at the bottom
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildTrailingIcons(BuildContext context, Event event) {
+    return Wrap(
+      spacing: 8.0,
+      children: [
+        IconButton(
+          onPressed: () => _navigateAndRefresh(
+            context,
+            UpdateEventScreen(eventId: event.id),
+          ),
+          icon: const Icon(Icons.edit),
+        ),
+        IconButton(
+          onPressed: () => _navigateAndRefresh(
+            context,
+            AttendeesScreen(eventId: event.id),
+          ),
+          icon: const Icon(Icons.people),
+        ),
+        IconButton(
+          onPressed: () => _showDeleteConfirmationDialog(context, event),
+          icon: const Icon(Icons.delete),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, Event event) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        bool isLoading = false; // To manage loading state
+
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text("Eliminar evento"),
+            content: isLoading
+                ? const CircularProgressIndicator()
+                : const Text("¿Está seguro que desea eliminar este evento?"),
+            actions: isLoading
+                ? []
+                : [
+                    TextButton(
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true; // Show loading spinner
+                        });
+
+                        final success = await removeEvent(context, event);
+
+                        setState(() {
+                          isLoading = false; // Hide loading spinner
+                        });
+
+                        Navigator.pop(context); // Close the dialog
+
+                        // Show snackbar with result
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(success
+                                ? 'Evento "${event.title}" (ID: ${event.id}) eliminado exitosamente.'
+                                : 'Error al eliminar el evento "${event.title}" (ID: ${event.id}).'),
+                            backgroundColor:
+                                success ? Colors.green : Colors.red,
+                          ),
+                        );
+                      },
+                      child: const Text("Sí"),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("No"),
+                    ),
+                  ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<bool> removeEvent(BuildContext context, Event event) async {
+    try {
+      BlocProvider.of<EventAdminBloc>(context)
+          .add(DeleteEventEvent(id: event.id));
+      await Future.delayed(const Duration(seconds: 3)); // Simulate a delay
+      _loadEvents(); // Reload events after deletion
+
+      return true; // Return success
+    } catch (e) {
+      return false; // Return failure if an error occurs
+    }
+  }
+
   IconData _getIconForFilter(EventFilter filter) {
     switch (filter) {
       case EventFilter.today:
@@ -311,7 +336,7 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
       case EventFilter.past:
         return Icons.history;
       default:
-        return Icons.calendar_today; // Valor predeterminado
+        return Icons.calendar_today;
     }
   }
 
@@ -330,7 +355,7 @@ class _EventsViewerScreenState extends State<EventsViewerScreen> {
       case EventFilter.past:
         return 'Pasados';
       default:
-        return ''; // Valor predeterminado
+        return '';
     }
   }
 }
