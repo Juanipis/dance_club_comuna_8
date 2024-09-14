@@ -25,7 +25,7 @@ jobs:
       - name: 📦 Install Dependencies
         run: flutter pub get
       - name: 🛠️ Build the application
-        run: flutter build web --dart-define=RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }}
+        run: flutter build web --dart-define=RECAPTCHA_V3_SITE_KEY=${{ secrets.RECAPTCHA_V3_SITE_KEY }} --dart-define=CAPTCHA_KEY=${{ secrets.CAPTCHA_KEY }}
       - name: ⬇️ Archive Production Artifact
         uses: actions/upload-artifact@master
         with:
