@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.0.0...v1.1.0) (2024-09-14)
+
+
+### Features
+
+* **attende-register:** added captcha to register ([ac5a946](https://github.com/Juanipis/dance_club_comuna_8/commit/ac5a94652494e930d5341cdd562abf6b0360374f))
+* **expanded-event:** improved style of expanded event and added add to google calendar button ([75cdc7b](https://github.com/Juanipis/dance_club_comuna_8/commit/75cdc7b766fe3b3b883cecdd62539c3233b8631d))
+
 # 1.0.0 (2024-09-13)
 
 
