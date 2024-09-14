@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.1.0...v1.1.1) (2024-09-14)
+
+
+### Bug Fixes
+
+* **sematic-release:** revert relase-drafter ([42a9f35](https://github.com/Juanipis/dance_club_comuna_8/commit/42a9f35396f143d0f55aebe562357c30b4947f1b))
+
 # [1.1.0](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.0.0...v1.1.0) (2024-09-14)
 
 
