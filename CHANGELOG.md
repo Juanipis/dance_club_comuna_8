@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.1.1...v1.1.2) (2024-09-15)
+
+
+### Bug Fixes
+
+* **editor-screen:** fixed preview when a new event is created ([3cf37a6](https://github.com/Juanipis/dance_club_comuna_8/commit/3cf37a69687527a6452af916a464d4087a8470df))
+
 ## [1.1.1](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.1.0...v1.1.1) (2024-09-14)
 
 
