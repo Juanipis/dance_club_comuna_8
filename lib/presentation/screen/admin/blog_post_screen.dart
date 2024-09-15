@@ -175,10 +175,18 @@ class _BlogPostScreenState extends State<BlogPostScreen> {
   }
 
   void _navigateToEditScreen(BuildContext context, {BlogPost? post}) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => BlogPostEditScreen(post: post),
-      ),
-    );
+    if (post != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => BlogPostEditScreen(post: post),
+        ),
+      );
+    } else {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const BlogPostEditScreen(),
+        ),
+      );
+    }
   }
 }

@@ -98,7 +98,6 @@ class _BlogPostEditScreenState extends State<BlogPostEditScreen> {
     final imageUrl = _imageUrlController.text;
 
     if (!_validateInputs(title, content)) return;
-    if (!await _validateImageUrl(imageUrl)) return;
 
     if (mounted) {
       final bloc = context.read<PresentationsBloc>();

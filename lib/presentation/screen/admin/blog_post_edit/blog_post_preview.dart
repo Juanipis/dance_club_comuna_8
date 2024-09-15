@@ -53,19 +53,20 @@ class BlogPostPreview extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-          // centred titile for the carousel
-          Center(
-            child: Text(
-              'Videos',
-              style: Theme.of(context).textTheme.headlineMedium,
+          if (videoUrls.isNotEmpty) ...[
+            Center(
+              child: Text(
+                'Videos',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          YouTubeCarousel(
-            videoUrls: videoUrls,
-            width: MediaQuery.of(context).size.width,
-            height: 300, // Ajusta esta altura según tus necesidades
-          ),
+            const SizedBox(height: 16),
+            YouTubeCarousel(
+              videoUrls: videoUrls,
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+            ),
+          ],
         ],
       ),
     );
