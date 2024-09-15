@@ -27,7 +27,9 @@ class _YouTubeCarouselState extends State<YouTubeCarousel> {
   @override
   void initState() {
     super.initState();
-    _loadVideo(_currentIndex);
+    if (widget.videoUrls.isNotEmpty) {
+      _loadVideo(_currentIndex);
+    }
   }
 
   void _loadVideo(int index) {
@@ -48,71 +50,92 @@ class _YouTubeCarouselState extends State<YouTubeCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CarouselSlider(
-          items: List.generate(widget.videoUrls.length, (index) {
-            if (index == _currentIndex) {
-              return YoutubePlayer(
-                controller: _videoController!,
-                aspectRatio: 16 / 9,
-              );
-            } else {
-              return Center(
-                child: Text('Video ${index + 1}'),
-              );
-            }
-          }),
-          carouselController: _controller,
-          options: CarouselOptions(
-            height: widget.height,
-            aspectRatio: widget.width / widget.height,
-            viewportFraction: 0.8,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            autoPlay: false,
-            enlargeCenterPage: true,
-            onPageChanged: (index, reason) {
-              setState(() {
-                _currentIndex = index;
-                _loadVideo(index);
-              });
-            },
-            scrollDirection: Axis.horizontal,
+    if (widget.videoUrls.isEmpty) {
+      // Si no hay videos, muestra un SizedBox vacío
+      return SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: const Center(
+          child: Text(
+            'No hay videos disponibles',
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => _controller.previousPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.linear,
+      );
+    }
+
+    return Column(
+      children: [
+        widget.videoUrls.length > 1
+            ? CarouselSlider(
+                items: List.generate(widget.videoUrls.length, (index) {
+                  if (index == _currentIndex) {
+                    return YoutubePlayer(
+                      controller: _videoController!,
+                      aspectRatio: 16 / 9,
+                    );
+                  } else {
+                    return Center(
+                      child: Text('Video ${index + 1}'),
+                    );
+                  }
+                }),
+                carouselController: _controller,
+                options: CarouselOptions(
+                  height: widget.height,
+                  aspectRatio: widget.width / widget.height,
+                  viewportFraction: 0.8,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  autoPlay: false,
+                  enlargeCenterPage: true,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _currentIndex = index;
+                      _loadVideo(index);
+                    });
+                  },
+                  scrollDirection: Axis.horizontal,
+                ),
+              )
+            : YoutubePlayer(
+                // Cuando solo hay un video, se muestra directamente
+                controller: _videoController!,
+                aspectRatio: 16 / 9,
               ),
-            ),
-            DotsIndicator(
-              dotsCount: widget.videoUrls.length,
-              position: _currentIndex,
-              decorator: DotsDecorator(
-                activeColor: Theme.of(context).colorScheme.secondary,
-                size: const Size.square(9.0),
-                activeSize: const Size(18.0, 9.0),
-                activeShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
+        if (widget.videoUrls.length > 1)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => _controller.previousPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.linear,
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward),
-              onPressed: () => _controller.nextPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.linear,
+              DotsIndicator(
+                dotsCount: widget.videoUrls.length,
+                position: _currentIndex,
+                decorator: DotsDecorator(
+                  activeColor: Theme.of(context).colorScheme.secondary,
+                  size: const Size.square(9.0),
+                  activeSize: const Size(18.0, 9.0),
+                  activeShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                onPressed: () => _controller.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.linear,
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }
