@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.1.2...v1.2.0) (2024-09-15)
+
+
+### Features
+
+* **ceo:** added web indexing ([1099a55](https://github.com/Juanipis/dance_club_comuna_8/commit/1099a551a5124b9154478d7266ba08af86a07191))
+
 ## [1.1.2](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.1.1...v1.1.2) (2024-09-15)
 
 
