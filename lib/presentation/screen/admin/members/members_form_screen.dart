@@ -25,6 +25,11 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
   late final TextEditingController _aboutController;
   late DateTime _birthDate;
 
+  // Define the listener as a separate method
+  void _imageUrlListener() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -34,12 +39,17 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
         TextEditingController(text: widget.member?.imageUrl ?? '');
     _aboutController = TextEditingController(text: widget.member?.about ?? '');
     _birthDate = widget.member?.birthDate ?? DateTime.now();
+
+    // Add listener to update UI when image URL changes
+    _imageUrlController.addListener(_imageUrlListener);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _roleController.dispose();
+    _imageUrlController
+        .removeListener(_imageUrlListener); // Correctly remove the listener
     _imageUrlController.dispose();
     _aboutController.dispose();
     super.dispose();
@@ -71,10 +81,18 @@ class _MemberFormScreenState extends State<MemberFormScreen> {
                 // Imagen Avatar
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(
-                    _imageUrlController.text,
-                  ),
+                  backgroundImage: _imageUrlController.text.isNotEmpty
+                      ? NetworkImage(_imageUrlController.text)
+                      : null, // No image, so backgroundImage is null
+                  child: _imageUrlController.text.isEmpty
+                      ? const Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Colors.white, // Adjust color as needed
+                        )
+                      : null, // Image is present, so no child widget
                 ),
+
                 const SizedBox(width: 24), // Espacio entre avatar e inputs
                 // Formulario de datos
                 ConstrainedBox(

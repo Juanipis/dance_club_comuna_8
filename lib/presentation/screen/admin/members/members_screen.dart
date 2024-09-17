@@ -1,3 +1,5 @@
+// members_screen.dart
+
 import 'package:dance_club_comuna_8/presentation/screen/admin/members/members_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,7 +62,12 @@ class _MembersScreenState extends State<MembersScreen> {
         final member = members[index];
         return ListTile(
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(member.imageUrl),
+            backgroundImage: member.imageUrl.isNotEmpty
+                ? NetworkImage(member.imageUrl)
+                : null, // Handle empty imageUrl
+            child: member.imageUrl.isEmpty
+                ? const Icon(Icons.person)
+                : null, // Show placeholder if no image
           ),
           title: Text(member.name),
           subtitle: Text(member.role),

@@ -33,8 +33,11 @@ class MemberCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(member.imageUrl),
-              radius: 60.0, // Aumentado el tamaño del avatar
+              backgroundImage: member.imageUrl.isNotEmpty
+                  ? NetworkImage(member.imageUrl)
+                  : null, // Show placeholder if no image
+              radius: 60.0, // Handle empty imageUrl
+              child: member.imageUrl.isEmpty ? const Icon(Icons.person) : null,
             ),
             const SizedBox(height: 16.0),
             Text(
