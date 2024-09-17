@@ -1,3 +1,4 @@
+import 'package:dance_club_comuna_8/presentation/screen/members/members.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -103,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<ScreenData> screens = [
     ScreenData(const BuildHomeScreen(), 'Página principal', Icons.home),
     ScreenData(const BuildAboutScreen(), '¿Quiénes somos?', Icons.people),
+    ScreenData(const Members(), 'Miembros', Icons.people),
     ScreenData(
         const BuildPresentationsScreen(), 'Presentaciones', Icons.event_seat),
     ScreenData(const BuildEventsScreen(), 'Eventos', Icons.event),
@@ -225,6 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _getBackgroundImage() {
     const backgrounds = [
       'assets/images/0014.webp',
+      'assets/images/0010.webp',
       'assets/images/0015.webp',
       'assets/images/0014.webp',
       'assets/images/0010.webp',
