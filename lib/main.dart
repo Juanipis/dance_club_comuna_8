@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      drawer: screenWidth < 680 ? _buildDrawer() : null,
+      drawer: screenWidth < 785 ? _buildDrawer() : null,
       body: CustomScrollView(
         slivers: <Widget>[
           _buildSliverAppBar(screenWidth),
@@ -186,19 +186,23 @@ class _MyHomePageState extends State<MyHomePage> {
       expandedHeight: 300.0,
       floating: false,
       pinned: true,
-      leading: screenWidth < 680 ? _buildMenuButton() : null,
+      leading: screenWidth < 785 ? _buildMenuButton() : null,
       flexibleSpace: FlexibleSpaceBar(
         background: _buildFlexibleSpaceBarBackground(),
       ),
-      actions: screenWidth > 680 ? _buildActionButtons() : [],
+      actions: screenWidth > 785 ? _buildActionButtons() : [],
     );
   }
 
   Widget _buildMenuButton() {
     return Builder(
-      builder: (context) => IconButton(
-        icon: Icon(Icons.menu, color: Theme.of(context).colorScheme.primary),
-        onPressed: () => Scaffold.of(context).openDrawer(),
+      builder: (context) => Container(
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+        child: IconButton(
+          icon:
+              Icon(Icons.menu, color: Theme.of(context).colorScheme.secondary),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
       ),
     );
   }
