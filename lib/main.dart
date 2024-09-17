@@ -1,3 +1,5 @@
+import 'package:dance_club_comuna_8/logic/bloc/member/member_bloc.dart';
+import 'package:dance_club_comuna_8/logic/services/firestore_member_service.dart';
 import 'package:dance_club_comuna_8/presentation/screen/members/members.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +53,8 @@ class MyApp extends StatelessWidget {
   final FirestoreStorageService bucketService = FirestoreStorageService();
   final FirestorePresentationsService firestorePresentationsService =
       FirestorePresentationsService();
+  final FirestoreMemberService firestoreMemberService =
+      FirestoreMemberService();
 
   MyApp({super.key});
 
@@ -77,6 +81,9 @@ class MyApp extends StatelessWidget {
           create: (_) => PresentationsBloc(
               firestorePresentationsService: firestorePresentationsService),
         ),
+        BlocProvider<MemberBloc>(
+          create: (_) => MemberBloc(firestoreMemberService),
+        )
       ],
       child: MaterialApp(
         title: 'Danzas la ladera alma y tradición',

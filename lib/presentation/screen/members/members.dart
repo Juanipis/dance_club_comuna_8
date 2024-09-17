@@ -1,7 +1,11 @@
+import 'package:dance_club_comuna_8/logic/bloc/member/member_bloc.dart';
+import 'package:dance_club_comuna_8/logic/bloc/member/member_events.dart';
+import 'package:dance_club_comuna_8/logic/bloc/member/member_states.dart';
 import 'package:dance_club_comuna_8/logic/models/member.dart';
+import 'package:dance_club_comuna_8/presentation/widgets/member_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_confetti/flutter_confetti.dart'; // Importa el paquete para el confetti
 import 'package:audioplayers/audioplayers.dart';
 
@@ -13,18 +17,20 @@ class Members extends StatefulWidget {
 }
 
 class _MembersState extends State<Members> {
-  final List<Member> members = [];
   List<Member> birthdayMembers = [];
   List<Member> otherMembers = [];
+
   @override
   void initState() {
     super.initState();
 
     initializeDateFormatting('es', null);
-    _filterBirthdayMembers();
+
+    // Cargar los miembros cuando el widget se inicialice
+    context.read<MemberBloc>().add(const LoadMembersEvent());
   }
 
-  void _filterBirthdayMembers() {
+  void _filterBirthdayMembers(List<Member> members) {
     DateTime today = DateTime.now();
     birthdayMembers = members
         .where((member) =>
@@ -66,6 +72,24 @@ class _MembersState extends State<Members> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<MemberBloc, MemberState>(
+      builder: (context, state) {
+        if (state is MemberLoadingState) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is MemberLoadedState) {
+          _filterBirthdayMembers(
+              state.members); // Filtrar miembros por cumpleaños
+          return _buildMembersContent();
+        } else if (state is MemberErrorState) {
+          return Center(child: Text('Error: ${state.message}'));
+        } else {
+          return const Center(child: Text('No hay miembros disponibles.'));
+        }
+      },
+    );
+  }
+
+  Widget _buildMembersContent() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -120,97 +144,6 @@ class _MembersState extends State<Members> {
             ),
           )
           .toList(),
-    );
-  }
-}
-
-class MemberCard extends StatelessWidget {
-  final Member member;
-
-  const MemberCard({
-    super.key,
-    required this.member,
-  });
-
-  String formatDate(DateTime date) {
-    return DateFormat("d 'de' MMMM", 'es_ES').format(date);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      color: Theme.of(context).colorScheme.surface,
-      child: Container(
-        width: 220, // Limitar el ancho de la tarjeta
-        constraints: const BoxConstraints(
-          maxHeight: 350, // Limitar el alto de la tarjeta
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(member.imageUrl),
-              radius: 60.0, // Aumentado el tamaño del avatar
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              member.name,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22, // Incremento del tamaño de texto
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              member.role,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 16, // Incremento del tamaño de texto
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12.0),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.cake,
-                    size: 22,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary), // Icono más grande
-                const SizedBox(width: 6.0),
-                Text(
-                  formatDate(member.birthDate),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontSize: 16, // Incremento del tamaño de texto
-                      ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12.0),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Text(
-                  member.about,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontSize: 16, // Incremento del tamaño de texto
-                      ),
-                  textAlign: TextAlign.center,
-                  maxLines: 4, // Limitar el número de líneas visibles
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

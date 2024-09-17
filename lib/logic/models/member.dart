@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Member {
-  final String id;
+  final String? id; // ID ahora es opcional
   final String name;
   final String role;
   final String imageUrl;
@@ -9,7 +9,7 @@ class Member {
   final String about;
 
   Member({
-    required this.id,
+    this.id, // ID es opcional
     required this.name,
     required this.role,
     required this.imageUrl,
@@ -44,7 +44,7 @@ class Member {
     };
   }
 
-  factory Member.fromJson(Map<String, dynamic> json, String id) {
+  factory Member.fromJson(Map<String, dynamic> json, String? id) {
     return Member(
       id: id,
       name: json['name'] as String,
