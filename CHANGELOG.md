@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.2.0...v1.3.0) (2024-09-17)
+
+
+### Bug Fixes
+
+* **drawer-homepager:** Added background to burguer menu ([72d5b2e](https://github.com/Juanipis/dance_club_comuna_8/commit/72d5b2e1593456bc546ac89137ac923c16df861f))
+
+
+### Features
+
+* **members:** added members feature ([a852c0c](https://github.com/Juanipis/dance_club_comuna_8/commit/a852c0c527e6b14aecad13a296ff3c332834d695))
+
 # [1.2.0](https://github.com/Juanipis/dance_club_comuna_8/compare/v1.1.2...v1.2.0) (2024-09-15)
 
 
