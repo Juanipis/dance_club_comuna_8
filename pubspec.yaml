@@ -59,6 +59,8 @@ dependencies:
   webview_flutter: ^4.8.0
   ionicons: ^0.2.2
   cloudflare_turnstile: ^1.2.6
+  flutter_confetti: ^0.3.0
+  audioplayers: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +86,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/sounds/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
