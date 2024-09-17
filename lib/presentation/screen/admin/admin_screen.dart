@@ -5,6 +5,7 @@ import 'package:dance_club_comuna_8/presentation/screen/admin/blog_post_screen.d
 import 'package:dance_club_comuna_8/presentation/screen/admin/event_form/add_event.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/events_viewer.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/login_form.dart';
+import 'package:dance_club_comuna_8/presentation/screen/admin/members/members_screen.dart';
 import 'package:dance_club_comuna_8/presentation/screen/admin/upload_images_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -123,6 +124,13 @@ class AdminPanelContent extends StatelessWidget {
                 icon: Icons.add_comment,
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (_) => const BlogPostScreen())),
+              ),
+              AdminOptionCard(
+                title: 'Miembros',
+                subtitle: 'Administra los miembros del club',
+                icon: Icons.people,
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const MembersScreen())),
               ),
             ],
           ),
