@@ -1,18 +1,47 @@
 <!DOCTYPE html>
-<html>
+<!-- Indica el idioma principal del contenido -->
+<html lang="es">
   <head>
     <base href="$FLUTTER_BASE_HREF" />
-
     <meta charset="UTF-8" />
-    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
-    <meta name="description" content="A new Flutter project." />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+
+    <!-- Descripción y palabras clave para SEO -->
+    <meta
+      name="description"
+      content="Espacio cultural y artístico de adultos mayores que promueven la danza folclórica en Medellín, Comuna 8."
+    />
+    <meta
+      name="keywords"
+      content="danza, folclor, Medellín, Comuna 8, danza de adultos mayores, cultura, Colombia, baile tradicional"
+    />
+
+    <!-- Open Graph para compartir en redes sociales -->
+    <meta
+      property="og:title"
+      content="Club de Danzas La Ladera Alma y Tradición"
+    />
+    <meta
+      property="og:description"
+      content="Espacio cultural y artístico de adultos mayores que promueven la danza folclórica en Medellín, Comuna 8."
+    />
+    <meta property="og:type" content="website" />
+    <!-- Reemplaza con la URL real de tu sitio -->
+    <meta property="og:url" content="https://dance-club-comuna-8.web.app/" />
+    <!-- Reemplaza con la URL de la imagen de vista previa en redes sociales -->
+    <meta property="og:image" content="https://i.postimg.cc/XNySmPKM/1.jpg" />
+    <!-- Opcional: idioma para Open Graph -->
+    <meta property="og:locale" content="es_CO" />
+
+    <!-- Metaetiqueta para el color del tema en navegadores móviles -->
+    <meta name="theme-color" content="#0175C2" />
 
     <!-- iOS meta tags & icons -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta
       name="apple-mobile-web-app-title"
-      content="starter_architecture_flutter_firebase"
+      content="Club de Danzas La Ladera Alma y Tradición"
     />
     <link rel="apple-touch-icon" href="icons/Icon-192.png" />
 
@@ -21,7 +50,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png" />
 
-    <title>Club de danzas la ladera</title>
+    <!-- Título del sitio -->
+    <title>Club de Danzas La Ladera Alma y Tradición</title>
+
+    <!-- Enlaza el archivo de manifiesto PWA -->
     <link rel="manifest" href="manifest.json" />
 
     <!-- Custom CSS styling for the loading spinner -->
@@ -57,19 +89,21 @@
       }
     </style>
 
-    <!-- Este script añade la nueva inicialización de Flutter para el código BOOTSTRAP JS -->
+    <!-- Script que inicializa Flutter -->
     <script src="flutter_bootstrap.js" async></script>
   </head>
   <body>
-    <!-- <script>
+    <!-- Agrega un contenedor de carga si lo deseas -->
+    <div class="loading">
+      <div class="loader"></div>
+    </div>
+
+    <link rel="canonical" href="https://dance-club-comuna-8.web.app/" />
+
+    <script>
       // ONLY FOR DEBUGGING
       // SET TRUE AND THEN ADD THE DEBUG TOKEN TO THE APP
-      self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-    </script> -->
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5515791126605734"
-      crossorigin="anonymous"
-    ></script>
+      // self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+    </script>
   </body>
 </html>
