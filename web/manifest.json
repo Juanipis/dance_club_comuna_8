@@ -1,12 +1,20 @@
 {
-    "name": "dance_club_comuna_8",
-    "short_name": "dance_club_comuna_8",
-    "start_url": ".",
+    "name": "Club de Danzas La Ladera Alma y Tradición",
+    "short_name": "DanzasComuna8",
+    "lang": "es-CO",
+    "dir": "ltr",
+    "start_url": "/?utm_source=web_app_manifest",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Espacio cultural y artístico de adultos mayores que promueven la danza folclórica en Medellín, Comuna 8.",
     "orientation": "portrait-primary",
+    "categories": [
+        "entertainment",
+        "culture",
+        "lifestyle"
+    ],
     "prefer_related_applications": false,
     "icons": [
         {
@@ -30,6 +38,18 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/1.webp",
+            "sizes": "1500x977",
+            "type": "image/webp"
+        },
+        {
+            "src": "screenshots/2.webp",
+            "sizes": "1600x1204",
+            "type": "image/webp"
         }
     ]
 }
