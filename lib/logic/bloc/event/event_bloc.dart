@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_events.dart';
 import 'package:dance_club_comuna_8/logic/bloc/event/event_states.dart';
-import 'package:dance_club_comuna_8/logic/models/event.dart';
 import 'package:dance_club_comuna_8/logic/services/firestore_events_service.dart';
 import 'package:logger/logger.dart';
 

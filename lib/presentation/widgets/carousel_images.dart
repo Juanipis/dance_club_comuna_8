@@ -19,7 +19,7 @@ class CarouselWithControls extends StatefulWidget {
 }
 
 class _CarouselWithControlsState extends State<CarouselWithControls> {
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   int _currentIndex = 0;
 
   @override

@@ -1,5 +1,4 @@
 import 'package:dance_club_comuna_8/presentation/widgets/carousel_videos_youtube.dart';
-import 'package:dance_club_comuna_8/presentation/widgets/video_player_youtube.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
