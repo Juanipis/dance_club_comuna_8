@@ -20,7 +20,7 @@ class YouTubeCarousel extends StatefulWidget {
 }
 
 class _YouTubeCarouselState extends State<YouTubeCarousel> {
-  final CarouselController _controller = CarouselController();
+  final CarouselSliderController _controller = CarouselSliderController();
   int _currentIndex = 0;
   YoutubePlayerController? _videoController;
 

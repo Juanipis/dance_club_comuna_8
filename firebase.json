@@ -21,7 +21,11 @@
   },
   "hosting": {
     "public": "build/web",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "rewrites": [
       {
         "source": "**",
@@ -29,6 +33,33 @@
       }
     ],
     "headers": [
+      {
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=0"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(mjs|js|wasm|json)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=1209600, s-maxage=1209600"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|css|eot|otf|ttf|woff|woff2)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=1209600, s-maxage=1209600"
+          }
+        ]
+      },
       {
         "source": "/**",
         "headers": [
