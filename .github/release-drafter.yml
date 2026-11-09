@@ -1,0 +1,55 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+    collapse-after: 5
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+    collapse-after: 5
+  - title: '🧰 Maintenance'
+    labels:
+      - 'chore'
+      - 'refactor'
+    collapse-after: 5
+  - title: '📝 Documentation'
+    labels:
+      - 'docs'
+  - title: '♻️ Refactoring'
+    labels:
+      - 'refactor'
+  - title: '🔧 Configurations'
+    labels:
+      - 'config'
+  - title: '🔄 Other Changes'
+    label: 'other'
+  - title: '❓ Unknown Changes'
+    labels: []  # No hay etiquetas, así que detectará automáticamente los PRs sin etiquetas.
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&' # Puedes añadir # y @ para deshabilitar menciones, y añadir ` para deshabilitar bloques de código.
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+exclude-labels:
+  - 'ignore'  # Si necesitas excluir algún PR específico, puedes usar esta etiqueta.
